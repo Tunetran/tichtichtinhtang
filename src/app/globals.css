@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+[data-theme='candlelight'] {
+  --bg: #FAF6F0;
+  --bg-surface: #FFFFFF;
+  --bg-envelope: #7A1835;
+  --bg-envelope-flap: #631129;
+  --primary: #7A1835;
+  --primary-fg: #FAF6F0;
+  --accent: #C89B54;
+  --text: #2B181E;
+  --text-muted: #6B4E56;
+  --border: rgba(200, 155, 84, 0.35);
+
+  --wax-seal: linear-gradient(135deg, #E5C378 0%, #C89B54 50%, #946E26 100%);
+  --wax-seal-shadow: 0 4px 14px rgba(122, 24, 53, 0.3);
+  --theme-ambient-glow: radial-gradient(circle at 50% -10%, rgba(200, 155, 84, 0.16) 0%, transparent 70%);
+}
+
+[data-theme='vintage'] {
+  --bg: #FDFBF7;
+  --bg-surface: #FFFDF9;
+  --bg-envelope: #B56576;
+  --bg-envelope-flap: #9E5162;
+  --primary: #B56576;
+  --primary-fg: #FDFBF7;
+  --accent: #4A373B;
+  --text: #332528;
+  --text-muted: #755F64;
+  --border: rgba(74, 55, 59, 0.2);
+
+  --wax-seal: linear-gradient(135deg, #CF8596 0%, #B56576 50%, #7E3547 100%);
+  --wax-seal-shadow: 0 4px 14px rgba(74, 55, 59, 0.25);
+  --theme-ambient-glow: radial-gradient(circle at 50% -10%, rgba(181, 101, 118, 0.12) 0%, transparent 65%);
+}
+
+[data-theme='starlight'] {
+  --bg: #0F172A;
+  --bg-surface: rgba(30, 41, 59, 0.72);
+  --bg-envelope: #1E293B;
+  --bg-envelope-flap: #334155;
+  --primary: #E2C275;
+  --primary-fg: #0F172A;
+  --accent: #F8FAFC;
+  --text: #F1F5F9;
+  --text-muted: #94A3B8;
+  --border: rgba(226, 194, 117, 0.3);
+
+  --wax-seal: linear-gradient(135deg, #F9E7B3 0%, #E2C275 50%, #AB8B3B 100%);
+  --wax-seal-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --theme-ambient-glow: radial-gradient(circle at 50% 0%, rgba(226, 194, 117, 0.15) 0%, transparent 75%);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    font-size: 15px;
+    line-height: 1.65;
+    background-image: var(--theme-ambient-glow);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Theme patterns */
+[data-theme='vintage'] body {
+  background-image:
+    var(--theme-ambient-glow),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+}
+
+[data-theme='starlight'] body {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 100px 80px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1px 1px at 170px 150px, #e2c275, rgba(0, 0, 0, 0)),
+    radial-gradient(2px 2px at 260px 40px, #ffffff, rgba(0, 0, 0, 0)),
+    radial-gradient(1.5px 1.5px at 320px 220px, #e2c275, rgba(0, 0, 0, 0)),
+    var(--theme-ambient-glow);
+  background-size: 350px 350px, 400px 400px, 300px 300px, 360px 360px, 380px 380px, 100% 100%;
+}
+
+/* Wax seal button styling */
+.wax-seal-btn {
+  background: var(--wax-seal);
+  box-shadow: var(--wax-seal-shadow);
+}
+
+/* Polaroid image styling for vintage theme */
+[data-theme='vintage'] .gallery-polaroid:nth-child(odd) {
+  transform: rotate(-2deg);
+}
+
+[data-theme='vintage'] .gallery-polaroid:nth-child(even) {
+  transform: rotate(2deg);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 9999px;
+}
