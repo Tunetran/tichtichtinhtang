@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { EVENT_CONFIG } from '@/config/event';
+import { getEventConfig } from '@/lib/event-settings';
 import type { GuestRecord } from '@/types/guest';
 import { InviteExperience } from '@/components/invite/InviteExperience';
 
@@ -14,11 +14,12 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.vercel.app';
+  const config = await getEventConfig();
 
   if (!slug) {
     return {
-      title: EVENT_CONFIG.eventName,
-      description: EVENT_CONFIG.slogan,
+      title: config.eventName,
+      description: config.slogan,
     };
   }
 
@@ -30,21 +31,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!guest) {
     return {
-      title: `Thiệp mời không tồn tại — ${EVENT_CONFIG.eventName}`,
-      description: EVENT_CONFIG.slogan,
+      title: `Thiệp mời không tồn tại — ${config.eventName}`,
+      description: config.slogan,
     };
   }
 
-  const title = `Thư mời ${guest.full_name} — ${EVENT_CONFIG.eventName}`;
-  const description = `${EVENT_CONFIG.slogan} | ${EVENT_CONFIG.eventDateLabel}`;
-  const ogImageUrl = `${siteUrl}${EVENT_CONFIG.ogImage}`;
+  const title = `Thư mời ${guest.full_name} — ${config.eventName}`;
+  const description = `${config.slogan} | ${config.eventDateLabel}`;
+  const ogImageUrl = `${siteUrl}${config.ogImage}`;
 
   return {
     title,
     description,
     openGraph: {
       title: `Trân trọng kính mời ${guest.full_name}`,
-      description: `${EVENT_CONFIG.eventName} — ${EVENT_CONFIG.eventDateLabel}`,
+      description: `${config.eventName} — ${config.eventDateLabel}`,
       images: [
         {
           url: ogImageUrl,
@@ -58,7 +59,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: `Trân trọng kính mời ${guest.full_name}`,
-      description: `${EVENT_CONFIG.eventName} — ${EVENT_CONFIG.eventDateLabel}`,
+      description: `${config.eventName} — ${config.eventDateLabel}`,
       images: [ogImageUrl],
     },
   };
@@ -71,15 +72,19 @@ export default async function InvitePage({ params }: PageProps) {
     notFound();
   }
 
-  const { data: guest, error } = await supabaseAdmin
-    .from('guests')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+  const [guestResult, config] = await Promise.all([
+    supabaseAdmin.from('guests').select('*').eq('slug', slug).single(),
+    getEventConfig(),
+  ]);
 
-  if (error || !guest) {
+  if (guestResult.error || !guestResult.data) {
     notFound();
   }
 
-  return <InviteExperience guest={guest as GuestRecord} />;
+  return (
+    <InviteExperience
+      guest={guestResult.data as GuestRecord}
+      config={config}
+    />
+  );
 }

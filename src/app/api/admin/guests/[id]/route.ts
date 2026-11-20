@@ -33,7 +33,7 @@ export async function PATCH(req: Request, context: RouteContext) {
       );
     }
 
-    const { full_name, custom_message } = validation.data;
+    const { full_name, custom_message, status, attendees_count, song_request, wish_message } = validation.data;
     const updatePayload: Record<string, any> = {};
 
     if (full_name !== undefined) {
@@ -42,8 +42,33 @@ export async function PATCH(req: Request, context: RouteContext) {
     if (custom_message !== undefined) {
       updatePayload.custom_message = custom_message || null;
     }
+    if (status !== undefined) {
+      updatePayload.status = status;
+      if (status === 'ACCEPTED' || status === 'DECLINED') {
+        updatePayload.responded_at = new Date().toISOString();
+        if (status === 'DECLINED') {
+          updatePayload.attendees_count = 0;
+          updatePayload.song_request = null;
+        }
+      } else if (status === 'OPENED') {
+        updatePayload.opened_at = new Date().toISOString();
+      } else if (status === 'NOT_OPENED') {
+        updatePayload.opened_at = null;
+        updatePayload.responded_at = null;
+        updatePayload.attendees_count = 0;
+      }
+    }
+    if (attendees_count !== undefined) {
+      updatePayload.attendees_count = attendees_count;
+    }
+    if (song_request !== undefined) {
+      updatePayload.song_request = song_request || null;
+    }
+    if (wish_message !== undefined) {
+      updatePayload.wish_message = wish_message || null;
+    }
 
-    // 3. Cập nhật thông tin (tuyệt đối giữ nguyên slug để không làm hỏng link đã gửi)
+    // 3. Cập nhật thông tin vào Supabase (tuyệt đối giữ nguyên slug để không làm hỏng link đã gửi)
     const { data: updated, error } = await supabaseAdmin
       .from('guests')
       .update(updatePayload)

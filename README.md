@@ -4,20 +4,29 @@
 
 ---
 
-## 1. Công Nghệ Sử Dụng (Tech Stack)
+## 1. Công Nghệ Sử Dụng & Chuẩn Thiết Kế Cao Cấp (Tech Stack & Craft Rules)
 
 - **Framework:** Next.js 15+ (App Router, Server Components & Route Handlers) với TypeScript (`strict: true`).
-- **Styling & Design System:** Tailwind CSS với hệ thống biến CSS (CSS Variables) hỗ trợ chuyển đổi 3 theme:
-  - `candlelight`: Ánh nến & Rượu vang (Mặc định).
-  - `vintage`: Thư tay cổ điển & Khung ảnh Polaroid.
-  - `starlight`: Bầu trời đêm ánh sao & Champagne.
-- **Typography Chuẩn Tiếng Việt:** `Playfair_Display` (Serif tiêu đề), `Dancing_Script` (Script tên khách), `Plus_Jakarta_Sans` (Sans nội dung).
-- **Animation:** `motion` (`motion/react`) — chuyển động phong bì và thư chỉ qua `transform` và `opacity`.
-- **Hiệu Ứng Pháo Giấy:** `canvas-confetti` khi khách đồng ý tham dự (RSVP).
-- **Icons:** `lucide-react`.
-- **Validation:** `zod` xác thực 100% dữ liệu API.
+- **Styling & Print-Inspired Luxury Aesthetic:**
+  - Lớp phủ vân giấy thủ công (Subtle SVG paper grain noise texture overlay) mang lại xúc giác sang trọng như thiệp in mỹ thuật cao cấp.
+  - Đường viền chỉ vàng tinh xảo (Hairline tinted borders) và bóng đổ nhiều lớp êm ái (Layered ambient shadows), loại bỏ cảm giác phẳng của các thẻ SaaS thông thường.
+  - Tối ưu hoàn hảo cho In-App Browser (Zalo, Messenger, iOS Safari): Hỗ trợ `100dvh`, Safe-area insets (`env(safe-area-inset-*)`), kích thước chạm tối thiểu `44px`, triệt tiêu hoàn toàn hiện tượng chớp xám khi chạm (`-webkit-tap-highlight-color: transparent`), và Zero CLS.
+  - Kiểu chữ chuẩn in ấn: `text-wrap: balance` cho tiêu đề, font đơn cách `tabular-nums` cho các mốc giờ và bộ đếm ngược.
+- **Hệ Thống 3 Theme Độc Bản:**
+  - `candlelight`: Ánh nến & Rượu vang Bordeaux, phong bì nhung đỏ, con dấu sáp vàng kim hoàng gia.
+  - `vintage`: Thư tay cổ điển Pháp, hoa hồng gai và khung ảnh polaroid hoài niệm.
+  - `starlight`: Bầu trời đêm huyền ảo, ánh sao lấp lánh & sáp dát vàng thiên hà.
+- **Hệ Thống Quản Trị Tùy Chỉnh Toàn Diện (Admin Settings Editor):**
+  - Cho phép Quản trị viên thay đổi trực tiếp tên sự kiện, câu slogan, người chủ trì, địa chỉ, ngày giờ, mốc lịch trình (timeline), quy định trang phục (dresscode), nhạc nền, và mọi câu từ lời ngỏ thư mời trực tiếp từ giao diện Admin.
+  - Lưu trữ trên bảng `event_settings` của Supabase kèm cơ chế fallback file cục bộ đảm bảo hoạt động bền bỉ.
+- **Tính Năng Bổ Trợ Trải Nghiệm Khách Mời:**
+  - Bộ đếm ngược trực tiếp (Live Countdown Timer) đến thời khắc khai mạc đêm nhạc.
+  - Nút thêm vào lịch cá nhân 1-chạm (Google Calendar & Apple Calendar/Outlook `.ics`).
+  - Trình phát nhạc đĩa than vinyl lơ lửng (Floating vinyl turntable player) xoay mượt mà khi phát nhạc.
+  - Công cụ tra cứu thiệp mời riêng tại Trang chủ cho khách mời làm thất lạc liên kết.
+- **Animation:** `motion` (`motion/react`) — chuyển động phong bì và thư chỉ qua `transform` và `opacity` với đường cong gia tốc tùy biến `cubic-bezier(0.22, 1, 0.36, 1)`.
+- **Hiệu Ứng Pháo Giấy:** `canvas-confetti` vàng kim/đỏ rượu mừng phản hồi RSVP.
 - **Database:** Supabase PostgreSQL với bảo mật Row Level Security (RLS).
-- **Keep-Alive:** Vercel Cron Job gọi `/api/health` định kỳ mỗi 2 ngày.
 
 ---
 

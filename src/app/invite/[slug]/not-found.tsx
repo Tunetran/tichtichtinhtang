@@ -1,8 +1,10 @@
 import Link from 'next/link';
 import { Music, AlertCircle, ArrowLeft } from 'lucide-react';
-import { EVENT_CONFIG } from '@/config/event';
+import { getEventConfig } from '@/lib/event-settings';
 
-export default function InviteNotFound() {
+export default async function InviteNotFound() {
+  const config = await getEventConfig();
+
   return (
     <main className="min-h-[100dvh] flex flex-col items-center justify-center p-4 sm:p-6 text-center">
       <div className="w-full max-w-[420px] bg-bg-surface/90 backdrop-blur-md border border-border rounded-2xl p-6 sm:p-8 shadow-xl space-y-6">
@@ -26,13 +28,13 @@ export default function InviteNotFound() {
         {/* Nút hỗ trợ liên hệ BTC */}
         <div className="pt-2 space-y-3">
           <a
-            href={EVENT_CONFIG.contactUrl}
+            href={config.contactUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full py-3 px-4 rounded-xl bg-primary text-primary-fg font-medium text-xs sm:text-sm shadow-md hover:opacity-95 transition-all flex items-center justify-center gap-2"
           >
             <Music className="w-4 h-4" />
-            <span>Liên hệ Ban Tổ Chức ({EVENT_CONFIG.contactLabel})</span>
+            <span>Liên hệ Ban Tổ Chức ({config.contactLabel})</span>
           </a>
 
           <Link

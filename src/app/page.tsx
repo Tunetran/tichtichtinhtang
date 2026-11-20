@@ -8,31 +8,43 @@ import {
   ExternalLink,
   ShieldCheck,
   Heart,
+  Sparkles,
 } from 'lucide-react';
-import { EVENT_CONFIG } from '@/config/event';
+import { getEventConfig } from '@/lib/event-settings';
+import { EventCountdown } from '@/components/invite/EventCountdown';
+import { AddToCalendarButton } from '@/components/invite/AddToCalendarButton';
+import { GuestLookup } from '@/components/home/GuestLookup';
 
-export default function HomePage() {
+export const dynamic = 'force-dynamic';
+
+export default async function HomePage() {
+  const config = await getEventConfig();
+
   return (
     <main
       suppressHydrationWarning
-      className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12"
+      className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 pb-safe pt-safe min-h-[100dvh]"
     >
-      <div className="w-full max-w-[460px] bg-bg-surface/90 backdrop-blur-md border border-border rounded-3xl p-6 sm:p-8 shadow-2xl text-center space-y-7">
+      <div className="w-full max-w-[480px] editorial-card rounded-3xl p-6 sm:p-8 text-center space-y-7 shadow-2xl">
         {/* Biểu tượng âm nhạc mở màn */}
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-primary/10 text-primary mx-auto ring-8 ring-primary/5">
-          <Music className="w-7 h-7" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto ring-8 ring-primary/5 shadow-sm">
+          <Music className="w-8 h-8" />
         </div>
 
         {/* Lời mở đầu lãng mạn */}
         <div className="space-y-2">
-          <p className="font-script text-2xl sm:text-3xl text-accent font-semibold">
-            Đêm Nhạc Tình Yêu
-          </p>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-text leading-snug">
-            {EVENT_CONFIG.eventName}
+          <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-accent font-semibold">
+            <Sparkles className="w-3 h-3" />
+            <span>{config.invitationBadge || 'Thư Mời Tham Dự'}</span>
+            <Sparkles className="w-3 h-3" />
+          </div>
+
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-text leading-snug text-balance">
+            {config.eventName}
           </h1>
-          <p className="text-xs sm:text-sm text-text-muted italic max-w-xs mx-auto leading-relaxed">
-            &ldquo;{EVENT_CONFIG.slogan}&rdquo;
+
+          <p className="text-xs sm:text-sm text-text-muted italic max-w-sm mx-auto leading-relaxed text-balance">
+            &ldquo;{config.slogan}&rdquo;
           </p>
         </div>
 
@@ -43,14 +55,19 @@ export default function HomePage() {
           <span className="h-px w-16 bg-border" />
         </div>
 
+        {/* Live Countdown Timer */}
+        {config.showCountdown !== false && (
+          <EventCountdown targetDateIso={config.eventDateIso} />
+        )}
+
         {/* Khối thông tin thời gian & địa điểm */}
-        <div className="border border-border/70 rounded-2xl p-4 sm:p-5 bg-bg/50 space-y-3.5 text-xs sm:text-sm text-left">
+        <div className="border border-border/70 rounded-2xl p-4 sm:p-5 bg-bg/60 space-y-3.5 text-xs sm:text-sm text-left shadow-2xs">
           <div className="flex items-start gap-3 text-text">
             <Calendar className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block">{EVENT_CONFIG.eventDateLabel}</span>
-              <span className="text-[11px] text-text-muted flex items-center gap-1.5 mt-0.5">
-                <Clock className="w-3 h-3" /> Đón khách: {EVENT_CONFIG.checkinTime} • Bắt đầu: {EVENT_CONFIG.startTime}
+              <span className="font-semibold block text-sm">{config.eventDateLabel}</span>
+              <span className="text-[11px] text-text-muted flex items-center gap-1.5 mt-0.5 font-mono tabular-nums">
+                <Clock className="w-3 h-3" /> Đón khách: {config.checkinTime} • Bắt đầu: {config.startTime}
               </span>
             </div>
           </div>
@@ -58,15 +75,15 @@ export default function HomePage() {
           <div className="flex items-start gap-3 text-text border-t border-border/40 pt-3">
             <MapPin className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div className="flex-1">
-              <span className="font-semibold block">{EVENT_CONFIG.venueName}</span>
+              <span className="font-semibold block text-sm">{config.venueName}</span>
               <span className="text-[11px] text-text-muted leading-relaxed block mt-0.5">
-                {EVENT_CONFIG.venueAddress}
+                {config.venueAddress}
               </span>
               <a
-                href={EVENT_CONFIG.googleMapsUrl}
+                href={config.googleMapsUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[11px] text-accent font-medium hover:underline mt-1.5"
+                className="inline-flex items-center gap-1 text-[11px] text-accent font-semibold hover:underline mt-1.5 min-h-[36px]"
               >
                 <span>Xem trên Google Maps</span>
                 <ExternalLink className="w-3 h-3" />
@@ -77,15 +94,15 @@ export default function HomePage() {
           <div className="flex items-start gap-3 text-text border-t border-border/40 pt-3">
             <Shirt className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
-              <span className="font-semibold block">Trang phục (Dress code)</span>
+              <span className="font-semibold block">Trang phục gợi ý (Dress code)</span>
               <span className="text-[11px] text-text-muted leading-relaxed block mt-0.5">
-                {EVENT_CONFIG.dresscodeDescription}
+                {config.dresscodeDescription}
               </span>
-              <div className="flex items-center gap-2 mt-2">
-                {EVENT_CONFIG.dresscodeColors.map((color) => (
-                  <div key={color.name} className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-2 mt-2">
+                {config.dresscodeColors.map((color) => (
+                  <div key={color.name} className="flex items-center gap-1 bg-bg-surface px-2 py-0.5 rounded-full border border-border">
                     <span
-                      className="w-3 h-3 rounded-full border border-black/15 shrink-0 shadow-sm"
+                      className="w-2.5 h-2.5 rounded-full border border-black/15 shrink-0 shadow-2xs"
                       style={{ backgroundColor: color.hex }}
                     />
                     <span className="text-[10px] text-text-muted">{color.name}</span>
@@ -94,41 +111,34 @@ export default function HomePage() {
               </div>
             </div>
           </div>
+
+          <div className="pt-2 border-t border-border/40">
+            <AddToCalendarButton config={config} />
+          </div>
         </div>
 
-        {/* Thông báo quan trọng về đường dẫn cá nhân */}
-        <div className="bg-primary/5 rounded-2xl p-4 border border-primary/20 text-xs text-text-muted leading-relaxed space-y-1.5">
-          <p className="font-semibold text-text flex items-center justify-center gap-1.5 text-xs sm:text-sm">
-            <span>💌</span>
-            <span>Thiệp Mời Điện Tử Cá Nhân Hóa</span>
-          </p>
-          <p>
-            Mỗi khách mời đều có một đường dẫn riêng biệt để mở phong bì niêm phong và gửi xác nhận tham dự (RSVP).
-          </p>
-          <p className="text-[11px] text-text-muted/80">
-            Vui lòng kiểm tra lại liên kết trong tin nhắn Zalo hoặc Messenger mà Ban Tổ Chức đã gửi cho bạn.
-          </p>
-        </div>
+        {/* Tra cứu thiệp mời dành cho khách mời */}
+        <GuestLookup />
 
         {/* Chân trang & liên hệ */}
         <footer className="pt-2 text-xs text-text-muted space-y-2">
           <p>
             Cần liên hệ Ban Tổ Chức?{' '}
             <a
-              href={EVENT_CONFIG.contactUrl}
+              href={config.contactUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-medium text-accent hover:underline"
+              className="font-semibold text-accent hover:underline min-h-[44px] inline-flex items-center"
             >
-              {EVENT_CONFIG.contactLabel}
+              {config.contactLabel}
             </a>
           </p>
 
           <div className="pt-3 border-t border-border/40 flex items-center justify-between text-[11px] text-text-muted/60">
-            <span>© 2026 {EVENT_CONFIG.eventName}</span>
+            <span>© {new Date().getFullYear()} {config.eventName}</span>
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 hover:text-accent transition-colors"
+              className="inline-flex items-center gap-1 hover:text-accent transition-colors p-2 -mr-2"
             >
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>Quản trị viên</span>

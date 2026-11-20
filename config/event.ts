@@ -21,7 +21,10 @@ export interface EventConfig {
   theme: ThemeName;
   eventName: string;
   slogan: string;
+  invitationBadge?: string; // Ví dụ: "Thư Mời Tham Dự", "Thiệp Mời", "Save The Date"
+  dedicationBadge?: string; // Ví dụ: "Dành tặng người bạn quý", "Kính gửi Quý khách"
   eventDateLabel: string;
+  eventDateIso?: string; // ISO 8601 string for countdown & calendar export
   checkinTime: string;
   startTime: string;
   venueName: string;
@@ -31,22 +34,34 @@ export interface EventConfig {
   dresscodeColors: DresscodeColor[];
   hostName: string;
   contactLabel: string;
-  contactUrl: string; // tel:09xxxxxxxx hoặc https://zalo.me/09xxxxxxxx
-  generalInvitationText: string[]; // Mảng các đoạn văn lời ngỏ chung
+  contactUrl: string;
+  envelopeGreeting: string; // "Trân trọng kính mời"
+  sealHintText: string; // "Chạm vào dấu sáp để mở thư"
+  letterSalutation: string; // "Thân gửi"
+  generalInvitationText: string[]; // Các đoạn văn lời ngỏ
   timeline: TimelineItem[];
   gallery: GalleryPhoto[];
   audio: {
     src: string;
-    defaultVolume: number; // 0.4
+    defaultVolume: number;
   };
-  ogImage: string; // '/images/cover.jpg'
+  ogImage: string;
+  footerThankYou: string;
+  rsvpHeading: string;
+  rsvpSubheading: string;
+  showCountdown?: boolean;
+  showGallery?: boolean;
+  showSongRequest?: boolean;
 }
 
 export const EVENT_CONFIG: EventConfig = {
   theme: 'candlelight',
   eventName: 'Đêm Nhạc Tình Yêu — Giai Điệu Chạm Trái Tim',
-  slogan: 'Một buổi tối chỉ có ánh nến, tiếng đàn và những bản tình ca',
+  slogan: 'Một buổi tối chỉ có ánh nến, tiếng đàn và những bản tình ca ngọt ngào',
+  invitationBadge: 'Thư Mời Tham Dự',
+  dedicationBadge: 'Dành tặng người bạn quý',
   eventDateLabel: 'Thứ Bảy, ngày 14 tháng 02 năm 2026',
+  eventDateIso: '2026-02-14T19:30:00+07:00',
   checkinTime: '19:00',
   startTime: '19:30',
   venueName: 'The Muse Acoustic Lounge',
@@ -57,10 +72,14 @@ export const EVENT_CONFIG: EventConfig = {
     { name: 'Đỏ rượu / Burgundy', hex: '#7A1835' },
     { name: 'Vàng kem / Champagne', hex: '#E8D3A2' },
     { name: 'Trắng thanh lịch', hex: '#FFFFFF' },
+    { name: 'Đen quý phái', hex: '#1C1917' },
   ],
   hostName: 'Minh Trí & Phương Anh',
   contactLabel: 'Ban Tổ Chức (Hotline / Zalo)',
   contactUrl: 'https://zalo.me/0987654321',
+  envelopeGreeting: 'Trân trọng kính mời',
+  sealHintText: 'Chạm vào dấu sáp để mở thiệp',
+  letterSalutation: 'Thân gửi',
   generalInvitationText: [
     'Khi những ngọn nến lung linh được thắp sáng và từng phím đàn cất lên, chúng mình mong muốn được cùng bạn sẻ chia một đêm nhạc ấm áp, nơi những cảm xúc chân thành nhất được nâng niu.',
     'Sự hiện diện của bạn là mảnh ghép hoàn hảo tạo nên những khoảnh khắc đáng nhớ của đêm nay. Hãy để âm nhạc dẫn lối cho những rung động trái tim.',
@@ -114,4 +133,10 @@ export const EVENT_CONFIG: EventConfig = {
     defaultVolume: 0.4,
   },
   ogImage: '/images/cover.jpg',
+  footerThankYou: 'Rất mong được gặp bạn trong đêm nhạc ấm áp này',
+  rsvpHeading: 'Xác Nhận Tham Dự',
+  rsvpSubheading: 'Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình',
+  showCountdown: true,
+  showGallery: true,
+  showSongRequest: true,
 };

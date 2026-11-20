@@ -21,6 +21,7 @@ import { removeVietnameseTones } from '@/lib/slug';
 
 interface GuestTableProps {
   guests: GuestRecord[];
+  eventName?: string;
   onRefresh: () => void;
   onEdit: (guest: GuestRecord) => void;
   onDelete: (id: string, name: string) => void;
@@ -28,7 +29,7 @@ interface GuestTableProps {
 
 type FilterTab = 'ALL' | GuestStatus;
 
-export function GuestTable({ guests, onRefresh, onEdit, onDelete }: GuestTableProps) {
+export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: GuestTableProps) {
   const [activeTab, setActiveTab] = useState<FilterTab>('ALL');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
@@ -74,7 +75,8 @@ export function GuestTable({ guests, onRefresh, onEdit, onDelete }: GuestTablePr
   const handleCopyZalo = async (guest: GuestRecord) => {
     const origin = typeof window !== 'undefined' ? window.location.origin : '';
     const inviteUrl = `${origin}/invite/${guest.slug}`;
-    const zaloMessage = `Trân trọng kính mời ${guest.full_name} tham dự ${EVENT_CONFIG.eventName}. Xem thiệp mời riêng tại đây nhé: ${inviteUrl}`;
+    const concertTitle = eventName || EVENT_CONFIG.eventName;
+    const zaloMessage = `Trân trọng kính mời ${guest.full_name} tham dự ${concertTitle}. Xem thiệp mời riêng tại đây nhé: ${inviteUrl}`;
     const ok = await copyTextToClipboard(zaloMessage);
     if (ok) {
       setCopiedZaloSlug(guest.slug);

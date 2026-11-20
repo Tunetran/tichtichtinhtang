@@ -13,13 +13,15 @@ import {
   X,
   Loader2,
   CheckCircle2,
+  Sparkles,
 } from 'lucide-react';
-import type { GuestRecord, AdminStats } from '@/types/guest';
+import type { GuestRecord, AdminStats, GuestStatus } from '@/types/guest';
 import { EVENT_CONFIG } from '@/config/event';
 import { StatsCards } from './StatsCards';
 import { GuestTable } from './GuestTable';
 import { SongRequestsTab } from './SongRequestsTab';
 import { BulkImportModal } from './BulkImportModal';
+import { EventSettingsTab } from './EventSettingsTab';
 
 export function AdminDashboard() {
   const router = useRouter();
@@ -34,7 +36,8 @@ export function AdminDashboard() {
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
-  const [activeMainTab, setActiveMainTab] = useState<'guests' | 'songs'>('guests');
+  const [activeMainTab, setActiveMainTab] = useState<'guests' | 'songs' | 'settings'>('guests');
+  const [eventName, setEventName] = useState<string>(EVENT_CONFIG.eventName);
 
   // Modal states
   const [isBulkModalOpen, setIsBulkModalOpen] = useState(false);
@@ -44,6 +47,10 @@ export function AdminDashboard() {
   // Form states cho tạo đơn & sửa
   const [formName, setFormName] = useState('');
   const [formMessage, setFormMessage] = useState('');
+  const [editStatus, setEditStatus] = useState<GuestStatus>('NOT_OPENED');
+  const [editAttendees, setEditAttendees] = useState<number>(0);
+  const [editSongRequest, setEditSongRequest] = useState<string>('');
+  const [editWishMessage, setEditWishMessage] = useState<string>('');
   const [isFormSubmitting, setIsFormSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -59,13 +66,25 @@ export function AdminDashboard() {
   const fetchData = useCallback(async (isSilent = false) => {
     if (!isSilent) setIsRefreshing(true);
     try {
-      const res = await fetch('/api/admin/guests');
-      if (res.status === 401) {
+      const [guestsRes, settingsRes] = await Promise.all([
+        fetch('/api/admin/guests'),
+        fetch('/api/admin/settings').catch(() => null),
+      ]);
+
+      if (guestsRes.status === 401) {
         router.refresh();
         return;
       }
-      const data = await res.json();
-      if (res.ok) {
+
+      if (settingsRes && settingsRes.ok) {
+        const sData = await settingsRes.json();
+        if (sData?.config?.eventName) {
+          setEventName(sData.config.eventName);
+        }
+      }
+
+      const data = await guestsRes.json();
+      if (guestsRes.ok) {
         setGuests(data.guests || []);
         setStats(data.stats || {
           totalInvites: 0,
@@ -138,10 +157,14 @@ export function AdminDashboard() {
     setEditingGuest(guest);
     setFormName(guest.full_name);
     setFormMessage(guest.custom_message || '');
+    setEditStatus(guest.status);
+    setEditAttendees(guest.attendees_count > 0 ? guest.attendees_count : 1);
+    setEditSongRequest(guest.song_request || '');
+    setEditWishMessage(guest.wish_message || '');
     setFormError(null);
   };
 
-  // Lưu sửa khách
+  // Lưu sửa khách vào Supabase
   const handleSaveEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingGuest || !formName.trim()) return;
@@ -156,6 +179,10 @@ export function AdminDashboard() {
         body: JSON.stringify({
           full_name: formName.trim(),
           custom_message: formMessage.trim() || null,
+          status: editStatus,
+          attendees_count: editStatus === 'ACCEPTED' ? editAttendees : 0,
+          song_request: editStatus === 'ACCEPTED' ? editSongRequest.trim() || null : null,
+          wish_message: editWishMessage.trim() || null,
         }),
       });
 
@@ -276,7 +303,7 @@ export function AdminDashboard() {
               </span>
             </div>
             <h1 className="font-serif text-xl sm:text-2xl font-bold text-text mt-0.5">
-              {EVENT_CONFIG.eventName}
+              {eventName}
             </h1>
             <p className="text-xs text-text-muted mt-0.5">
               Theo dõi phản hồi khách mời & điều phối tổ chức đêm nhạc
@@ -311,24 +338,24 @@ export function AdminDashboard() {
         {/* Thanh Điều Hướng Tab Chính & Các Nút Thao Tác */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
           {/* Main Tab Switcher */}
-          <div className="flex items-center gap-2 bg-bg-surface p-1 rounded-xl border border-border shadow-sm">
+          <div className="flex items-center gap-1.5 bg-bg-surface p-1 rounded-xl border border-border shadow-sm overflow-x-auto">
             <button
               type="button"
               onClick={() => setActiveMainTab('guests')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 activeMainTab === 'guests'
                   ? 'bg-primary text-primary-fg shadow-sm'
                   : 'text-text-muted hover:text-text'
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
-              <span>Danh sách khách mời ({guests.length})</span>
+              <span>Danh sách khách ({guests.length})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveMainTab('songs')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                 activeMainTab === 'songs'
                   ? 'bg-primary text-primary-fg shadow-sm'
                   : 'text-text-muted hover:text-text'
@@ -337,43 +364,58 @@ export function AdminDashboard() {
               <Music className="w-3.5 h-3.5" />
               <span>Bài hát yêu cầu ({songRequestsCount})</span>
             </button>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleExportCSV}
-              disabled={guests.length === 0}
-              className="flex-1 sm:flex-none py-2 px-3.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-medium text-text transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
-            >
-              <Download className="w-3.5 h-3.5 text-accent" />
-              <span>Xuất CSV</span>
-            </button>
 
             <button
               type="button"
-              onClick={() => {
-                setFormName('');
-                setFormMessage('');
-                setFormError(null);
-                setIsCreateModalOpen(true);
-              }}
-              className="flex-1 sm:flex-none py-2 px-3.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-medium text-text transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              onClick={() => setActiveMainTab('settings')}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                activeMainTab === 'settings'
+                  ? 'bg-primary text-primary-fg shadow-sm'
+                  : 'text-text-muted hover:text-text'
+              }`}
             >
-              <UserPlus className="w-3.5 h-3.5 text-accent" />
-              <span>+ Thêm khách</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setIsBulkModalOpen(true)}
-              className="flex-1 sm:flex-none py-2 px-4 rounded-xl bg-primary text-primary-fg hover:opacity-95 text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>+ Tạo hàng loạt</span>
+              <Sparkles className="w-3.5 h-3.5 text-accent" />
+              <span>Cài đặt sự kiện & Câu từ</span>
             </button>
           </div>
+
+          {/* Action Buttons - Only show for guests tab */}
+          {activeMainTab === 'guests' && (
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportCSV}
+                disabled={guests.length === 0}
+                className="flex-1 sm:flex-none py-2 px-3.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-medium text-text transition-all flex items-center justify-center gap-1.5 shadow-sm disabled:opacity-50"
+              >
+                <Download className="w-3.5 h-3.5 text-accent" />
+                <span>Xuất CSV</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setFormName('');
+                  setFormMessage('');
+                  setFormError(null);
+                  setIsCreateModalOpen(true);
+                }}
+                className="flex-1 sm:flex-none py-2 px-3.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-medium text-text transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <UserPlus className="w-3.5 h-3.5 text-accent" />
+                <span>+ Thêm khách</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsBulkModalOpen(true)}
+                className="flex-1 sm:flex-none py-2 px-4 rounded-xl bg-primary text-primary-fg hover:opacity-95 text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>+ Tạo hàng loạt</span>
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Nội dung Tab */}
@@ -385,12 +427,15 @@ export function AdminDashboard() {
         ) : activeMainTab === 'guests' ? (
           <GuestTable
             guests={guests}
+            eventName={eventName}
             onRefresh={() => fetchData(true)}
             onEdit={handleOpenEdit}
             onDelete={handleDelete}
           />
-        ) : (
+        ) : activeMainTab === 'songs' ? (
           <SongRequestsTab guests={guests} />
+        ) : (
+          <EventSettingsTab onSaved={() => fetchData(true)} />
         )}
       </div>
 
@@ -522,12 +567,88 @@ export function AdminDashboard() {
                 </label>
                 <textarea
                   id="edit-msg"
-                  rows={3}
+                  rows={2}
                   maxLength={1000}
                   value={formMessage}
                   onChange={(e) => setFormMessage(e.target.value)}
                   placeholder="Để trống nếu không có..."
-                  className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text resize-none"
+                  className="w-full px-3.5 py-2 text-xs sm:text-sm rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text resize-none"
+                />
+              </div>
+
+              {/* Trạng thái phản hồi Supabase */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div className="space-y-1.5">
+                  <label htmlFor="edit-status" className="block text-xs font-medium text-text">
+                    Trạng thái tham dự
+                  </label>
+                  <select
+                    id="edit-status"
+                    value={editStatus}
+                    onChange={(e) => setEditStatus(e.target.value as GuestStatus)}
+                    className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text"
+                  >
+                    <option value="NOT_OPENED">Chưa mở thiệp</option>
+                    <option value="OPENED">Đã mở thiệp</option>
+                    <option value="ACCEPTED">Đồng ý tham gia</option>
+                    <option value="DECLINED">Từ chối tham gia</option>
+                  </select>
+                </div>
+
+                {editStatus === 'ACCEPTED' && (
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-medium text-text">
+                      Số người tham gia
+                    </label>
+                    <div className="flex gap-1.5">
+                      {[1, 2, 3, 4].map((num) => (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => setEditAttendees(num)}
+                          className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                            editAttendees === num
+                              ? 'bg-accent text-primary-fg border-accent'
+                              : 'bg-bg text-text-muted border-border hover:border-accent'
+                          }`}
+                        >
+                          {num}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {editStatus === 'ACCEPTED' && (
+                <div className="space-y-1.5">
+                  <label htmlFor="edit-song" className="block text-xs font-medium text-text">
+                    Ca khúc yêu cầu
+                  </label>
+                  <input
+                    id="edit-song"
+                    type="text"
+                    maxLength={200}
+                    value={editSongRequest}
+                    onChange={(e) => setEditSongRequest(e.target.value)}
+                    placeholder="Tên bài hát..."
+                    className="w-full px-3.5 py-2 text-xs rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-1.5">
+                <label htmlFor="edit-wish" className="block text-xs font-medium text-text">
+                  Lời chúc từ khách mời
+                </label>
+                <textarea
+                  id="edit-wish"
+                  rows={2}
+                  maxLength={500}
+                  value={editWishMessage}
+                  onChange={(e) => setEditWishMessage(e.target.value)}
+                  placeholder="Để trống nếu không có..."
+                  className="w-full px-3.5 py-2 text-xs rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text resize-none"
                 />
               </div>
 

@@ -5,12 +5,18 @@ import { useRouter } from 'next/navigation';
 import { Lock, Eye, EyeOff, Loader2, Music } from 'lucide-react';
 import { EVENT_CONFIG } from '@/config/event';
 
-export function AdminLoginForm() {
+interface AdminLoginFormProps {
+  eventName?: string;
+}
+
+export function AdminLoginForm({ eventName }: AdminLoginFormProps) {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const displayTitle = eventName || EVENT_CONFIG.eventName;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +55,7 @@ export function AdminLoginForm() {
             Bảng Quản Trị
           </p>
           <h1 className="font-serif text-xl font-bold text-text">
-            {EVENT_CONFIG.eventName}
+            {displayTitle}
           </h1>
           <p className="text-xs text-text-muted">
             Vui lòng nhập mật khẩu quản trị viên để tiếp tục

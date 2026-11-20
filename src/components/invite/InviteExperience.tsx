@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react';
 import type { GuestRecord } from '@/types/guest';
+import type { EventConfig } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
 import { EnvelopeStage } from './EnvelopeStage';
 import { AudioPlayer } from './AudioPlayer';
@@ -9,9 +10,10 @@ import { LetterContent } from './LetterContent';
 
 interface InviteExperienceProps {
   guest: GuestRecord;
+  config?: EventConfig;
 }
 
-export function InviteExperience({ guest: initialGuest }: InviteExperienceProps) {
+export function InviteExperience({ guest: initialGuest, config = EVENT_CONFIG }: InviteExperienceProps) {
   const [guest, setGuest] = useState<GuestRecord>(initialGuest);
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [showLetter, setShowLetter] = useState<boolean>(false);
@@ -20,6 +22,13 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const userMutedRef = useRef<boolean>(false);
 
+  // Sync theme attribute to documentElement
+  useEffect(() => {
+    if (config?.theme) {
+      document.documentElement.setAttribute('data-theme', config.theme);
+    }
+  }, [config?.theme]);
+
   // Fade-in âm lượng từ từ lên mức defaultVolume
   const fadeInAudio = useCallback(() => {
     const audio = audioRef.current;
@@ -27,7 +36,7 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
 
     try {
       audio.volume = 0.05;
-      const targetVolume = EVENT_CONFIG.audio.defaultVolume || 0.4;
+      const targetVolume = config.audio?.defaultVolume ?? 0.4;
       const step = (targetVolume - 0.05) / 15;
 
       const fadeInterval = setInterval(() => {
@@ -50,7 +59,7 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
     } catch {
       // Bỏ qua lỗi volume trên trình duyệt di động
     }
-  }, []);
+  }, [config.audio?.defaultVolume]);
 
   // Xử lý mở thư & kích hoạt âm thanh đồng bộ
   const handleOpenEnvelope = () => {
@@ -64,22 +73,22 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
           fadeInAudio();
         })
         .catch(() => {
-          // Trình duyệt vẫn chặn âm thanh, không làm gián đoạn trải nghiệm mở thư
+          // Trình duyệt chặn âm thanh
         });
     }
 
     // 2. Kích hoạt chuỗi animation phong bì
     setIsOpened(true);
 
-    // 3. Ghi nhận mở thiệp (Fire-and-forget không chặn UI)
+    // 3. Ghi nhận mở thiệp
     fetch(`/api/invites/${guest.slug}/open`, {
       method: 'POST',
     }).catch(() => {});
 
-    // 4. Sau khi nắp phong bì và thư trượt xong (~1.4s), mở khóa hiển thị toàn bộ nội dung
+    // 4. Mở khóa hiển thị toàn bộ nội dung sau khi nắp trượt xong (~1.2s)
     setTimeout(() => {
       setShowLetter(true);
-    }, 1400);
+    }, 1200);
   };
 
   // Nút bật/tắt nhạc chủ động
@@ -114,7 +123,6 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
           setIsPlaying(false);
         }
       } else {
-        // Chỉ phát tiếp nếu trước đó người dùng chưa chủ động bấm tắt
         if (!userMutedRef.current && isOpened) {
           audio
             .play()
@@ -135,19 +143,20 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
       {/* Audio element ẩn */}
       <audio
         ref={audioRef}
-        src={EVENT_CONFIG.audio.src}
+        src={config.audio?.src || EVENT_CONFIG.audio.src}
         loop
         preload="none"
         playsInline
       />
 
-      {/* Nút bật/tắt nhạc nổi góc trên bên phải */}
+      {/* Floating Vinyl Audio Controller */}
       <AudioPlayer isPlaying={isPlaying} onToggle={handleToggleAudio} />
 
-      {/* Chặng 1 & 2: Phong bì niêm phong */}
+      {/* Chặng 1 & 2: Phong bì niêm phong vật lý */}
       {!showLetter && (
         <EnvelopeStage
           guest={guest}
+          config={config}
           isOpened={isOpened}
           onOpen={handleOpenEnvelope}
         />
@@ -155,12 +164,13 @@ export function InviteExperience({ guest: initialGuest }: InviteExperienceProps)
 
       {/* Chặng 3 & 4: Nội dung thư, thư viện ảnh & form RSVP */}
       <div
-        className={`w-full transition-opacity duration-700 ${
+        className={`w-full transition-opacity duration-700 ease-luxury ${
           showLetter ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
       >
         <LetterContent
           guest={guest}
+          config={config}
           onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
         />
       </div>
