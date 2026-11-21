@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
-import { EnvelopeStage } from './EnvelopeStage';
+import { EnvelopeStage, type InviteStage } from './EnvelopeStage';
 import { AudioPlayer } from './AudioPlayer';
 import { LetterContent } from './LetterContent';
 import { FallingHearts } from '@/components/FallingHearts';
@@ -25,8 +26,7 @@ export function InviteExperience({
   initialWaxSealUrl = null,
 }: InviteExperienceProps) {
   const [guest, setGuest] = useState<GuestRecord>(initialGuest);
-  const [isOpened, setIsOpened] = useState<boolean>(false);
-  const [showLetter, setShowLetter] = useState<boolean>(false);
+  const [stage, setStage] = useState<InviteStage>('closed');
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
   const [bgUrl, setBgUrl] = useState<string | null>(initialBgUrl);
@@ -56,7 +56,7 @@ export function InviteExperience({
           }
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       mounted = false;
@@ -118,18 +118,18 @@ export function InviteExperience({
         });
     }
 
-    // 2. Kích hoạt chuỗi animation phong bì
-    setIsOpened(true);
+    // 2. Chuyển sang nhịp opening (nắp mở 3D & rút thư)
+    setStage('opening');
 
     // 3. Ghi nhận mở thiệp
     fetch(`/api/invites/${guest.slug}/open`, {
       method: 'POST',
-    }).catch(() => {});
+    }).catch(() => { });
 
-    // 4. Mở khóa hiển thị toàn bộ nội dung sau khi nắp trượt xong (~1.2s)
+    // 4. Nhịp 3: Chuyển sang reading sau 1.4s (tăng 0.3s cho nhịp 2)
     setTimeout(() => {
-      setShowLetter(true);
-    }, 1200);
+      setStage('reading');
+    }, 1400);
   };
 
   // Nút bật/tắt nhạc chủ động
@@ -148,7 +148,7 @@ export function InviteExperience({
           setIsPlaying(true);
           userMutedRef.current = false;
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   };
 
@@ -164,11 +164,11 @@ export function InviteExperience({
           setIsPlaying(false);
         }
       } else {
-        if (!userMutedRef.current && isOpened) {
+        if (!userMutedRef.current && stage === 'reading') {
           audio
             .play()
             .then(() => setIsPlaying(true))
-            .catch(() => {});
+            .catch(() => { });
         }
       }
     };
@@ -177,7 +177,7 @@ export function InviteExperience({
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isOpened]);
+  }, [stage]);
 
   return (
     <div className="relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
@@ -216,31 +216,38 @@ export function InviteExperience({
       <AudioPlayer isPlaying={isPlaying} onToggle={handleToggleAudio} />
 
       {/* Chặng 1 & 2: Phong bì niêm phong vật lý */}
-      {!showLetter && (
-        <EnvelopeStage
-          guest={guest}
-          config={config}
-          isOpened={isOpened}
-          onOpen={handleOpenEnvelope}
-          logoUrl={logoUrl}
-          waxSealUrl={waxSealUrl}
-        />
-      )}
+      <AnimatePresence mode="wait">
+        {stage !== 'reading' && (
+          <EnvelopeStage
+            key="envelope-stage"
+            guest={guest}
+            config={config}
+            stage={stage}
+            onOpen={handleOpenEnvelope}
+            logoUrl={logoUrl}
+            waxSealUrl={waxSealUrl}
+          />
+        )}
+      </AnimatePresence>
 
-      {/* Chặng 3 & 4: Nội dung thư, thư viện ảnh & form RSVP */}
-      <div
-        className={`w-full transition-opacity duration-700 ease-luxury ${
-          showLetter ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-      >
-        <LetterContent
-          guest={guest}
-          config={config}
-          onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
-          logoUrl={logoUrl}
-          isOpened={isOpened}
-        />
-      </div>
+      {/* Chặng 3: Nhịp 3 phóng to lá thư êm ái giữa màn hình */}
+      {stage === 'reading' && (
+        <motion.div
+          key="reading-stage"
+          className="w-full flex justify-center"
+          initial={{ scale: 0.86, opacity: 0, y: 24 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 110, damping: 20 }}
+        >
+          <LetterContent
+            guest={guest}
+            config={config}
+            onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
+            logoUrl={logoUrl}
+            isOpened={stage === 'reading'}
+          />
+        </motion.div>
+      )}
     </div>
   );
 }

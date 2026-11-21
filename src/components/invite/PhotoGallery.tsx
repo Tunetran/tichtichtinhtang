@@ -36,44 +36,40 @@ export function PhotoGallery({ gallery, theme }: PhotoGalleryProps) {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-2 gap-4 sm:gap-5 pt-2">
         {gallery.map((photo, index) => {
           const isOdd = index % 2 !== 0;
 
           return (
             <motion.div
               key={photo.src}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.15 }}
-              transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
               onClick={() => setSelectedPhoto(photo)}
-              className={`cursor-pointer overflow-hidden rounded-xl bg-bg-surface border border-border/80 shadow-sm hover:shadow-md transition-all duration-300 group active:scale-[0.98] ${
-                isVintage
-                  ? `gallery-polaroid p-2 bg-white pb-6 shadow-md ${
-                      isOdd ? 'rotate-1' : '-rotate-1'
-                    }`
-                  : 'p-1.5'
+              className={`relative cursor-pointer bg-white p-2 pb-6 shadow-md rounded-sm transition-transform duration-300 hover:scale-[1.02] active:scale-[0.98] ${
+                isOdd ? 'rotate-1' : '-rotate-1'
               }`}
             >
-              <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-bg/50">
+              {/* Dải băng dính Washi Tape màu hồng phấn bán trong suốt ở chính giữa mép trên */}
+              <div
+                className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-12 sm:w-14 h-4 bg-[#F6C1D3]/60 backdrop-blur-[1px] rounded-xs shadow-xs z-10 pointer-events-none rotate-[-1deg]"
+                aria-hidden="true"
+              />
+
+              <div className="relative aspect-square w-full overflow-hidden rounded-xs bg-[#FFF5F8]">
                 <Image
                   src={photo.src}
                   alt={photo.alt}
                   fill
                   sizes="(max-width: 640px) 45vw, 220px"
-                  className="object-cover transition-transform duration-500 ease-luxury group-hover:scale-105"
+                  className="object-cover transition-transform duration-500 ease-luxury hover:scale-105"
                 />
               </div>
 
               {photo.caption && (
-                <p
-                  className={`mt-2 text-center text-xs truncate px-1 ${
-                    isVintage
-                      ? 'font-script text-sm text-[#4A373B]'
-                      : 'text-text-muted font-serif'
-                  }`}
-                >
+                <p className="mt-2 text-center text-xs font-handwriting text-[#5C1F38] truncate px-1 text-[13px]">
                   {photo.caption}
                 </p>
               )}

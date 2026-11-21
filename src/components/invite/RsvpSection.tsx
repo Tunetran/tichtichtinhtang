@@ -90,8 +90,9 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
 
       {/* Thẻ tóm tắt khi đã phản hồi và không ở chế độ sửa */}
       {hasAlreadyResponded && !isEditing && (
-        <div className="editorial-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 bg-white border border-[#F6C1D3]">
-          <div className="flex items-center gap-3">
+        <div className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-7 shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 space-y-4 overflow-hidden">
+          <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
+          <div className="flex items-center gap-3 relative z-10">
             {guest.status === 'ACCEPTED' ? (
               <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             ) : (
@@ -143,8 +144,9 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
       {isEditing && (
         <form
           onSubmit={handleSubmit}
-          className="editorial-card rounded-2xl p-5 sm:p-6 shadow-md space-y-5 text-left bg-white border border-[#F6C1D3]"
+          className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 space-y-5 text-left overflow-hidden"
         >
+          <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
           {/* Lựa chọn 2 phương án */}
           <div className="grid grid-cols-2 gap-3">
             <button
