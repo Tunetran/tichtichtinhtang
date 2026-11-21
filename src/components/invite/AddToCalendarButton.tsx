@@ -65,11 +65,11 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
   };
 
   return (
-    <div className="relative inline-block text-left w-full sm:w-auto">
+    <div className="relative inline-block text-left w-full sm:w-auto font-invitation">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-semibold text-text shadow-sm transition-all duration-200 active:scale-[0.98] min-h-[44px]"
+        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-sm sm:text-base font-bold text-text shadow-sm transition-all duration-200 active:scale-[0.98] min-h-[44px] font-invitation cursor-pointer"
       >
         <CalendarPlus className="w-4 h-4 text-accent" />
         <span>Thêm vào lịch cá nhân</span>
@@ -83,13 +83,13 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 sm:left-0 mt-2 w-56 rounded-xl bg-bg-surface border border-border shadow-xl z-50 py-1.5 animate-fadeIn">
+          <div className="absolute right-0 sm:left-0 mt-2 w-56 rounded-xl bg-bg-surface border border-border shadow-xl z-50 py-1.5 animate-fadeIn font-invitation">
             <a
               href={googleCalendarUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs text-text hover:bg-bg transition-colors min-h-[44px]"
+              className="flex items-center gap-2.5 px-3.5 py-2.5 text-sm sm:text-base font-bold text-text hover:bg-bg transition-colors min-h-[44px] font-invitation"
             >
               <span className="w-2 h-2 rounded-full bg-blue-500" />
               <span>Google Calendar</span>
@@ -98,7 +98,7 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             <button
               type="button"
               onClick={handleDownloadIcs}
-              className="w-full text-left flex items-center justify-between px-3.5 py-2.5 text-xs text-text hover:bg-bg transition-colors min-h-[44px]"
+              className="w-full text-left flex items-center justify-between px-3.5 py-2.5 text-sm sm:text-base font-bold text-text hover:bg-bg transition-colors min-h-[44px] font-invitation cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
                 <span className="w-2 h-2 rounded-full bg-rose-500" />

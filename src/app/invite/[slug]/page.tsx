@@ -84,12 +84,14 @@ export default async function InvitePage({ params }: PageProps) {
   }
 
   return (
-    <InviteExperience
-      guest={guestResult.data as GuestRecord}
-      config={config}
-      initialLogoUrl={siteSettings.event_logo_url}
-      initialBgUrl={siteSettings.event_bg_url}
-      initialWaxSealUrl={siteSettings.wax_seal_url}
-    />
+    <div className="font-invitation font-handwriting">
+      <InviteExperience
+        guest={guestResult.data as GuestRecord}
+        config={config}
+        initialLogoUrl={siteSettings.event_logo_url}
+        initialBgUrl={siteSettings.event_bg_url}
+        initialWaxSealUrl={siteSettings.wax_seal_url}
+      />
+    </div>
   );
 }

@@ -180,7 +180,7 @@ export function InviteExperience({
   }, [stage]);
 
   return (
-    <div className="relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
+    <div className="font-invitation font-handwriting relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
       {/* Lớp nền ảnh sự kiện động phủ toàn màn hình kèm mờ trắng-hồng dịu (-z-20) */}
       {bgUrl && (
         <div

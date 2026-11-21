@@ -21,17 +21,17 @@ export function PhotoGallery({ gallery, theme }: PhotoGalleryProps) {
   const isVintage = theme === 'vintage';
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-invitation">
       <div className="text-center space-y-1">
-        <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-wider text-accent font-semibold">
-          <Sparkles className="w-3 h-3" />
+        <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm uppercase tracking-wider text-accent font-bold font-invitation">
+          <Sparkles className="w-3.5 h-3.5" />
           <span>Khoảnh Khắc</span>
-          <Sparkles className="w-3 h-3" />
+          <Sparkles className="w-3.5 h-3.5" />
         </div>
-        <h3 className="font-serif text-lg sm:text-xl font-bold text-text text-balance">
+        <h3 className="font-invitation text-2xl sm:text-3xl font-bold text-text text-balance leading-relaxed">
           Không Gian & Kỷ Niệm
         </h3>
-        <p className="text-xs text-text-muted italic">
+        <p className="text-sm sm:text-base text-text-muted italic font-invitation leading-relaxed">
           Những thanh âm và hình ảnh dịu êm
         </p>
       </div>
@@ -69,7 +69,7 @@ export function PhotoGallery({ gallery, theme }: PhotoGalleryProps) {
               </div>
 
               {photo.caption && (
-                <p className="mt-2 text-center text-xs font-handwriting text-[#5C1F38] truncate px-1 text-[13px]">
+                <p className="mt-2 text-center text-sm sm:text-base font-invitation text-[#5C1F38] truncate px-1 font-bold leading-relaxed">
                   {photo.caption}
                 </p>
               )}
@@ -102,7 +102,7 @@ export function PhotoGallery({ gallery, theme }: PhotoGalleryProps) {
             {/* Central photo frame */}
             <div
               onClick={(e) => e.stopPropagation()}
-              className="relative max-w-sm sm:max-w-md w-full max-h-[80vh] flex flex-col items-center cursor-default"
+              className="relative max-w-sm sm:max-w-md w-full max-h-[80vh] flex flex-col items-center cursor-default font-invitation"
             >
               <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-white/20">
                 <Image
@@ -114,10 +114,10 @@ export function PhotoGallery({ gallery, theme }: PhotoGalleryProps) {
                 />
               </div>
 
-              <div className="mt-3 text-center text-white px-2 space-y-0.5">
-                <p className="text-sm font-semibold">{selectedPhoto.alt}</p>
+              <div className="mt-3 text-center text-white px-2 space-y-1">
+                <p className="text-base sm:text-lg font-bold font-invitation leading-relaxed">{selectedPhoto.alt}</p>
                 {selectedPhoto.caption && (
-                  <p className="text-xs text-white/80 italic font-serif">
+                  <p className="text-sm sm:text-base text-white/90 italic font-invitation leading-relaxed">
                     {selectedPhoto.caption}
                   </p>
                 )}

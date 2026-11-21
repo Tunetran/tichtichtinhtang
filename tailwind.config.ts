@@ -31,6 +31,7 @@ const config: Config = {
         serif: ['var(--font-serif)', 'serif'],
         script: ['var(--font-script)', 'cursive'],
         handwriting: ['var(--font-handwriting)', 'cursive', 'sans-serif'],
+        invitation: ['var(--font-handwriting)', 'Dancing Script', 'cursive', 'sans-serif'],
         sans: ['var(--font-sans)', 'sans-serif'],
       },
     },

@@ -1,18 +1,19 @@
 import type { Metadata, Viewport } from 'next';
-import { Dancing_Script, Be_Vietnam_Pro } from 'next/font/google';
+import { Dancing_Script, Plus_Jakarta_Sans } from 'next/font/google';
 import { getEventConfig } from '@/lib/event-settings';
 import './globals.css';
 
 const dancingScript = Dancing_Script({
   subsets: ['latin', 'vietnamese'],
-  variable: '--font-script',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-handwriting',
   display: 'swap',
 });
 
-const beVietnamPro = Be_Vietnam_Pro({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin', 'vietnamese'],
   weight: ['400', '500', '600', '700'],
-  variable: '--font-handwriting',
+  variable: '--font-sans',
   display: 'swap',
 });
 
@@ -64,7 +65,7 @@ export default async function RootLayout({
   return (
     <html lang="vi" data-theme={config.theme} suppressHydrationWarning>
       <body
-        className={`${dancingScript.variable} ${beVietnamPro.variable} bg-bg text-text font-sans antialiased min-h-[100dvh] flex flex-col justify-between selection:bg-accent/20 selection:text-text relative`}
+        className={`${dancingScript.variable} ${plusJakartaSans.variable} bg-bg text-text font-sans antialiased min-h-[100dvh] flex flex-col justify-between selection:bg-accent/20 selection:text-text relative`}
         suppressHydrationWarning
       >
         {/* Subtle SVG Paper Grain Overlay for tactile luxury feel */}

@@ -135,15 +135,15 @@ export function LetterContent({
         <LetterHeaderLogo logoUrl={logoUrl} />
 
         <div className="space-y-1.5">
-          <p className="font-handwriting text-2xl sm:text-3xl text-[#5C1F38] font-semibold tracking-wide">
+          <p className="font-invitation text-3xl sm:text-4xl text-[#5C1F38] font-bold tracking-wide leading-relaxed">
             {config.invitationBadge || 'Thư Mời Tham Dự'}
           </p>
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight title-pearl-shimmer leading-snug text-balance">
+          <h1 className="font-invitation text-3xl sm:text-4xl sm:text-[38px] font-bold tracking-tight title-pearl-shimmer leading-relaxed text-balance">
             {config.eventName}
           </h1>
         </div>
 
-        <p className="text-xs sm:text-sm text-[#7D6670] italic max-w-sm mx-auto leading-relaxed text-balance px-2">
+        <p className="text-base sm:text-lg text-[#7D6670] italic max-w-sm mx-auto leading-relaxed text-balance px-2 font-invitation">
           &ldquo;{config.slogan}&rdquo;
         </p>
 
@@ -189,15 +189,15 @@ export function LetterContent({
         </motion.div>
 
         <div className="border-b border-[#F3C6D6]/70 pb-3 relative z-10">
-          <p className="text-[11px] uppercase tracking-widest text-[#7D6670] font-semibold">
+          <p className="text-xs sm:text-sm uppercase tracking-widest text-[#7D6670] font-bold font-invitation">
             {config.dedicationBadge || 'Dành tặng người bạn quý'}
           </p>
-          <h2 className="font-handwriting text-3xl sm:text-4xl text-[#5C1F38] font-bold mt-1">
+          <h2 className="font-invitation text-3xl sm:text-4xl sm:text-[40px] text-[#5C1F38] font-bold mt-1 leading-relaxed">
             {salutation} {guest.full_name},
           </h2>
         </div>
 
-        <div className="space-y-3.5 text-[16px] sm:text-[17px] text-[#4A3B42] leading-relaxed font-handwriting relative z-10">
+        <div className="space-y-4 text-lg sm:text-xl text-[#4A3B42] leading-relaxed font-invitation relative z-10">
           {paragraphs.map((paragraph, index) => (
             <div key={index} className="min-h-[1.5em]">
               {isOpened ? (
@@ -217,12 +217,12 @@ export function LetterContent({
 
         {/* Khối lời nhắn riêng cho khách mời (nếu có) */}
         {guest.custom_message && (
-          <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#FFF5F8]/80 border border-[#F3C6D6] space-y-1.5 shadow-2xs font-handwriting relative z-10">
-            <p className="text-[11px] font-bold uppercase tracking-wider text-[#D85C8A] flex items-center gap-1.5 not-italic font-sans">
+          <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#FFF5F8]/80 border border-[#F3C6D6] space-y-2 shadow-2xs font-invitation relative z-10">
+            <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#D85C8A] flex items-center gap-1.5 not-italic font-invitation">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Lời nhắn riêng gửi đến bạn:</span>
             </p>
-            <div className="leading-relaxed text-[#4A3B42] italic text-[16px]">
+            <div className="leading-relaxed text-[#4A3B42] italic text-lg sm:text-xl font-invitation">
               {isOpened ? (
                 <TypeAnimation
                   sequence={[`“${guest.custom_message}”`]}
@@ -248,32 +248,32 @@ export function LetterContent({
         <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
 
         <div className="text-center border-b border-[#F3C6D6]/70 pb-3 space-y-0.5 relative z-10">
-          <h3 className="font-serif text-lg sm:text-xl font-bold text-[#5C1F38]">
+          <h3 className="font-invitation text-2xl sm:text-3xl font-bold text-[#5C1F38] leading-relaxed">
             Thông Tin Đêm Nhạc
           </h3>
-          <p className="text-[11px] text-[#7D6670] uppercase tracking-wider font-medium">
+          <p className="text-xs sm:text-sm text-[#7D6670] uppercase tracking-wider font-bold font-invitation">
             Thời Gian & Không Gian
           </p>
         </div>
 
-        <div className="space-y-4 text-sm relative z-10">
+        <div className="space-y-4 text-base relative z-10 font-invitation">
           {/* Thời gian */}
           <div className="flex items-start gap-3.5">
             <div className="p-2 rounded-xl bg-[#FFF5F8] border border-[#F3C6D6] text-[#D85C8A] shrink-0 mt-0.5 shadow-2xs">
               <Calendar className="w-4 h-4" />
             </div>
             <div className="space-y-1 flex-1">
-              <p className="font-semibold text-[#5C1F38] text-sm sm:text-base">
+              <p className="font-bold text-[#5C1F38] text-lg sm:text-xl font-invitation leading-relaxed">
                 {config.eventDateLabel}
               </p>
-              <div className="flex flex-wrap items-center gap-2 text-xs text-[#7D6670] font-mono tabular-nums">
+              <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base text-[#7D6670] font-invitation tabular-nums leading-relaxed">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-[#D85C8A]" />
-                  Đón khách: <strong className="text-[#4A3B42]">{config.checkinTime}</strong>
+                  Đón khách: <strong className="text-[#4A3B42] font-bold">{config.checkinTime}</strong>
                 </span>
                 <span>•</span>
                 <span>
-                  Bắt đầu: <strong className="text-[#4A3B42]">{config.startTime}</strong>
+                  Bắt đầu: <strong className="text-[#4A3B42] font-bold">{config.startTime}</strong>
                 </span>
               </div>
             </div>
@@ -286,21 +286,21 @@ export function LetterContent({
             </div>
             <div className="space-y-2 flex-1">
               <div>
-                <p className="font-semibold text-[#5C1F38] text-sm sm:text-base">
+                <p className="font-bold text-[#5C1F38] text-lg sm:text-xl font-invitation leading-relaxed">
                   {config.venueName}
                 </p>
-                <p className="text-xs text-[#7D6670] mt-0.5 leading-relaxed">
+                <p className="text-sm sm:text-base text-[#7D6670] mt-0.5 leading-relaxed font-invitation">
                   {config.venueAddress}
                 </p>
               </div>
 
               {/* Nút tác vụ xem map & copy địa chỉ */}
-              <div className="flex flex-wrap items-center gap-2 pt-1">
+              <div className="flex flex-wrap items-center gap-2 pt-1 font-invitation">
                 <a
                   href={config.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D85C8A] hover:underline bg-[#FFF5F8] px-3.5 py-2 rounded-xl border border-[#F3C6D6] transition-all min-h-[44px] active:scale-[0.98] shadow-2xs"
+                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-[#D85C8A] hover:underline bg-[#FFF5F8] px-3.5 py-2 rounded-xl border border-[#F3C6D6] transition-all min-h-[44px] active:scale-[0.98] shadow-2xs"
                 >
                   <span>Chỉ đường Google Maps</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -309,12 +309,12 @@ export function LetterContent({
                 <button
                   type="button"
                   onClick={handleCopyAddress}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7D6670] hover:text-[#4A3B42] bg-white border border-[#F3C6D6] px-3 py-2 rounded-xl transition-all min-h-[44px] active:scale-[0.98] shadow-2xs"
+                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-[#7D6670] hover:text-[#4A3B42] bg-white border border-[#F3C6D6] px-3 py-2 rounded-xl transition-all min-h-[44px] active:scale-[0.98] shadow-2xs cursor-pointer"
                 >
                   {copiedAddress ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-600 font-semibold">Đã chép địa chỉ</span>
+                      <span className="text-emerald-600 font-bold">Đã chép địa chỉ</span>
                     </>
                   ) : (
                     <>
@@ -339,14 +339,16 @@ export function LetterContent({
             </div>
             <div className="space-y-2 flex-1">
               <div>
-                <p className="font-semibold text-[#5C1F38] text-sm">Trang phục gợi ý (Dress code)</p>
-                <p className="text-xs text-[#7D6670] mt-0.5 leading-relaxed">
+                <p className="font-bold text-[#5C1F38] text-base sm:text-lg font-invitation leading-relaxed">
+                  Trang phục gợi ý (Dress code)
+                </p>
+                <p className="text-sm sm:text-base text-[#7D6670] mt-0.5 leading-relaxed font-invitation">
                   {config.dresscodeDescription}
                 </p>
               </div>
 
               {/* Bảng màu mẫu sang trọng */}
-              <div className="flex flex-wrap gap-2 pt-1">
+              <div className="flex flex-wrap gap-2 pt-1 font-invitation">
                 {config.dresscodeColors.map((color) => (
                   <div
                     key={color.name}
@@ -356,7 +358,7 @@ export function LetterContent({
                       className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 shadow-xs"
                       style={{ backgroundColor: color.hex }}
                     />
-                    <span className="text-[11px] font-medium text-[#7D6670]">{color.name}</span>
+                    <span className="text-xs sm:text-sm font-bold text-[#7D6670] font-invitation">{color.name}</span>
                   </div>
                 ))}
               </div>
@@ -374,29 +376,29 @@ export function LetterContent({
         <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
 
         <div className="text-center border-b border-[#F3C6D6]/70 pb-3 space-y-0.5 relative z-10">
-          <h3 className="font-serif text-lg sm:text-xl font-bold text-[#5C1F38]">
+          <h3 className="font-invitation text-2xl sm:text-3xl font-bold text-[#5C1F38] leading-relaxed">
             Lịch Trình Đêm Nhạc
           </h3>
-          <p className="text-[11px] text-[#7D6670] uppercase tracking-wider font-medium">
+          <p className="text-xs sm:text-sm text-[#7D6670] uppercase tracking-wider font-bold font-invitation">
             Timeline Chương Trình
           </p>
         </div>
 
-        <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#F3C6D6] relative z-10">
+        <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#F3C6D6] relative z-10 font-invitation">
           {config.timeline.map((item, index) => (
             <div key={index} className="relative">
               {/* Chấm mốc timeline hồng cánh sen */}
               <span className="absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white bg-[#D85C8A] shadow-xs" />
 
               <div className="space-y-0.5">
-                <span className="inline-block text-xs font-bold font-mono tabular-nums text-[#D85C8A] bg-[#FFF5F8] px-2 py-0.5 rounded border border-[#F3C6D6]">
+                <span className="inline-block text-sm sm:text-base font-bold font-invitation tabular-nums text-[#D85C8A] bg-[#FFF5F8] px-2.5 py-0.5 rounded border border-[#F3C6D6]">
                   {item.time}
                 </span>
-                <p className="font-semibold text-sm text-[#5C1F38] mt-1 text-balance">
+                <p className="font-bold text-base sm:text-lg text-[#5C1F38] mt-1 text-balance font-invitation leading-relaxed">
                   {item.title}
                 </p>
                 {item.description && (
-                  <p className="text-xs text-[#7D6670] leading-relaxed">
+                  <p className="text-sm sm:text-base text-[#7D6670] leading-relaxed font-invitation">
                     {item.description}
                   </p>
                 )}
@@ -424,14 +426,14 @@ export function LetterContent({
       <RsvpSection guest={guest} config={config} onRsvpSuccess={onRsvpUpdated} />
 
       {/* 8. Chân trang & Chữ ký Host */}
-      <footer className="text-center pt-8 pb-6 border-t border-[#F3C6D6]/60 space-y-3">
-        <p className="text-xs text-[#7D6670] text-balance italic">
+      <footer className="text-center pt-8 pb-6 border-t border-[#F3C6D6]/60 space-y-3 font-invitation">
+        <p className="text-base sm:text-lg text-[#7D6670] text-balance italic font-invitation leading-relaxed">
           {config.footerThankYou || 'Rất mong được gặp bạn trong đêm nhạc ấm áp này'}
         </p>
-        <p className="font-handwriting text-3xl sm:text-4xl text-[#5C1F38] font-bold">
+        <p className="font-invitation text-4xl sm:text-5xl text-[#5C1F38] font-bold leading-relaxed">
           {config.hostName}
         </p>
-        <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-[#7D6670]/70">
+        <div className="pt-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-[#7D6670]/70 font-invitation">
           <span>© {new Date().getFullYear()} {config.eventName}</span>
         </div>
       </footer>
