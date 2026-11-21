@@ -53,14 +53,14 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
         throw new Error(data.error || 'Có lỗi xảy ra khi gửi xác nhận.');
       }
 
-      // Kích hoạt confetti hạt vàng kim / đỏ rượu nếu đồng ý tham gia
+      // Kích hoạt confetti hạt hồng cánh sen / hồng pastel / trắng nếu đồng ý tham gia
       if (selectedStatus === 'ACCEPTED') {
         try {
           confetti({
             particleCount: 65,
             spread: 70,
             origin: { y: 0.72 },
-            colors: ['#7A1835', '#C89B54', '#FAF6F0', '#E2C275', '#ECCF8A'],
+            colors: ['#D85C8A', '#F6C1D3', '#FFFFFF', '#FDE2EC'],
             disableForReducedMotion: true,
           });
         } catch {
@@ -78,19 +78,19 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
   };
 
   return (
-    <section className="space-y-6 pt-6 border-t border-border/60">
+    <section className="space-y-6 pt-6 border-t border-[#F6C1D3]/70">
       <div className="text-center space-y-1.5 px-2">
-        <h3 className="font-serif text-xl sm:text-2xl font-bold text-text text-balance">
+        <h3 className="font-serif text-xl sm:text-2xl font-bold text-[#5C1F38] text-balance">
           {config.rsvpHeading || 'Xác Nhận Tham Dự'}
         </h3>
-        <p className="text-xs sm:text-sm text-text-muted text-balance max-w-sm mx-auto">
+        <p className="text-xs sm:text-sm text-[#7D6670] text-balance max-w-sm mx-auto">
           {config.rsvpSubheading || 'Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình'}
         </p>
       </div>
 
       {/* Thẻ tóm tắt khi đã phản hồi và không ở chế độ sửa */}
       {hasAlreadyResponded && !isEditing && (
-        <div className="editorial-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-4">
+        <div className="editorial-card rounded-2xl p-5 sm:p-6 shadow-sm space-y-4 bg-white border border-[#F6C1D3]">
           <div className="flex items-center gap-3">
             {guest.status === 'ACCEPTED' ? (
               <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
@@ -98,32 +98,32 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
               <XCircle className="w-6 h-6 text-rose-500 shrink-0" />
             )}
             <div>
-              <p className="font-semibold text-text text-sm">
+              <p className="font-semibold text-[#5C1F38] text-sm">
                 {guest.status === 'ACCEPTED'
                   ? `Bạn đã xác nhận tham dự cùng ${guest.attendees_count} người`
                   : 'Bạn đã báo không thể tham dự đêm nhạc'}
               </p>
-              <p className="text-xs text-text-muted mt-0.5">
+              <p className="text-xs text-[#7D6670] mt-0.5">
                 Cảm ơn bạn đã phản hồi cho Ban Tổ Chức
               </p>
             </div>
           </div>
 
           {guest.song_request && (
-            <div className="text-xs bg-bg/70 p-3 rounded-xl border border-border/50 text-text space-y-1">
-              <span className="text-accent flex items-center gap-1.5 font-semibold">
+            <div className="text-xs bg-[#FFF5F8] p-3 rounded-xl border border-[#F6C1D3] text-[#4A3B42] space-y-1">
+              <span className="text-[#D85C8A] flex items-center gap-1.5 font-semibold">
                 <Music className="w-3.5 h-3.5" /> Ca khúc bạn yêu cầu:
               </span>
-              <p className="italic pl-5 font-serif text-sm">&ldquo;{guest.song_request}&rdquo;</p>
+              <p className="italic pl-5 font-serif text-sm text-[#5C1F38]">&ldquo;{guest.song_request}&rdquo;</p>
             </div>
           )}
 
           {guest.wish_message && (
-            <div className="text-xs bg-bg/70 p-3 rounded-xl border border-border/50 text-text space-y-1">
-              <span className="text-accent flex items-center gap-1.5 font-semibold">
+            <div className="text-xs bg-[#FFF5F8] p-3 rounded-xl border border-[#F6C1D3] text-[#4A3B42] space-y-1">
+              <span className="text-[#D85C8A] flex items-center gap-1.5 font-semibold">
                 <MessageSquareHeart className="w-3.5 h-3.5" /> Lời chúc của bạn:
               </span>
-              <p className="italic pl-5 text-text-muted">&ldquo;{guest.wish_message}&rdquo;</p>
+              <p className="italic pl-5 text-[#7D6670]">&ldquo;{guest.wish_message}&rdquo;</p>
             </div>
           )}
 
@@ -131,7 +131,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
             <button
               type="button"
               onClick={() => setIsEditing(true)}
-              className="text-xs font-semibold text-accent hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
+              className="text-xs font-semibold text-[#D85C8A] hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
             >
               Thay đổi phản hồi của bạn
             </button>
@@ -143,7 +143,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
       {isEditing && (
         <form
           onSubmit={handleSubmit}
-          className="editorial-card rounded-2xl p-5 sm:p-6 shadow-md space-y-5 text-left"
+          className="editorial-card rounded-2xl p-5 sm:p-6 shadow-md space-y-5 text-left bg-white border border-[#F6C1D3]"
         >
           {/* Lựa chọn 2 phương án */}
           <div className="grid grid-cols-2 gap-3">
@@ -152,13 +152,13 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
               onClick={() => setSelectedStatus('ACCEPTED')}
               className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-semibold text-xs sm:text-sm border transition-all duration-200 active:scale-[0.98] min-h-[44px] cursor-pointer ${
                 selectedStatus === 'ACCEPTED'
-                  ? 'bg-primary text-primary-fg border-primary shadow-md ring-2 ring-primary/20'
-                  : 'bg-bg text-text border-border hover:border-accent'
+                  ? 'bg-[#D85C8A] text-white border-[#D85C8A] shadow-md ring-2 ring-[#D85C8A]/20'
+                  : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
               }`}
             >
               <Heart
                 className={`w-4 h-4 ${
-                  selectedStatus === 'ACCEPTED' ? 'fill-current text-primary-fg' : 'text-accent'
+                  selectedStatus === 'ACCEPTED' ? 'fill-current text-white' : 'text-[#D85C8A]'
                 }`}
               />
               <span>Tôi sẽ tham gia</span>
@@ -169,11 +169,11 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
               onClick={() => setSelectedStatus('DECLINED')}
               className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-semibold text-xs sm:text-sm border transition-all duration-200 active:scale-[0.98] min-h-[44px] cursor-pointer ${
                 selectedStatus === 'DECLINED'
-                  ? 'bg-neutral-700 text-white border-neutral-700 shadow-md ring-2 ring-neutral-700/20'
-                  : 'bg-bg text-text border-border hover:border-accent'
+                  ? 'bg-[#7D6670] text-white border-[#7D6670] shadow-md ring-2 ring-[#7D6670]/20'
+                  : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
               }`}
             >
-              <XCircle className="w-4 h-4 text-text-muted" />
+              <XCircle className="w-4 h-4 text-[#7D6670]" />
               <span>Rất tiếc vắng mặt</span>
             </button>
           </div>
@@ -191,7 +191,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
               >
                 {/* Chọn số người tham dự */}
                 <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-text">
+                  <label className="block text-xs font-semibold text-[#5C1F38]">
                     Số người tham dự (bao gồm bạn):
                   </label>
                   <div className="flex gap-2">
@@ -202,8 +202,8 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                         onClick={() => setAttendeesCount(num)}
                         className={`flex-1 py-2.5 text-xs font-bold rounded-xl border transition-all active:scale-[0.98] min-h-[44px] cursor-pointer ${
                           attendeesCount === num
-                            ? 'bg-accent text-primary-fg border-accent shadow-sm ring-2 ring-accent/20'
-                            : 'bg-bg text-text border-border hover:border-accent'
+                            ? 'bg-[#D85C8A] text-white border-[#D85C8A] shadow-xs ring-2 ring-[#D85C8A]/20'
+                            : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
                         }`}
                       >
                         {num} người
@@ -215,7 +215,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                 {/* Yêu cầu bài hát (nếu được bật trong cài đặt sự kiện) */}
                 {config.showSongRequest !== false && (
                   <div className="space-y-1.5">
-                    <label htmlFor="song_request" className="block text-xs font-semibold text-text">
+                    <label htmlFor="song_request" className="block text-xs font-semibold text-[#5C1F38]">
                       Gợi ý ca khúc bạn muốn lắng nghe trong đêm nhạc (không bắt buộc):
                     </label>
                     <input
@@ -225,14 +225,14 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                       value={songRequest}
                       onChange={(e) => setSongRequest(e.target.value)}
                       placeholder="Ví dụ: Nàng thơ, Có chàng trai viết lên cây, Khúc thụy du..."
-                      className="w-full px-3.5 py-3 text-xs sm:text-sm rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60 min-h-[44px]"
+                      className="w-full px-3.5 py-3 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 min-h-[44px]"
                     />
                   </div>
                 )}
 
                 {/* Lời chúc */}
                 <div className="space-y-1.5">
-                  <label htmlFor="wish_message_acc" className="block text-xs font-semibold text-text">
+                  <label htmlFor="wish_message_acc" className="block text-xs font-semibold text-[#5C1F38]">
                     Lời chúc hoặc thông điệp gửi đến đêm nhạc (không bắt buộc):
                   </label>
                   <textarea
@@ -242,7 +242,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                     value={wishMessage}
                     onChange={(e) => setWishMessage(e.target.value)}
                     placeholder="Gửi gắm đôi dòng cảm xúc của bạn..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60 resize-none"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 resize-none"
                   />
                 </div>
               </motion.div>
@@ -257,7 +257,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
               >
                 {/* Lời chúc khi từ chối */}
                 <div className="space-y-1.5">
-                  <label htmlFor="wish_message_dec" className="block text-xs font-semibold text-text">
+                  <label htmlFor="wish_message_dec" className="block text-xs font-semibold text-[#5C1F38]">
                     Gửi lời chúc đến đêm nhạc (không bắt buộc):
                   </label>
                   <textarea
@@ -267,7 +267,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                     value={wishMessage}
                     onChange={(e) => setWishMessage(e.target.value)}
                     placeholder="Dù không thể tham gia, hãy để lại lời chúc cho tụi mình nhé..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60 resize-none"
+                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 resize-none"
                   />
                 </div>
               </motion.div>
@@ -288,7 +288,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
                 type="button"
                 onClick={() => setIsEditing(false)}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 rounded-xl border border-border text-xs text-text-muted hover:bg-bg transition-colors min-h-[44px]"
+                className="px-4 py-2.5 rounded-xl border border-[#F6C1D3] text-xs text-[#7D6670] hover:bg-[#FFF5F8] transition-colors min-h-[44px]"
               >
                 Hủy bỏ
               </button>
@@ -296,7 +296,7 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3 px-4 rounded-xl bg-primary text-primary-fg font-semibold text-xs sm:text-sm shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 min-h-[44px]"
+              className="flex-1 py-3 px-4 rounded-xl bg-[#D85C8A] text-white font-semibold text-xs sm:text-sm shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 min-h-[44px]"
             >
               {isSubmitting ? (
                 <>
@@ -312,13 +312,13 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess }: Rsv
       )}
 
       {/* Thông tin liên hệ BTC ở chân trang */}
-      <div className="text-center pt-2 text-xs text-text-muted space-y-1">
+      <div className="text-center pt-2 text-xs text-[#7D6670] space-y-1">
         <p>Cần hỗ trợ thêm thông tin sự kiện?</p>
         <a
           href={config.contactUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center font-semibold text-accent hover:underline min-h-[44px]"
+          className="inline-flex items-center justify-center font-semibold text-[#D85C8A] hover:underline min-h-[44px]"
         >
           {config.contactLabel}
         </a>

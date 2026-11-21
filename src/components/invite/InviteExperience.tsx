@@ -7,20 +7,61 @@ import { EVENT_CONFIG } from '@/config/event';
 import { EnvelopeStage } from './EnvelopeStage';
 import { AudioPlayer } from './AudioPlayer';
 import { LetterContent } from './LetterContent';
+import { FallingHearts } from '@/components/FallingHearts';
 
 interface InviteExperienceProps {
   guest: GuestRecord;
   config?: EventConfig;
+  initialLogoUrl?: string | null;
+  initialBgUrl?: string | null;
+  initialWaxSealUrl?: string | null;
 }
 
-export function InviteExperience({ guest: initialGuest, config = EVENT_CONFIG }: InviteExperienceProps) {
+export function InviteExperience({
+  guest: initialGuest,
+  config = EVENT_CONFIG,
+  initialLogoUrl = null,
+  initialBgUrl = null,
+  initialWaxSealUrl = null,
+}: InviteExperienceProps) {
   const [guest, setGuest] = useState<GuestRecord>(initialGuest);
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [showLetter, setShowLetter] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
+  const [bgUrl, setBgUrl] = useState<string | null>(initialBgUrl);
+  const [waxSealUrl, setWaxSealUrl] = useState<string | null>(initialWaxSealUrl);
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const userMutedRef = useRef<boolean>(false);
+
+  // Tự động kiểm tra cập nhật logo, nền và con dấu mới nhất từ API cài đặt
+  useEffect(() => {
+    let mounted = true;
+    fetch('/api/settings', { cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (mounted && data) {
+          if ('event_logo_url' in data) {
+            setLogoUrl(data.event_logo_url || null);
+          }
+          if ('event_bg_url' in data) {
+            setBgUrl(data.event_bg_url || null);
+          }
+          if ('wax_seal_url' in data) {
+            setWaxSealUrl(data.wax_seal_url || null);
+          }
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   // Sync theme attribute to documentElement
   useEffect(() => {
@@ -140,6 +181,28 @@ export function InviteExperience({ guest: initialGuest, config = EVENT_CONFIG }:
 
   return (
     <div className="relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
+      {/* Lớp nền ảnh sự kiện động phủ toàn màn hình kèm mờ trắng-hồng dịu (-z-20) */}
+      {bgUrl && (
+        <div
+          className="fixed inset-0 -z-20 pointer-events-none select-none overflow-hidden"
+          aria-hidden="true"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={bgUrl}
+            alt="Nền thiệp mời"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = 'none';
+            }}
+          />
+          <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px]" />
+        </div>
+      )}
+
+      {/* Hiệu ứng logo sự kiện/trái tim pastel rơi phía sau nền (-z-10) */}
+      <FallingHearts logoUrl={logoUrl} />
+
       {/* Audio element ẩn */}
       <audio
         ref={audioRef}
@@ -159,6 +222,8 @@ export function InviteExperience({ guest: initialGuest, config = EVENT_CONFIG }:
           config={config}
           isOpened={isOpened}
           onOpen={handleOpenEnvelope}
+          logoUrl={logoUrl}
+          waxSealUrl={waxSealUrl}
         />
       )}
 
@@ -172,6 +237,8 @@ export function InviteExperience({ guest: initialGuest, config = EVENT_CONFIG }:
           guest={guest}
           config={config}
           onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
+          logoUrl={logoUrl}
+          isOpened={isOpened}
         />
       </div>
     </div>

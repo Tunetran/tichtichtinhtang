@@ -11,14 +11,21 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { getEventConfig } from '@/lib/event-settings';
+import { getSiteSettings } from '@/lib/site-settings';
 import { EventCountdown } from '@/components/invite/EventCountdown';
 import { AddToCalendarButton } from '@/components/invite/AddToCalendarButton';
 import { GuestLookup } from '@/components/home/GuestLookup';
+import { EventLogoImage } from '@/components/common/EventLogoImage';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const config = await getEventConfig();
+  const [config, siteSettings] = await Promise.all([
+    getEventConfig(),
+    getSiteSettings(),
+  ]);
+
+  const logoUrl = siteSettings.event_logo_url;
 
   return (
     <main
@@ -26,33 +33,31 @@ export default async function HomePage() {
       className="flex-1 flex flex-col items-center justify-center px-4 py-8 sm:py-12 pb-safe pt-safe min-h-[100dvh]"
     >
       <div className="w-full max-w-[480px] editorial-card rounded-3xl p-6 sm:p-8 text-center space-y-7 shadow-2xl">
-        {/* Biểu tượng âm nhạc mở màn */}
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mx-auto ring-8 ring-primary/5 shadow-sm">
-          <Music className="w-8 h-8" />
-        </div>
+        {/* Logo sự kiện hoặc Logo mặc định */}
+        <EventLogoImage src={logoUrl} />
 
         {/* Lời mở đầu lãng mạn */}
         <div className="space-y-2">
-          <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-accent font-semibold">
+          <div className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.25em] text-[#D85C8A] font-semibold">
             <Sparkles className="w-3 h-3" />
             <span>{config.invitationBadge || 'Thư Mời Tham Dự'}</span>
             <Sparkles className="w-3 h-3" />
           </div>
 
-          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-text leading-snug text-balance">
+          <h1 className="font-serif text-2xl sm:text-3xl font-bold tracking-tight text-[#5C1F38] leading-snug text-balance">
             {config.eventName}
           </h1>
 
-          <p className="text-xs sm:text-sm text-text-muted italic max-w-sm mx-auto leading-relaxed text-balance">
+          <p className="text-xs sm:text-sm text-[#7D6670] italic max-w-sm mx-auto leading-relaxed text-balance">
             &ldquo;{config.slogan}&rdquo;
           </p>
         </div>
 
         {/* Đường kẻ trang trí */}
         <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-16 bg-border" />
-          <Heart className="w-3.5 h-3.5 text-accent fill-accent" />
-          <span className="h-px w-16 bg-border" />
+          <span className="h-px w-16 bg-[#F6C1D3]" />
+          <Heart className="w-3.5 h-3.5 text-[#D85C8A] fill-[#D85C8A]" />
+          <span className="h-px w-16 bg-[#F6C1D3]" />
         </div>
 
         {/* Live Countdown Timer */}

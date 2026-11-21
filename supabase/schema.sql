@@ -114,4 +114,67 @@ DO $$ BEGIN
   END IF;
 END $$;
 
+-- 9. Bảng site_settings quản lý cài đặt trang & Logo sự kiện động
+CREATE TABLE IF NOT EXISTS site_settings (
+  id TEXT PRIMARY KEY DEFAULT 'main',
+  event_logo_url TEXT,
+  event_bg_url TEXT,
+  wax_seal_url TEXT,
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
 
+-- Bổ sung cột event_bg_url và wax_seal_url nếu bảng đã tồn tại từ trước
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS event_bg_url TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS wax_seal_url TEXT;
+
+-- Chèn sẵn 1 dòng mặc định id = 'main'
+INSERT INTO site_settings (id, event_logo_url)
+VALUES ('main', NULL)
+ON CONFLICT (id) DO NOTHING;
+
+-- Trigger tự động cập nhật updated_at cho site_settings
+DROP TRIGGER IF EXISTS trg_site_settings_updated_at ON site_settings;
+CREATE TRIGGER trg_site_settings_updated_at
+BEFORE UPDATE ON site_settings
+FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+
+-- Bảo mật RLS cho site_settings
+ALTER TABLE site_settings ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'site_settings' AND policyname = 'service_role_all_site_settings'
+  ) THEN
+    CREATE POLICY "service_role_all_site_settings" ON site_settings
+    FOR ALL TO service_role USING (true) WITH CHECK (true);
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'site_settings' AND policyname = 'public_read_site_settings'
+  ) THEN
+    CREATE POLICY "public_read_site_settings" ON site_settings
+    FOR SELECT TO anon, authenticated USING (true);
+  END IF;
+END $$;
+
+-- 10. Cấu hình Storage Bucket 'event-assets' lưu ảnh logo sự kiện (PNG, JPG, WEBP, SVG)
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'event-assets',
+  'event-assets',
+  true,
+  10485760, -- 10MB
+  ARRAY['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml']
+)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Cho phép đọc công khai tệp trong bucket event-assets
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Public Access event-assets'
+  ) THEN
+    CREATE POLICY "Public Access event-assets"
+    ON storage.objects FOR SELECT
+    USING (bucket_id = 'event-assets');
+  END IF;
+END $$;

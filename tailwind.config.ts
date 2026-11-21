@@ -22,12 +22,15 @@ const config: Config = {
         text: {
           DEFAULT: 'var(--text)',
           muted: 'var(--text-muted)',
+          heading: 'var(--heading)',
         },
+        heading: 'var(--heading)',
         border: 'var(--border)',
       },
       fontFamily: {
         serif: ['var(--font-serif)', 'serif'],
         script: ['var(--font-script)', 'cursive'],
+        handwriting: ['var(--font-handwriting)', 'cursive', 'sans-serif'],
         sans: ['var(--font-sans)', 'sans-serif'],
       },
     },

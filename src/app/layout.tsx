@@ -1,6 +1,20 @@
 import type { Metadata, Viewport } from 'next';
+import { Dancing_Script, Be_Vietnam_Pro } from 'next/font/google';
 import { getEventConfig } from '@/lib/event-settings';
 import './globals.css';
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin', 'vietnamese'],
+  variable: '--font-script',
+  display: 'swap',
+});
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-handwriting',
+  display: 'swap',
+});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -50,7 +64,7 @@ export default async function RootLayout({
   return (
     <html lang="vi" data-theme={config.theme} suppressHydrationWarning>
       <body
-        className="bg-bg text-text font-sans antialiased min-h-[100dvh] flex flex-col justify-between selection:bg-accent/20 selection:text-text relative"
+        className={`${dancingScript.variable} ${beVietnamPro.variable} bg-bg text-text font-sans antialiased min-h-[100dvh] flex flex-col justify-between selection:bg-accent/20 selection:text-text relative`}
         suppressHydrationWarning
       >
         {/* Subtle SVG Paper Grain Overlay for tactile luxury feel */}

@@ -6,74 +6,98 @@
 
 :root {
   --font-serif: 'Playfair Display', Didot, 'Bodoni MT', Georgia, serif;
-  --font-script: 'Dancing Script', 'Great Vibes', 'Brush Script MT', cursive;
+  --font-script: var(--font-script), 'Dancing Script', 'Great Vibes', cursive;
+  --font-handwriting: var(--font-handwriting), 'Be Vietnam Pro', cursive, sans-serif;
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
-  --paper-grain-opacity: 0.035;
+  --paper-grain-opacity: 0.02;
+
+  /* Bảng màu Hồng & Trắng (Pink & White): Thanh lịch, lãng mạn, tương phản cao */
+  --bg: #FFF5F8;
+  --bg-surface: #FFFFFF;
+  --bg-envelope: #D85C8A;
+  --bg-envelope-flap: #C44D78;
+  --primary: #D85C8A;
+  --primary-fg: #FFFFFF;
+  --accent: #D85C8A;
+  --accent-light: #FDE2EC;
+  --heading: #5C1F38;
+  --text: #4A3B42;
+  --text-muted: #7D6670;
+  --border: #F6C1D3;
+  --border-strong: #D85C8A;
+  --border-hairline: rgba(216, 92, 138, 0.16);
+
+  --wax-seal: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FCE4EC 28%, #F8BBD0 65%, #D85C8A 100%);
+  --wax-seal-shadow: 0 10px 25px -4px rgba(216, 92, 138, 0.45), 0 4px 10px -2px rgba(216, 92, 138, 0.25);
+  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(246, 193, 211, 0.45) 0%, rgba(255, 245, 248, 0) 70%);
+  --card-shadow: 0 12px 35px -8px rgba(92, 31, 56, 0.07), 0 4px 12px -2px rgba(92, 31, 56, 0.03);
 }
 
 [data-theme='candlelight'] {
-  --bg: #FBF7F2;
+  --bg: #FFF5F8;
   --bg-surface: #FFFFFF;
-  --bg-envelope: #6D142D;
-  --bg-envelope-flap: #560F23;
-  --primary: #7A1835;
-  --primary-fg: #FAF6F0;
-  --accent: #C89B54;
-  --accent-light: #F4E8D1;
-  --text: #26161B;
-  --text-muted: #6B4E56;
-  --border: rgba(200, 155, 84, 0.28);
-  --border-strong: rgba(200, 155, 84, 0.5);
-  --border-hairline: rgba(122, 24, 53, 0.12);
+  --bg-envelope: #D85C8A;
+  --bg-envelope-flap: #C44D78;
+  --primary: #D85C8A;
+  --primary-fg: #FFFFFF;
+  --accent: #D85C8A;
+  --accent-light: #FDE2EC;
+  --heading: #5C1F38;
+  --text: #4A3B42;
+  --text-muted: #7D6670;
+  --border: #F6C1D3;
+  --border-strong: #D85C8A;
+  --border-hairline: rgba(216, 92, 138, 0.16);
 
-  --wax-seal: linear-gradient(135deg, #ECCF8A 0%, #C89B54 48%, #8E651D 100%);
-  --wax-seal-shadow: 0 10px 25px -4px rgba(109, 20, 45, 0.4), 0 4px 8px -2px rgba(109, 20, 45, 0.2);
-  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(200, 155, 84, 0.2) 0%, rgba(251, 247, 242, 0) 70%);
-  --card-shadow: 0 12px 35px -8px rgba(74, 30, 41, 0.08), 0 4px 12px -2px rgba(74, 30, 41, 0.04);
+  --wax-seal: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FCE4EC 28%, #F8BBD0 65%, #D85C8A 100%);
+  --wax-seal-shadow: 0 10px 25px -4px rgba(216, 92, 138, 0.45), 0 4px 10px -2px rgba(216, 92, 138, 0.25);
+  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(246, 193, 211, 0.45) 0%, rgba(255, 245, 248, 0) 70%);
+  --card-shadow: 0 12px 35px -8px rgba(92, 31, 56, 0.07), 0 4px 12px -2px rgba(92, 31, 56, 0.03);
 }
 
 [data-theme='vintage'] {
-  --bg: #FBF8F3;
-  --bg-surface: #FFFDF9;
-  --bg-envelope: #A45063;
-  --bg-envelope-flap: #8A3D4E;
-  --primary: #A45063;
-  --primary-fg: #FDFBF7;
-  --accent: #5C4347;
-  --accent-light: #EFE4E0;
-  --text: #2E2023;
-  --text-muted: #725B61;
-  --border: rgba(92, 67, 71, 0.22);
-  --border-strong: rgba(92, 67, 71, 0.45);
-  --border-hairline: rgba(164, 80, 99, 0.14);
+  --bg: #FFF8FA;
+  --bg-surface: #FFFFFF;
+  --bg-envelope: #D85C8A;
+  --bg-envelope-flap: #BA4B73;
+  --primary: #D85C8A;
+  --primary-fg: #FFFFFF;
+  --accent: #BA4B73;
+  --accent-light: #FDE2EC;
+  --heading: #5C1F38;
+  --text: #4A3B42;
+  --text-muted: #7D6670;
+  --border: #F6C1D3;
+  --border-strong: #D85C8A;
+  --border-hairline: rgba(216, 92, 138, 0.18);
 
-  --wax-seal: linear-gradient(135deg, #DE9AA9 0%, #A45063 50%, #6E2D3C 100%);
-  --wax-seal-shadow: 0 10px 25px -4px rgba(92, 67, 71, 0.35), 0 4px 8px -2px rgba(92, 67, 71, 0.18);
-  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(164, 80, 99, 0.15) 0%, rgba(251, 248, 243, 0) 65%);
-  --card-shadow: 0 12px 35px -8px rgba(92, 67, 71, 0.09), 0 4px 12px -2px rgba(92, 67, 71, 0.04);
+  --wax-seal: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FCE4EC 28%, #F8BBD0 65%, #D85C8A 100%);
+  --wax-seal-shadow: 0 10px 25px -4px rgba(216, 92, 138, 0.4), 0 4px 8px -2px rgba(216, 92, 138, 0.2);
+  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(246, 193, 211, 0.35) 0%, rgba(255, 248, 250, 0) 65%);
+  --card-shadow: 0 12px 35px -8px rgba(92, 31, 56, 0.07), 0 4px 12px -2px rgba(92, 31, 56, 0.03);
 }
 
 [data-theme='starlight'] {
-  --bg: #0C1222;
-  --bg-surface: #141D33;
-  --bg-envelope: #18233C;
-  --bg-envelope-flap: #223050;
-  --primary: #E8CA82;
-  --primary-fg: #0C1222;
-  --accent: #F4E8D1;
-  --accent-light: #243354;
-  --text: #F8FAFC;
-  --text-muted: #94A3B8;
-  --border: rgba(232, 202, 130, 0.25);
-  --border-strong: rgba(232, 202, 130, 0.5);
-  --border-hairline: rgba(232, 202, 130, 0.12);
+  --bg: #FFF5F8;
+  --bg-surface: #FFFFFF;
+  --bg-envelope: #D85C8A;
+  --bg-envelope-flap: #C44D78;
+  --primary: #D85C8A;
+  --primary-fg: #FFFFFF;
+  --accent: #D85C8A;
+  --accent-light: #FDE2EC;
+  --heading: #5C1F38;
+  --text: #4A3B42;
+  --text-muted: #7D6670;
+  --border: #F6C1D3;
+  --border-strong: #D85C8A;
+  --border-hairline: rgba(216, 92, 138, 0.16);
 
-  --wax-seal: linear-gradient(135deg, #FBEBC2 0%, #E8CA82 50%, #B8923F 100%);
-  --wax-seal-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.7), 0 4px 10px -2px rgba(232, 202, 130, 0.25);
-  --theme-ambient-glow: radial-gradient(circle at 50% -5%, rgba(232, 202, 130, 0.18) 0%, rgba(12, 18, 34, 0) 75%);
-  --card-shadow: 0 14px 40px -8px rgba(0, 0, 0, 0.5), 0 4px 12px -2px rgba(0, 0, 0, 0.3);
-  --paper-grain-opacity: 0.02;
+  --wax-seal: radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FCE4EC 28%, #F8BBD0 65%, #D85C8A 100%);
+  --wax-seal-shadow: 0 10px 25px -4px rgba(216, 92, 138, 0.45), 0 4px 10px -2px rgba(216, 92, 138, 0.25);
+  --theme-ambient-glow: radial-gradient(circle at 50% -8%, rgba(246, 193, 211, 0.45) 0%, rgba(255, 245, 248, 0) 70%);
+  --card-shadow: 0 12px 35px -8px rgba(92, 31, 56, 0.07), 0 4px 12px -2px rgba(92, 31, 56, 0.03);
 }
 
 @layer base {
@@ -112,7 +136,11 @@
     padding-top: max(1.25rem, env(safe-area-inset-top, 0px));
   }
 
-  /* Text balance for headings */
+  /* Text balance and default heading color */
+  h1, h2, h3, h4 {
+    color: var(--heading);
+  }
+
   h1, h2, h3, .text-balance {
     text-wrap: balance;
   }

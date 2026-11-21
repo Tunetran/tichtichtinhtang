@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { getEventConfig } from '@/lib/event-settings';
+import { getSiteSettings } from '@/lib/site-settings';
 import type { GuestRecord } from '@/types/guest';
 import { InviteExperience } from '@/components/invite/InviteExperience';
 
@@ -72,9 +73,10 @@ export default async function InvitePage({ params }: PageProps) {
     notFound();
   }
 
-  const [guestResult, config] = await Promise.all([
+  const [guestResult, config, siteSettings] = await Promise.all([
     supabaseAdmin.from('guests').select('*').eq('slug', slug).single(),
     getEventConfig(),
+    getSiteSettings(),
   ]);
 
   if (guestResult.error || !guestResult.data) {
@@ -85,6 +87,9 @@ export default async function InvitePage({ params }: PageProps) {
     <InviteExperience
       guest={guestResult.data as GuestRecord}
       config={config}
+      initialLogoUrl={siteSettings.event_logo_url}
+      initialBgUrl={siteSettings.event_bg_url}
+      initialWaxSealUrl={siteSettings.wax_seal_url}
     />
   );
 }

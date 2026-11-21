@@ -22,6 +22,7 @@ import { GuestTable } from './GuestTable';
 import { SongRequestsTab } from './SongRequestsTab';
 import { BulkImportModal } from './BulkImportModal';
 import { EventSettingsTab } from './EventSettingsTab';
+import { EventLogoSetting } from './EventLogoSetting';
 
 export function AdminDashboard() {
   const router = useRouter();
@@ -425,13 +426,16 @@ export function AdminDashboard() {
             <p className="text-xs text-text-muted">Đang tải dữ liệu khách mời...</p>
           </div>
         ) : activeMainTab === 'guests' ? (
-          <GuestTable
-            guests={guests}
-            eventName={eventName}
-            onRefresh={() => fetchData(true)}
-            onEdit={handleOpenEdit}
-            onDelete={handleDelete}
-          />
+          <div className="space-y-6">
+            <EventLogoSetting />
+            <GuestTable
+              guests={guests}
+              eventName={eventName}
+              onRefresh={() => fetchData(true)}
+              onEdit={handleOpenEdit}
+              onDelete={handleDelete}
+            />
+          </div>
         ) : activeMainTab === 'songs' ? (
           <SongRequestsTab guests={guests} />
         ) : (
