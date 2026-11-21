@@ -179,8 +179,16 @@ export function InviteExperience({
     };
   }, [stage]);
 
+  // Gấp lại phong bì: cuộn lên đầu trang và trả stage về closed mà không ngắt nhạc
+  const handleCloseEnvelope = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      setStage('closed');
+    }, 250);
+  };
+
   return (
-    <div className="font-invitation font-handwriting relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
+    <div className="font-sans-ui relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
       {/* Lớp nền ảnh sự kiện động phủ toàn màn hình kèm mờ trắng-hồng dịu (-z-20) */}
       {bgUrl && (
         <div
@@ -245,6 +253,7 @@ export function InviteExperience({
             onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
             logoUrl={logoUrl}
             isOpened={stage === 'reading'}
+            onCloseEnvelope={handleCloseEnvelope}
           />
         </motion.div>
       )}

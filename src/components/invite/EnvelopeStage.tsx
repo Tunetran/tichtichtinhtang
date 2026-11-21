@@ -133,19 +133,19 @@ export function EnvelopeStage({
               : { opacity: 1, y: 0 }
           }
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-5 text-center space-y-1.5 px-2"
+          className="mb-5 text-center space-y-1.5 px-2 overflow-visible"
         >
-          <div className="inline-flex items-center gap-1.5 text-xs sm:text-sm uppercase tracking-[0.2em] text-[#7D6670] font-bold font-invitation">
+          <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-[#7D6670] font-bold font-sans-ui">
             <Sparkles className="w-3.5 h-3.5 text-[#D85C8A]" />
             <span>{greeting}</span>
             <Sparkles className="w-3.5 h-3.5 text-[#D85C8A]" />
           </div>
 
-          <h1 className="font-invitation text-4xl sm:text-5xl text-[#5C1F38] font-bold px-2 truncate max-w-[330px] drop-shadow-xs leading-relaxed">
+          <h1 className="font-serif-title text-3xl sm:text-4xl text-[#5C1F38] font-bold px-2 py-2 pb-3 overflow-visible max-w-[340px] drop-shadow-xs leading-relaxed">
             {guest.full_name}
           </h1>
 
-          <p className="text-sm sm:text-base text-[#7D6670] italic max-w-xs mx-auto truncate font-invitation leading-relaxed">
+          <p className="text-sm sm:text-base text-[#7D6670] italic max-w-xs mx-auto truncate font-serif-title leading-relaxed">
             {config.eventName}
           </p>
         </motion.div>
@@ -180,10 +180,10 @@ export function EnvelopeStage({
           >
             <div className="absolute inset-1.5 border border-[#F3C6D6]/60 rounded-lg pointer-events-none" />
             <EnvelopeLetterLogo logoUrl={logoUrl} />
-            <p className="font-invitation text-base sm:text-lg font-bold text-[#5C1F38] truncate max-w-[240px] leading-relaxed">
+            <p className="font-serif-title text-base sm:text-lg font-bold text-[#5C1F38] truncate max-w-[240px] leading-relaxed">
               {config.eventName}
             </p>
-            <p className="text-sm sm:text-base text-[#D85C8A] italic mt-0.5 font-invitation leading-relaxed">
+            <p className="text-base text-[#D85C8A] italic mt-0.5 font-handwriting leading-relaxed">
               {config.slogan}
             </p>
           </motion.div>
@@ -310,7 +310,7 @@ export function EnvelopeStage({
               : { opacity: 1, y: 0 }
           }
           transition={{ duration: 0.3 }}
-          className="mt-5 text-sm sm:text-base text-[#7D6670] font-bold flex items-center gap-1.5 animate-pulse select-none font-invitation leading-relaxed"
+          className="mt-5 text-xs sm:text-sm text-[#7D6670] font-medium flex items-center gap-1.5 animate-pulse select-none font-sans-ui"
         >
           <span>✨</span>
           <span>{hintText}</span>

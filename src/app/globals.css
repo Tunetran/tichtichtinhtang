@@ -5,10 +5,12 @@
 @tailwind utilities;
 
 :root {
-  --font-serif: var(--font-handwriting), 'Dancing Script', cursive, serif;
-  --font-script: var(--font-handwriting), 'Dancing Script', cursive;
-  --font-handwriting: var(--font-handwriting), 'Dancing Script', cursive, sans-serif;
-  --font-sans: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif-title: var(--font-serif-title), 'Playfair Display', Georgia, serif;
+  --font-handwriting: var(--font-handwriting), 'Dancing Script', cursive;
+  --font-sans-ui: var(--font-sans-ui), 'Be Vietnam Pro', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: var(--font-serif-title);
+  --font-script: var(--font-handwriting);
+  --font-sans: var(--font-sans-ui);
   --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
   --paper-grain-opacity: 0.02;
 
@@ -189,9 +191,21 @@
   position: relative;
 }
 
-/* Invitation Handwriting Font Class */
+/* Typography Utility Classes */
+.font-serif-title {
+  font-family: var(--font-serif-title), 'Playfair Display', Georgia, serif;
+}
+
+.font-handwriting {
+  font-family: var(--font-handwriting), 'Dancing Script', cursive;
+}
+
+.font-sans-ui {
+  font-family: var(--font-sans-ui), 'Be Vietnam Pro', system-ui, sans-serif;
+}
+
 .font-invitation {
-  font-family: var(--font-handwriting), 'Dancing Script', cursive, sans-serif;
+  font-family: var(--font-sans-ui), 'Be Vietnam Pro', system-ui, sans-serif;
 }
 
 .editorial-card::before {

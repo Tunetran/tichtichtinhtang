@@ -84,7 +84,7 @@ export default async function InvitePage({ params }: PageProps) {
   }
 
   return (
-    <div className="font-invitation font-handwriting">
+    <div className="font-sans-ui">
       <InviteExperience
         guest={guestResult.data as GuestRecord}
         config={config}

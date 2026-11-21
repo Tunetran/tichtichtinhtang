@@ -1100,12 +1100,12 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
         </div>
       </div>
 
-      {/* 7. Tùy Chọn Hiển Thị & Thư Viện Ảnh (Gallery) */}
+      {/* 7. Tùy Chọn Hiển Thị & Ảnh Đơn Vị Đồng Hành / Nhà Tài Trợ */}
       <div className="bg-bg-surface p-5 sm:p-6 rounded-2xl border border-border space-y-6 shadow-sm">
         <div className="flex items-center gap-2 border-b border-border/70 pb-3">
           <Sliders className="w-4 h-4 text-accent" />
           <h3 className="font-serif text-base font-semibold text-text">
-            7. Bật/Tắt Tính Năng & Quản Lý Thư Viện Ảnh
+            7. Bật/Tắt Tính Năng & Ảnh Đơn Vị Đồng Hành / Nhà Tài Trợ
           </h3>
         </div>
 
@@ -1138,8 +1138,8 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
                 className="w-4 h-4 accent-accent rounded cursor-pointer"
               />
               <div className="text-xs">
-                <span className="font-semibold block text-text">Khối ảnh kỷ niệm</span>
-                <span className="text-[11px] text-text-muted">Hiện bộ sưu tập ảnh trên thiệp mời</span>
+                <span className="font-semibold block text-text">Khối đơn vị đồng hành</span>
+                <span className="text-[11px] text-text-muted">Hiện logo nhà tài trợ / đơn vị đồng hành trên thiệp mời</span>
               </div>
             </label>
 
@@ -1165,7 +1165,7 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
             <div className="flex items-center gap-2">
               <ImageIcon className="w-4 h-4 text-accent" />
               <label className="text-xs font-semibold text-text">
-                Danh sách ảnh thư viện ({(config.gallery || []).length} ảnh)
+                Ảnh Đơn Vị Đồng Hành / Nhà Tài Trợ ({(config.gallery || []).length} logo)
               </label>
             </div>
 
@@ -1176,7 +1176,7 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
                 ) : (
                   <Upload className="w-3.5 h-3.5" />
                 )}
-                <span>{isUploadingNewPhotos ? 'Đang tải lên Supabase...' : 'Tải ảnh từ máy lên Supabase'}</span>
+                <span>{isUploadingNewPhotos ? 'Đang tải lên Supabase...' : 'Tải logo từ máy lên Supabase'}</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -1199,7 +1199,7 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
           </div>
 
           <p className="text-[11px] text-text-muted">
-            Tải ảnh trực tiếp từ máy tính lên Supabase Storage hoặc nhập đường dẫn ảnh có sẵn. Ảnh sau khi tải lên sẽ có link public vĩnh viễn trên Supabase.
+            Tải logo nhà tài trợ trực tiếp từ máy tính lên Supabase Storage hoặc nhập đường dẫn ảnh có sẵn. Ảnh sau khi tải lên sẽ có link public vĩnh viễn trên Supabase.
           </p>
 
           <div className="space-y-3">
@@ -1265,14 +1265,14 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
 
                     <div className="space-y-1">
                       <label className="text-[10px] text-text-muted uppercase font-bold block">
-                        Mô tả ảnh (Alt text) *
+                        Tên đơn vị / Alt text *
                       </label>
                       <input
                         type="text"
                         required
                         value={photo.alt}
                         onChange={(e) => updateGalleryPhoto(idx, 'alt', e.target.value)}
-                        placeholder="Mô tả khoảnh khắc"
+                        placeholder="Tên đơn vị đồng hành / nhà tài trợ"
                         className="w-full px-2.5 py-1.5 text-xs text-text rounded-lg bg-bg-surface border border-border focus:ring-1 focus:ring-accent"
                       />
                     </div>
@@ -1280,13 +1280,13 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
 
                   <div className="space-y-1">
                     <label className="text-[10px] text-text-muted uppercase font-bold block">
-                      Chú thích hiển thị dưới ảnh (Caption)
+                      Chú thích hiển thị / Hạng mục tài trợ (Caption)
                     </label>
                     <input
                       type="text"
                       value={photo.caption || ''}
                       onChange={(e) => updateGalleryPhoto(idx, 'caption', e.target.value)}
-                      placeholder="Giai điệu tình ca..."
+                      placeholder="Nhà tài trợ Kim Cương / Đồng hành..."
                       className="w-full px-2.5 py-1.5 text-xs text-text-muted rounded-lg bg-bg-surface border border-border focus:ring-1 focus:ring-accent italic font-serif"
                     />
                   </div>
@@ -1296,7 +1296,7 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
                   type="button"
                   onClick={() => removeGalleryPhoto(idx)}
                   className="p-1.5 text-text-muted hover:text-rose-500 rounded-lg hover:bg-rose-50 transition-colors self-end sm:self-center mt-1 sm:mt-0"
-                  title="Xóa ảnh này"
+                  title="Xóa logo này"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -1305,7 +1305,7 @@ export function EventSettingsTab({ onSaved }: EventSettingsTabProps) {
 
             {(config.gallery || []).length === 0 && (
               <p className="text-xs text-text-muted italic text-center py-4 bg-bg/40 rounded-xl border border-dashed border-border">
-                Chưa có ảnh nào trong thư viện. Bấm &quot;Thêm ảnh mới&quot; để bổ sung hình ảnh kỷ niệm.
+                Chưa có logo nào. Bấm &quot;Tải logo từ máy lên Supabase&quot; hoặc &quot;Thêm qua link URL&quot; để bổ sung đơn vị đồng hành.
               </p>
             )}
           </div>

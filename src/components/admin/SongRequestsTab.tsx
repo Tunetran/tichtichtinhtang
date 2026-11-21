@@ -18,10 +18,10 @@ export function SongRequestsTab({ guests }: SongRequestsTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h3 className="font-serif text-lg font-semibold text-text">
-            Danh Sách Bài Hát Yêu Cầu ({songRequests.length})
+            Danh Sách Lời Nhắn ({songRequests.length})
           </h3>
           <p className="text-xs text-text-muted mt-0.5">
-            Tổng hợp các ca khúc được khách mời gửi gắm cho ban nhạc
+            Tổng hợp các lời nhắn được khách mời gửi gắm đến đêm nhạc
           </p>
         </div>
       </div>
@@ -29,9 +29,9 @@ export function SongRequestsTab({ guests }: SongRequestsTabProps) {
       {songRequests.length === 0 ? (
         <div className="bg-bg-surface border border-border rounded-xl p-8 text-center space-y-2">
           <Music className="w-8 h-8 text-accent/50 mx-auto" />
-          <p className="text-sm font-medium text-text">Chưa có bài hát nào được yêu cầu</p>
+          <p className="text-sm font-medium text-text">Chưa có lời nhắn nào</p>
           <p className="text-xs text-text-muted">
-            Khi khách mời xác nhận tham gia và gửi bài hát, danh sách sẽ hiển thị tại đây.
+            Khi khách mời xác nhận tham gia và gửi lời nhắn, danh sách sẽ hiển thị tại đây.
           </p>
         </div>
       ) : (
@@ -54,7 +54,7 @@ export function SongRequestsTab({ guests }: SongRequestsTabProps) {
                 <div className="flex items-center gap-2 text-xs text-text-muted pl-8">
                   <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
                   <span>
-                    Khách yêu cầu: <strong className="text-text">{guest.full_name}</strong> (đi cùng {guest.attendees_count} người)
+                    Khách gửi: <strong className="text-text">{guest.full_name}</strong> (đi cùng {guest.attendees_count} người)
                   </span>
                 </div>
               </div>
@@ -62,7 +62,10 @@ export function SongRequestsTab({ guests }: SongRequestsTabProps) {
               {guest.wish_message && (
                 <div className="text-xs bg-bg/70 p-2.5 rounded-lg border border-border/40 text-text-muted flex items-start gap-2 italic">
                   <MessageSquareHeart className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
-                  <span className="line-clamp-2">&ldquo;{guest.wish_message}&rdquo;</span>
+                  <span className="line-clamp-2">
+                    <strong className="not-italic text-accent mr-1">Ghi chú riêng BTC:</strong>
+                    &ldquo;{guest.wish_message}&rdquo;
+                  </span>
                 </div>
               )}
             </div>

@@ -220,7 +220,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
             type="text"
             value={searchKeyword}
             onChange={(e) => setSearchKeyword(e.target.value)}
-            placeholder="Tìm theo tên, bài hát, lời nhắn..."
+            placeholder="Tìm theo tên, lời nhắn..."
             className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-bg-surface border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60"
           />
         </div>
@@ -257,7 +257,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                   <tr>
                     <th className="py-3 px-4 font-semibold">Khách Mời</th>
                     <th className="py-3 px-4 font-semibold">Trạng Thái</th>
-                    <th className="py-3 px-4 font-semibold">Bài Hát & Lời Chúc</th>
+                    <th className="py-3 px-4 font-semibold">Lời Nhắn & Ghi Chú Riêng BTC</th>
                     <th className="py-3 px-4 font-semibold">Cập Nhật</th>
                     <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
                   </tr>
@@ -297,17 +297,18 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           {renderStatusBadge(guest)}
                         </td>
 
-                        {/* Cột 3: Bài hát & Lời chúc */}
+                        {/* Cột 3: Lời nhắn & Ghi chú riêng BTC */}
                         <td className="py-3.5 px-4 max-w-[240px]">
                           <div className="space-y-1 text-xs">
                             {guest.song_request && (
-                              <div className="flex items-center gap-1.5 text-accent font-medium truncate">
-                                <Music className="w-3 h-3 shrink-0" />
+                              <div className="flex items-center gap-1.5 text-accent font-medium truncate" title={`Lời nhắn gửi đêm nhạc: ${guest.song_request}`}>
+                                <MessageSquare className="w-3 h-3 shrink-0" />
                                 <span className="truncate">&ldquo;{guest.song_request}&rdquo;</span>
                               </div>
                             )}
                             {guest.wish_message ? (
-                              <p className="text-text-muted truncate italic text-[11px]">
+                              <p className="text-text-muted truncate italic text-[11px]" title={`Ghi chú riêng BTC: ${guest.wish_message}`}>
+                                <span className="not-italic text-accent font-semibold mr-1">[BTC]:</span>
                                 &ldquo;{guest.wish_message}&rdquo;
                               </p>
                             ) : !guest.song_request ? (
@@ -454,12 +455,13 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                     <div className="space-y-1 text-xs border-t border-border/40 pt-2 text-text">
                       {guest.song_request && (
                         <p className="flex items-center gap-1.5 text-accent font-medium">
-                          <Music className="w-3.5 h-3.5 shrink-0" />
-                          <span>{guest.song_request}</span>
+                          <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                          <span>Lời nhắn gửi đêm nhạc: &ldquo;{guest.song_request}&rdquo;</span>
                         </p>
                       )}
                       {guest.wish_message && (
                         <p className="text-text-muted italic text-[11px]">
+                          <span className="not-italic text-accent font-semibold mr-1">Ghi chú riêng BTC:</span>
                           &ldquo;{guest.wish_message}&rdquo;
                         </p>
                       )}

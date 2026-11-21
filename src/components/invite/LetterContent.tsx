@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { TypeAnimation } from 'react-type-animation';
-import { Calendar, Clock, MapPin, Shirt, ExternalLink, Copy, Check, Sparkles, Heart } from 'lucide-react';
+import { Calendar, Clock, MapPin, Shirt, ExternalLink, Copy, Check, Sparkles, Heart, RotateCcw } from 'lucide-react';
 import { LilyCorner } from '@/components/LilyCorner';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
@@ -12,6 +12,8 @@ import { PhotoGallery } from './PhotoGallery';
 import { RsvpSection } from './RsvpSection';
 import { EventCountdown } from './EventCountdown';
 import { AddToCalendarButton } from './AddToCalendarButton';
+import { MessageWall, type WallMessage } from './MessageWall';
+import { useTapHearts, HeartBurstRenderer, TapHeartButton } from './TapHeartBurst';
 
 interface LetterContentProps {
   guest: GuestRecord;
@@ -19,6 +21,7 @@ interface LetterContentProps {
   onRsvpUpdated: (updated: GuestRecord) => void;
   logoUrl?: string | null;
   isOpened?: boolean;
+  onCloseEnvelope?: () => void;
 }
 
 /**
@@ -114,8 +117,13 @@ export function LetterContent({
   onRsvpUpdated,
   logoUrl,
   isOpened = false,
+  onCloseEnvelope,
 }: LetterContentProps) {
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [latestWallMessage, setLatestWallMessage] = useState<WallMessage | null>(
+    guest.song_request ? { id: guest.slug, name: guest.full_name, message: guest.song_request } : null
+  );
+  const { hearts, spawnHearts } = useTapHearts();
 
   const handleCopyAddress = async () => {
     try {
@@ -125,25 +133,39 @@ export function LetterContent({
     } catch {}
   };
 
+  const handleRsvpUpdated = (updated: GuestRecord) => {
+    onRsvpUpdated(updated);
+    if (updated.song_request && updated.song_request.trim()) {
+      setLatestWallMessage({
+        id: updated.slug,
+        name: updated.full_name,
+        message: updated.song_request.trim(),
+      });
+    }
+  };
+
   const salutation = config.letterSalutation || 'Thân gửi';
   const paragraphs = config.generalInvitationText || EVENT_CONFIG.generalInvitationText;
 
   return (
-    <article className="w-full max-w-[490px] mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-10 sm:space-y-12 text-[#4A3B42] pb-safe pt-safe">
+    <article className="w-full max-w-[490px] mx-auto px-4 sm:px-6 py-10 sm:py-16 space-y-10 sm:space-y-12 text-[#4A3B42] pb-safe pt-safe font-sans-ui relative">
+      {/* Renderer cho hiệu ứng tim bay nhẹ Tap-to-Heart */}
+      <HeartBurstRenderer hearts={hearts} />
+
       {/* 1. Header Đêm Nhạc (Hot-stamped Luxury Editorial Style tông Hồng & Trắng) */}
       <header className="text-center space-y-4">
         <LetterHeaderLogo logoUrl={logoUrl} />
 
         <div className="space-y-1.5">
-          <p className="font-invitation text-3xl sm:text-4xl text-[#5C1F38] font-bold tracking-wide leading-relaxed">
+          <p className="font-sans-ui text-xs sm:text-sm text-[#D85C8A] font-bold tracking-widest uppercase">
             {config.invitationBadge || 'Thư Mời Tham Dự'}
           </p>
-          <h1 className="font-invitation text-3xl sm:text-4xl sm:text-[38px] font-bold tracking-tight title-pearl-shimmer leading-relaxed text-balance">
+          <h1 className="font-serif-title text-2xl sm:text-3xl sm:text-[34px] font-bold tracking-tight title-pearl-shimmer leading-relaxed py-1 overflow-visible text-balance">
             {config.eventName}
           </h1>
         </div>
 
-        <p className="text-base sm:text-lg text-[#7D6670] italic max-w-sm mx-auto leading-relaxed text-balance px-2 font-invitation">
+        <p className="text-base sm:text-lg text-[#7D6670] italic max-w-sm mx-auto leading-relaxed text-balance px-2 font-handwriting">
           &ldquo;{config.slogan}&rdquo;
         </p>
 
@@ -189,15 +211,16 @@ export function LetterContent({
         </motion.div>
 
         <div className="border-b border-[#F3C6D6]/70 pb-3 relative z-10">
-          <p className="text-xs sm:text-sm uppercase tracking-widest text-[#7D6670] font-bold font-invitation">
+          <p className="text-xs uppercase tracking-widest text-[#7D6670] font-semibold font-sans-ui">
             {config.dedicationBadge || 'Dành tặng người bạn quý'}
           </p>
-          <h2 className="font-invitation text-3xl sm:text-4xl sm:text-[40px] text-[#5C1F38] font-bold mt-1 leading-relaxed">
+          <h2 className="font-serif-title text-2xl sm:text-3xl text-[#5C1F38] font-bold mt-1 leading-relaxed py-1 overflow-visible">
             {salutation} {guest.full_name},
           </h2>
         </div>
 
-        <div className="space-y-4 text-lg sm:text-xl text-[#4A3B42] leading-relaxed font-invitation relative z-10">
+        {/* Lời ngỏ chung (Dancing Script viết tay) */}
+        <div className="space-y-4 text-lg sm:text-xl text-[#4A3B42] leading-relaxed font-handwriting relative z-10">
           {paragraphs.map((paragraph, index) => (
             <div key={index} className="min-h-[1.5em]">
               {isOpened ? (
@@ -215,14 +238,14 @@ export function LetterContent({
           ))}
         </div>
 
-        {/* Khối lời nhắn riêng cho khách mời (nếu có) */}
+        {/* Khối lời nhắn riêng cho khách mời (nếu có - Dancing Script viết tay) */}
         {guest.custom_message && (
-          <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#FFF5F8]/80 border border-[#F3C6D6] space-y-2 shadow-2xs font-invitation relative z-10">
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-[#D85C8A] flex items-center gap-1.5 not-italic font-invitation">
+          <div className="mt-5 p-4 sm:p-5 rounded-2xl bg-[#FFF5F8]/80 border border-[#F3C6D6] space-y-2 shadow-2xs relative z-10">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#D85C8A] flex items-center gap-1.5 not-italic font-sans-ui">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Lời nhắn riêng gửi đến bạn:</span>
             </p>
-            <div className="leading-relaxed text-[#4A3B42] italic text-lg sm:text-xl font-invitation">
+            <div className="leading-relaxed text-[#4A3B42] italic text-lg sm:text-xl font-handwriting">
               {isOpened ? (
                 <TypeAnimation
                   sequence={[`“${guest.custom_message}”`]}
@@ -237,43 +260,48 @@ export function LetterContent({
             </div>
           </div>
         )}
+
+        {/* Nút Thả tim nhẹ (Tap-to-Heart) ở cuối đoạn lời mời */}
+        <div className="pt-3 flex justify-center relative z-10">
+          <TapHeartButton onTap={(e) => spawnHearts(e.clientX, e.clientY)} />
+        </div>
       </section>
 
       {/* Đường phân cách */}
       <SectionDivider icon={Sparkles} />
 
       {/* 4. Khối Thông Tin Chính & Địa Điểm */}
-      <section className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 p-6 sm:p-8 sm:p-9 space-y-6 overflow-hidden">
+      <section className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 p-6 sm:p-8 sm:p-9 space-y-6 overflow-hidden font-sans-ui">
         {/* Khung viền đôi kiểu thiệp in cao cấp */}
         <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
 
         <div className="text-center border-b border-[#F3C6D6]/70 pb-3 space-y-0.5 relative z-10">
-          <h3 className="font-invitation text-2xl sm:text-3xl font-bold text-[#5C1F38] leading-relaxed">
+          <h3 className="font-serif-title text-xl sm:text-2xl font-bold text-[#5C1F38] leading-relaxed py-1 overflow-visible">
             Thông Tin Đêm Nhạc
           </h3>
-          <p className="text-xs sm:text-sm text-[#7D6670] uppercase tracking-wider font-bold font-invitation">
+          <p className="text-xs text-[#7D6670] uppercase tracking-wider font-semibold">
             Thời Gian & Không Gian
           </p>
         </div>
 
-        <div className="space-y-4 text-base relative z-10 font-invitation">
+        <div className="space-y-4 text-xs sm:text-sm relative z-10">
           {/* Thời gian */}
           <div className="flex items-start gap-3.5">
             <div className="p-2 rounded-xl bg-[#FFF5F8] border border-[#F3C6D6] text-[#D85C8A] shrink-0 mt-0.5 shadow-2xs">
               <Calendar className="w-4 h-4" />
             </div>
             <div className="space-y-1 flex-1">
-              <p className="font-bold text-[#5C1F38] text-lg sm:text-xl font-invitation leading-relaxed">
+              <p className="font-semibold text-[#5C1F38] text-sm sm:text-base">
                 {config.eventDateLabel}
               </p>
-              <div className="flex flex-wrap items-center gap-2 text-sm sm:text-base text-[#7D6670] font-invitation tabular-nums leading-relaxed">
+              <div className="flex flex-wrap items-center gap-2 text-xs text-[#7D6670] font-sans-ui tabular-nums">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5 text-[#D85C8A]" />
-                  Đón khách: <strong className="text-[#4A3B42] font-bold">{config.checkinTime}</strong>
+                  Đón khách: <strong className="text-[#4A3B42] font-semibold">{config.checkinTime}</strong>
                 </span>
                 <span>•</span>
                 <span>
-                  Bắt đầu: <strong className="text-[#4A3B42] font-bold">{config.startTime}</strong>
+                  Bắt đầu: <strong className="text-[#4A3B42] font-semibold">{config.startTime}</strong>
                 </span>
               </div>
             </div>
@@ -286,21 +314,21 @@ export function LetterContent({
             </div>
             <div className="space-y-2 flex-1">
               <div>
-                <p className="font-bold text-[#5C1F38] text-lg sm:text-xl font-invitation leading-relaxed">
+                <p className="font-semibold text-[#5C1F38] text-sm sm:text-base">
                   {config.venueName}
                 </p>
-                <p className="text-sm sm:text-base text-[#7D6670] mt-0.5 leading-relaxed font-invitation">
+                <p className="text-xs text-[#7D6670] mt-0.5 leading-relaxed">
                   {config.venueAddress}
                 </p>
               </div>
 
               {/* Nút tác vụ xem map & copy địa chỉ */}
-              <div className="flex flex-wrap items-center gap-2 pt-1 font-invitation">
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <a
                   href={config.googleMapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-[#D85C8A] hover:underline bg-[#FFF5F8] px-3.5 py-2 rounded-xl border border-[#F3C6D6] transition-all min-h-[44px] active:scale-[0.98] shadow-2xs"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D85C8A] hover:underline bg-[#FFF5F8] px-3.5 py-2 rounded-xl border border-[#F3C6D6] transition-all min-h-[44px] active:scale-[0.98] shadow-2xs"
                 >
                   <span>Chỉ đường Google Maps</span>
                   <ExternalLink className="w-3.5 h-3.5" />
@@ -309,12 +337,12 @@ export function LetterContent({
                 <button
                   type="button"
                   onClick={handleCopyAddress}
-                  className="inline-flex items-center gap-1.5 text-sm sm:text-base font-bold text-[#7D6670] hover:text-[#4A3B42] bg-white border border-[#F3C6D6] px-3 py-2 rounded-xl transition-all min-h-[44px] active:scale-[0.98] shadow-2xs cursor-pointer"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium text-[#7D6670] hover:text-[#4A3B42] bg-white border border-[#F3C6D6] px-3 py-2 rounded-xl transition-all min-h-[44px] active:scale-[0.98] shadow-2xs cursor-pointer"
                 >
                   {copiedAddress ? (
                     <>
                       <Check className="w-3.5 h-3.5 text-emerald-600" />
-                      <span className="text-emerald-600 font-bold">Đã chép địa chỉ</span>
+                      <span className="text-emerald-600 font-semibold">Đã chép địa chỉ</span>
                     </>
                   ) : (
                     <>
@@ -339,16 +367,14 @@ export function LetterContent({
             </div>
             <div className="space-y-2 flex-1">
               <div>
-                <p className="font-bold text-[#5C1F38] text-base sm:text-lg font-invitation leading-relaxed">
-                  Trang phục gợi ý (Dress code)
-                </p>
-                <p className="text-sm sm:text-base text-[#7D6670] mt-0.5 leading-relaxed font-invitation">
+                <p className="font-semibold text-[#5C1F38] text-xs sm:text-sm">Trang phục gợi ý (Dress code)</p>
+                <p className="text-xs text-[#7D6670] mt-0.5 leading-relaxed">
                   {config.dresscodeDescription}
                 </p>
               </div>
 
               {/* Bảng màu mẫu sang trọng */}
-              <div className="flex flex-wrap gap-2 pt-1 font-invitation">
+              <div className="flex flex-wrap gap-2 pt-1">
                 {config.dresscodeColors.map((color) => (
                   <div
                     key={color.name}
@@ -358,7 +384,7 @@ export function LetterContent({
                       className="w-3.5 h-3.5 rounded-full border border-black/10 shrink-0 shadow-xs"
                       style={{ backgroundColor: color.hex }}
                     />
-                    <span className="text-xs sm:text-sm font-bold text-[#7D6670] font-invitation">{color.name}</span>
+                    <span className="text-xs font-medium text-[#7D6670]">{color.name}</span>
                   </div>
                 ))}
               </div>
@@ -371,34 +397,34 @@ export function LetterContent({
       <SectionDivider icon={Sparkles} />
 
       {/* 5. Timeline Buổi Diễn (Lịch Trình Chương Trình) */}
-      <section className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 p-6 sm:p-8 sm:p-9 space-y-6 overflow-hidden">
+      <section className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 p-6 sm:p-8 sm:p-9 space-y-6 overflow-hidden font-sans-ui">
         {/* Khung viền đôi kiểu thiệp in cao cấp */}
         <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
 
         <div className="text-center border-b border-[#F3C6D6]/70 pb-3 space-y-0.5 relative z-10">
-          <h3 className="font-invitation text-2xl sm:text-3xl font-bold text-[#5C1F38] leading-relaxed">
+          <h3 className="font-serif-title text-xl sm:text-2xl font-bold text-[#5C1F38] leading-relaxed py-1 overflow-visible">
             Lịch Trình Đêm Nhạc
           </h3>
-          <p className="text-xs sm:text-sm text-[#7D6670] uppercase tracking-wider font-bold font-invitation">
+          <p className="text-xs text-[#7D6670] uppercase tracking-wider font-semibold">
             Timeline Chương Trình
           </p>
         </div>
 
-        <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#F3C6D6] relative z-10 font-invitation">
+        <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#F3C6D6] relative z-10">
           {config.timeline.map((item, index) => (
             <div key={index} className="relative">
               {/* Chấm mốc timeline hồng cánh sen */}
               <span className="absolute -left-6 top-1 w-4 h-4 rounded-full border-2 border-white bg-[#D85C8A] shadow-xs" />
 
               <div className="space-y-0.5">
-                <span className="inline-block text-sm sm:text-base font-bold font-invitation tabular-nums text-[#D85C8A] bg-[#FFF5F8] px-2.5 py-0.5 rounded border border-[#F3C6D6]">
+                <span className="inline-block text-xs font-bold font-sans-ui tabular-nums text-[#D85C8A] bg-[#FFF5F8] px-2 py-0.5 rounded border border-[#F3C6D6]">
                   {item.time}
                 </span>
-                <p className="font-bold text-base sm:text-lg text-[#5C1F38] mt-1 text-balance font-invitation leading-relaxed">
+                <p className="font-semibold text-xs sm:text-sm text-[#5C1F38] mt-1 text-balance">
                   {item.title}
                 </p>
                 {item.description && (
-                  <p className="text-sm sm:text-base text-[#7D6670] leading-relaxed font-invitation">
+                  <p className="text-xs text-[#7D6670] leading-relaxed">
                     {item.description}
                   </p>
                 )}
@@ -422,18 +448,42 @@ export function LetterContent({
       {/* Nét vẽ uốn lượn kết thư (Signature Flourish) trước phần RSVP */}
       <SignatureFlourish />
 
-      {/* 7. Form Xác Nhận RSVP */}
-      <RsvpSection guest={guest} config={config} onRsvpSuccess={onRsvpUpdated} />
+      {/* 7. Form Xác Nhận RSVP (kèm Vé kỷ niệm mini khi đã xác nhận) */}
+      <RsvpSection
+        guest={guest}
+        config={config}
+        onRsvpSuccess={handleRsvpUpdated}
+        logoUrl={logoUrl}
+      />
 
-      {/* 8. Chân trang & Chữ ký Host */}
-      <footer className="text-center pt-8 pb-6 border-t border-[#F3C6D6]/60 space-y-3 font-invitation">
-        <p className="text-base sm:text-lg text-[#7D6670] text-balance italic font-invitation leading-relaxed">
+      {/* 8. Bức Tường Lời Nhắn (Cập nhật tự động) */}
+      <SectionDivider icon={Heart} />
+      <MessageWall latestMessage={latestWallMessage} />
+
+      {/* 9. Chân trang, Chữ ký Host & Nút Gấp lại phong bì */}
+      <footer className="text-center pt-8 pb-6 border-t border-[#F3C6D6]/60 space-y-4 font-sans-ui">
+        <p className="text-xs sm:text-sm text-[#7D6670] text-balance italic">
           {config.footerThankYou || 'Rất mong được gặp bạn trong đêm nhạc ấm áp này'}
         </p>
-        <p className="font-invitation text-4xl sm:text-5xl text-[#5C1F38] font-bold leading-relaxed">
+        <p className="font-serif-title text-3xl sm:text-4xl text-[#5C1F38] font-bold leading-relaxed py-1 overflow-visible">
           {config.hostName}
         </p>
-        <div className="pt-2 flex items-center justify-center gap-2 text-xs sm:text-sm text-[#7D6670]/70 font-invitation">
+
+        {/* Nút Gấp lại phong bì (Requirement 5) */}
+        {onCloseEnvelope && (
+          <div className="pt-2 flex justify-center">
+            <button
+              type="button"
+              onClick={onCloseEnvelope}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#F3C6D6] bg-white/90 hover:bg-[#FFF5F8] hover:border-[#D85C8A] text-[#7D6670] hover:text-[#5C1F38] transition-all duration-200 text-xs sm:text-sm font-semibold shadow-2xs active:scale-[0.97] cursor-pointer"
+            >
+              <RotateCcw className="w-4 h-4 text-[#D85C8A]" />
+              <span>Gấp lại phong bì</span>
+            </button>
+          </div>
+        )}
+
+        <div className="pt-2 flex items-center justify-center gap-2 text-[11px] text-[#7D6670]/70">
           <span>© {new Date().getFullYear()} {config.eventName}</span>
         </div>
       </footer>

@@ -250,9 +250,9 @@ export function AdminDashboard() {
       'Tên khách mời',
       'Trạng thái',
       'Số người tham dự',
-      'Bài hát yêu cầu',
-      'Lời chúc',
-      'Lời nhắn riêng',
+      'Lời nhắn gửi đêm nhạc',
+      'Ghi chú riêng BTC',
+      'Lời nhắn riêng từ Host',
       'Link thiệp mời',
       'Thời gian mở',
       'Thời gian phản hồi',
@@ -363,7 +363,7 @@ export function AdminDashboard() {
               }`}
             >
               <Music className="w-3.5 h-3.5" />
-              <span>Bài hát yêu cầu ({songRequestsCount})</span>
+              <span>Lời nhắn ({songRequestsCount})</span>
             </button>
 
             <button
@@ -627,7 +627,7 @@ export function AdminDashboard() {
               {editStatus === 'ACCEPTED' && (
                 <div className="space-y-1.5">
                   <label htmlFor="edit-song" className="block text-xs font-medium text-text">
-                    Ca khúc yêu cầu
+                    Lời nhắn gửi đến đêm nhạc (Bức tường lời nhắn)
                   </label>
                   <input
                     id="edit-song"
@@ -635,7 +635,7 @@ export function AdminDashboard() {
                     maxLength={200}
                     value={editSongRequest}
                     onChange={(e) => setEditSongRequest(e.target.value)}
-                    placeholder="Tên bài hát..."
+                    placeholder="Gửi một lời chúc hoặc tâm tình nhỏ đến Still us..."
                     className="w-full px-3.5 py-2 text-xs rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text"
                   />
                 </div>
@@ -643,7 +643,7 @@ export function AdminDashboard() {
 
               <div className="space-y-1.5">
                 <label htmlFor="edit-wish" className="block text-xs font-medium text-text">
-                  Lời chúc từ khách mời
+                  Ghi chú riêng BTC
                 </label>
                 <textarea
                   id="edit-wish"
@@ -651,7 +651,7 @@ export function AdminDashboard() {
                   maxLength={500}
                   value={editWishMessage}
                   onChange={(e) => setEditWishMessage(e.target.value)}
-                  placeholder="Để trống nếu không có..."
+                  placeholder="Ví dụ: SĐT liên hệ, muốn ngồi gần bạn A, hoặc dự kiến đến lúc 17:00..."
                   className="w-full px-3.5 py-2 text-xs rounded-xl bg-bg border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text resize-none"
                 />
               </div>

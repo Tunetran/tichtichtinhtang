@@ -50,7 +50,7 @@ export function AudioPlayer({ isPlaying, onToggle }: AudioPlayerProps) {
             <VolumeX className="w-3.5 h-3.5 text-text-muted" />
           )}
 
-          <span className="text-xs sm:text-sm font-bold text-text tracking-wide hidden sm:inline select-none font-invitation">
+          <span className="text-[11px] font-semibold text-text tracking-wide hidden sm:inline select-none font-sans-ui">
             {isPlaying ? 'Đang phát' : 'Âm nhạc'}
           </span>
         </div>
