@@ -88,7 +88,7 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 w-64 rounded-2xl bg-[#FFFDF9] border border-[#C8E6C9] shadow-[0_12px_30px_-5px_rgba(0,108,58,0.18)] z-50 py-2 font-sans-ui overflow-hidden animate-fadeIn">
+          <div className="absolute bottom-full left-0 mb-2 z-50 min-w-[200px] w-64 rounded-2xl bg-[#FFFDF9] border border-[#C8E6C9] shadow-[0_12px_30px_-5px_rgba(0,108,58,0.18)] py-2 font-sans-ui overflow-hidden animate-fadeIn">
             <a
               href={googleCalendarUrl}
               target="_blank"

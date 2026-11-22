@@ -171,7 +171,7 @@ export function LetterContent({
       {/* ========================================================
           3. KHỐI LỊCH DIỄN, THỜI GIAN & ĐỊA ĐIỂM (Page 3)
          ======================================================== */}
-      <section className="relative bg-[#FFFDF9]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-8 space-y-6 overflow-hidden">
+      <section className="relative bg-[#FFFDF9]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-8 space-y-6 overflow-visible">
         {/* Câu thơ đề dân gian */}
         <div className="text-center space-y-1 border-b border-[#C8E6C9]/60 pb-3">
           <p className="font-serif-title text-sm sm:text-base text-[#006C3A] font-semibold tracking-normal leading-relaxed">
