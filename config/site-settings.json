@@ -2,5 +2,12 @@
   "event_logo_url": "/images/logo-tichtichtinhtang.png",
   "event_bg_url": "/images/bg-bamboo-lotus.png",
   "wax_seal_url": "/images/wax-seal-combined.png",
-  "updated_at": "2026-11-22T23:25:00.000Z"
+  "organizer_contact": {
+    "name": "aa",
+    "phone": "aa",
+    "email": "aaa",
+    "social_url": "aa",
+    "note": "aa"
+  },
+  "updated_at": "2026-11-22T19:58:00.730Z"
 }

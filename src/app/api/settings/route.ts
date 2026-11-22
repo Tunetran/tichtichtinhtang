@@ -3,7 +3,7 @@ import path from 'path';
 import fs from 'fs';
 import { isAdminAuthenticated, verifyAdminPassword } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { getSiteSettings, updateSiteSettings } from '@/lib/site-settings';
+import { getSiteSettings, updateSiteSettings, type OrganizerContact, type SiteSettings } from '@/lib/site-settings';
 import { deleteMediaFile } from '@/lib/storage-cleanup';
 
 export const dynamic = 'force-dynamic';
@@ -81,7 +81,7 @@ async function checkAdminAuth(
 }
 
 /**
- * GET: Trả về { event_logo_url, event_bg_url, wax_seal_url } hiện tại
+ * GET: Trả về { event_logo_url, event_bg_url, wax_seal_url, organizer_contact } hiện tại
  */
 export async function GET() {
   const settings = await getSiteSettings();
@@ -90,6 +90,7 @@ export async function GET() {
       event_logo_url: settings.event_logo_url,
       event_bg_url: settings.event_bg_url,
       wax_seal_url: settings.wax_seal_url,
+      organizer_contact: settings.organizer_contact || null,
     },
     {
       headers: {
@@ -176,6 +177,61 @@ export async function POST(req: Request) {
         return NextResponse.json(
           { error: 'Yêu cầu mật khẩu quản trị viên hoặc phiên đăng nhập admin' },
           { status: 401 }
+        );
+      }
+
+      // Xử lý lưu đối tượng organizer_contact hoặc gói cập nhật cài đặt tổng hợp
+      if (
+        body &&
+        ('organizer_contact' in body ||
+          ('event_logo_url' in body && 'event_bg_url' in body) ||
+          ('wax_seal_url' in body && 'event_bg_url' in body))
+      ) {
+        let organizerContactToSave: OrganizerContact | null | undefined = undefined;
+        if ('organizer_contact' in body) {
+          if (body.organizer_contact && typeof body.organizer_contact === 'object') {
+            const raw = body.organizer_contact as Record<string, unknown>;
+            organizerContactToSave = {
+              name: typeof raw.name === 'string' ? raw.name.trim() : '',
+              phone: typeof raw.phone === 'string' ? raw.phone.trim() : '',
+              email: typeof raw.email === 'string' ? raw.email.trim() : '',
+              social_url: typeof raw.social_url === 'string' ? raw.social_url.trim() : '',
+              note: typeof raw.note === 'string' ? raw.note.trim() : '',
+            };
+          } else {
+            organizerContactToSave = null;
+          }
+        }
+
+        const updates: Partial<SiteSettings> = {};
+        if ('organizer_contact' in body) {
+          updates.organizer_contact = organizerContactToSave;
+        }
+        if (typeof body.event_logo_url === 'string') {
+          updates.event_logo_url = body.event_logo_url.trim() || null;
+        }
+        if (typeof body.event_bg_url === 'string') {
+          updates.event_bg_url = body.event_bg_url.trim() || null;
+        }
+        if (typeof body.wax_seal_url === 'string') {
+          updates.wax_seal_url = body.wax_seal_url.trim() || null;
+        }
+
+        const updated = await updateSiteSettings(updates);
+        return NextResponse.json(
+          {
+            success: true,
+            event_logo_url: updated.event_logo_url,
+            event_bg_url: updated.event_bg_url,
+            wax_seal_url: updated.wax_seal_url,
+            organizer_contact: updated.organizer_contact || null,
+            message: 'Đã lưu cấu hình cài đặt thành công!',
+          },
+          {
+            headers: {
+              'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            },
+          }
         );
       }
 

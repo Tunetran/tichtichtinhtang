@@ -20,6 +20,8 @@ import { RsvpSection } from './RsvpSection';
 import { GuestWishesSection } from './GuestWishesSection';
 import { EventCountdown } from './EventCountdown';
 import { AddToCalendarButton } from './AddToCalendarButton';
+import { OrganizerContactModal } from './OrganizerContactModal';
+import type { OrganizerContact } from '@/lib/site-settings';
 
 interface LetterContentProps {
   guest: GuestRecord;
@@ -28,6 +30,7 @@ interface LetterContentProps {
   logoUrl?: string | null;
   isOpened?: boolean;
   onCloseEnvelope?: () => void;
+  organizerContact?: OrganizerContact | null;
 }
 
 /**
@@ -57,6 +60,7 @@ export function LetterContent({
   logoUrl,
   isOpened = false,
   onCloseEnvelope,
+  organizerContact,
 }: LetterContentProps) {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [latestWish, setLatestWish] = useState<{ id?: string; name: string; message: string } | null>(null);
@@ -546,9 +550,10 @@ export function LetterContent({
           </p>
         </div>
 
-        {/* Nút Gấp lại phong bì */}
-        {onCloseEnvelope && (
-          <div className="pt-2 flex justify-center">
+        {/* Nút hành động cuối thư: Liên hệ Ban Tổ Chức & Gấp lại phong bì */}
+        <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+          <OrganizerContactModal contact={organizerContact} />
+          {onCloseEnvelope && (
             <button
               type="button"
               onClick={onCloseEnvelope}
@@ -557,8 +562,8 @@ export function LetterContent({
               <RotateCcw className="w-4 h-4 text-[#006C3A]" />
               <span>Gấp lại phong bì thư</span>
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Bản quyền sự kiện */}
         <footer className="pt-4 text-xs text-[#61733F]/80 space-y-1 font-sans-ui tracking-normal">

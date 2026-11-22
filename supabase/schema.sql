@@ -100,6 +100,7 @@ CREATE TABLE IF NOT EXISTS site_settings (
 
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS event_bg_url TEXT;
 ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS wax_seal_url TEXT;
+ALTER TABLE site_settings ADD COLUMN IF NOT EXISTS organizer_contact JSONB;
 
 DROP TRIGGER IF EXISTS trg_site_settings_updated_at ON site_settings;
 CREATE TRIGGER trg_site_settings_updated_at

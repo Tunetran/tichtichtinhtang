@@ -19,9 +19,11 @@ import {
   Play,
   Pause,
   RotateCcw,
+  Phone,
 } from 'lucide-react';
 import type { EventConfig, SponsorItem } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
+import type { OrganizerContact } from '@/lib/site-settings';
 
 interface EventVisualSettingsTabProps {
   onSaved?: () => void;
@@ -37,6 +39,13 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
   const [logoUrl, setLogoUrl] = useState<string>('/images/logo-tichtichtinhtang.png');
   const [bgUrl, setBgUrl] = useState<string>('/images/bg-bamboo-lotus.png');
   const [waxSealUrl, setWaxSealUrl] = useState<string>('/images/wax-seal-combined.png');
+  const [organizerContact, setOrganizerContact] = useState<OrganizerContact>({
+    name: '',
+    phone: '',
+    email: '',
+    social_url: '',
+    note: '',
+  });
 
   // Invitation text state
   const [invitationText, setInvitationText] = useState<string>('');
@@ -91,6 +100,15 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
             if (sData.event_logo_url) setLogoUrl(sData.event_logo_url);
             if (sData.event_bg_url) setBgUrl(sData.event_bg_url);
             if (sData.wax_seal_url) setWaxSealUrl(sData.wax_seal_url);
+            if (sData.organizer_contact) {
+              setOrganizerContact({
+                name: sData.organizer_contact.name || '',
+                phone: sData.organizer_contact.phone || '',
+                email: sData.organizer_contact.email || '',
+                social_url: sData.organizer_contact.social_url || '',
+                note: sData.organizer_contact.note || '',
+              });
+            }
           }
         }
       } catch {
@@ -209,6 +227,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
             event_logo_url: logoUrl,
             event_bg_url: bgUrl,
             wax_seal_url: waxSealUrl,
+            organizer_contact: organizerContact,
           }),
         }),
       ]);
@@ -867,6 +886,91 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
               </button>
             </div>
           </form>
+        </div>
+
+        {/* ========================================================
+            THẺ 7: THÔNG TIN LIÊN HỆ BAN TỔ CHỨC
+           ======================================================== */}
+        <div className="bg-bg-surface border border-border rounded-2xl p-5 shadow-2xs space-y-4 md:col-span-2">
+          <div className="flex items-center gap-2 border-b border-border/70 pb-3">
+            <Phone className="w-4 h-4 text-[#006C3A]" />
+            <h3 className="font-semibold text-sm text-text">7. Thông Tin Liên Hệ Ban Tổ Chức</h3>
+          </div>
+          <p className="text-xs text-text-muted">
+            Thông tin liên hệ sẽ hiển thị trong hộp thoại nổi khi khách mời bấm nút &ldquo;Liên hệ Ban Tổ Chức&rdquo; trên thiệp. Bỏ trống các ô nếu không muốn hiển thị mục đó.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* 1. Tên BTC / Phụ trách */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text block">
+                Tên Ban Tổ Chức / Người phụ trách
+              </label>
+              <input
+                type="text"
+                value={organizerContact.name || ''}
+                onChange={(e) => setOrganizerContact((prev) => ({ ...prev, name: e.target.value }))}
+                placeholder="Ví dụ: BTC The Light / Đinh Thị Thảo Vy"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border text-text focus:outline-none focus:ring-1 focus:ring-[#006C3A] font-sans-ui"
+              />
+            </div>
+
+            {/* 2. Số điện thoại */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text block">
+                Số điện thoại liên hệ
+              </label>
+              <input
+                type="text"
+                value={organizerContact.phone || ''}
+                onChange={(e) => setOrganizerContact((prev) => ({ ...prev, phone: e.target.value }))}
+                placeholder="Ví dụ: 0912 345 678"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border text-text focus:outline-none focus:ring-1 focus:ring-[#006C3A] font-sans-ui"
+              />
+            </div>
+
+            {/* 3. Email */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-text block">
+                Email liên hệ
+              </label>
+              <input
+                type="email"
+                value={organizerContact.email || ''}
+                onChange={(e) => setOrganizerContact((prev) => ({ ...prev, email: e.target.value }))}
+                placeholder="Ví dụ: thelight.btclive@gmail.com"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border text-text focus:outline-none focus:ring-1 focus:ring-[#006C3A] font-sans-ui"
+              />
+            </div>
+
+            {/* 4. Link Zalo / Fanpage */}
+            <div className="space-y-1.5 sm:col-span-2 lg:col-span-2">
+              <label className="text-xs font-semibold text-text block">
+                Link Zalo hoặc Facebook Fanpage (Tùy chọn)
+              </label>
+              <input
+                type="url"
+                value={organizerContact.social_url || ''}
+                onChange={(e) => setOrganizerContact((prev) => ({ ...prev, social_url: e.target.value }))}
+                placeholder="Ví dụ: https://zalo.me/... hoặc https://facebook.com/..."
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border text-text focus:outline-none focus:ring-1 focus:ring-[#006C3A] font-sans-ui"
+              />
+            </div>
+
+            {/* 5. Ghi chú hỗ trợ */}
+            <div className="space-y-1.5 sm:col-span-2 lg:col-span-3">
+              <label className="text-xs font-semibold text-text block">
+                Ghi chú hỗ trợ ngắn (Tùy chọn)
+              </label>
+              <textarea
+                rows={2}
+                value={organizerContact.note || ''}
+                onChange={(e) => setOrganizerContact((prev) => ({ ...prev, note: e.target.value }))}
+                placeholder="Ví dụ: Hỗ trợ chỉ đường, hướng dẫn gửi xe và đón tiếp khách mời từ 17:30..."
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border text-text focus:outline-none focus:ring-1 focus:ring-[#006C3A] leading-relaxed resize-y font-sans-ui"
+              />
+            </div>
+          </div>
         </div>
       </div>
 

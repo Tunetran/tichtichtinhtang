@@ -9,6 +9,7 @@ import { EnvelopeStage, type InviteStage } from './EnvelopeStage';
 import { AudioPlayer } from './AudioPlayer';
 import { LetterContent } from './LetterContent';
 import { FallingHearts } from '@/components/FallingHearts';
+import type { OrganizerContact } from '@/lib/site-settings';
 
 interface InviteExperienceProps {
   guest: GuestRecord;
@@ -16,6 +17,7 @@ interface InviteExperienceProps {
   initialLogoUrl?: string | null;
   initialBgUrl?: string | null;
   initialWaxSealUrl?: string | null;
+  initialOrganizerContact?: OrganizerContact | null;
 }
 
 export function InviteExperience({
@@ -24,6 +26,7 @@ export function InviteExperience({
   initialLogoUrl = null,
   initialBgUrl = null,
   initialWaxSealUrl = null,
+  initialOrganizerContact = null,
 }: InviteExperienceProps) {
   const [guest, setGuest] = useState<GuestRecord>(initialGuest);
   const [stage, setStage] = useState<InviteStage>('closed');
@@ -31,11 +34,14 @@ export function InviteExperience({
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
   const [bgUrl, setBgUrl] = useState<string | null>(initialBgUrl);
   const [waxSealUrl, setWaxSealUrl] = useState<string | null>(initialWaxSealUrl);
+  const [organizerContact, setOrganizerContact] = useState<OrganizerContact | null>(
+    initialOrganizerContact
+  );
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const userMutedRef = useRef<boolean>(false);
 
-  // Tự động kiểm tra cập nhật logo, nền và con dấu mới nhất từ API cài đặt
+  // Tự động kiểm tra cập nhật logo, nền, con dấu và thông tin liên hệ BTC mới nhất từ API cài đặt
   useEffect(() => {
     let mounted = true;
     fetch('/api/settings', { cache: 'no-store' })
@@ -53,6 +59,9 @@ export function InviteExperience({
           }
           if ('wax_seal_url' in data) {
             setWaxSealUrl(data.wax_seal_url || null);
+          }
+          if ('organizer_contact' in data) {
+            setOrganizerContact(data.organizer_contact || null);
           }
         }
       })
@@ -264,6 +273,7 @@ export function InviteExperience({
               logoUrl={logoUrl}
               isOpened={stage === 'reading'}
               onCloseEnvelope={handleCloseEnvelope}
+              organizerContact={organizerContact}
             />
           </motion.div>
         )}

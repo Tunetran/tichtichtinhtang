@@ -38,22 +38,22 @@
   ],
   "dresscodeOptions": [
     {
-      "title": "ĐỒ LỊCH SỰ",
-      "description": "Trang phục công sở, thanh lịch, trang nhã",
+      "bgHex": "#C9E6C9",
       "image": "/images/dresscode-1-smart.png",
-      "bgHex": "#C9E6C9"
+      "title": "ĐỒ LỊCH SỰ",
+      "description": "Trang phục công sở, thanh lịch, trang nhã"
     },
     {
-      "title": "ÁO DÀI",
-      "description": "Áo dài truyền thống hoặc áo dài cách tân",
+      "bgHex": "#F8B4C4",
       "image": "/images/dresscode-2-aodai.png",
-      "bgHex": "#F8B4C4"
+      "title": "ÁO DÀI",
+      "description": "Áo dài truyền thống hoặc áo dài cách tân"
     },
     {
-      "title": "TRANG PHỤC TRUYỀN THỐNG",
-      "description": "Cổ phục Việt Nam, trang phục dân gian",
+      "bgHex": "#FAD8C0",
       "image": "/images/dresscode-3-traditional.png",
-      "bgHex": "#FAD8C0"
+      "title": "TRANG PHỤC TRUYỀN THỐNG",
+      "description": "Cổ phục Việt Nam, trang phục dân gian"
     }
   ],
   "hostName": "Đoàn Kịch The Light",
@@ -91,8 +91,8 @@
     }
   ],
   "audio": {
-    "src": "/music/bg-love.mp3",
-    "defaultVolume": 0.4
+    "src": "https://hxrfcdgaydfpaydtouwo.supabase.co/storage/v1/object/public/event-audio/uploads/audio/1795375285556-1--1-.mp3",
+    "defaultVolume": 1
   },
   "ogImage": "/images/page-1.png",
   "footerThankYou": "The Light xin chân thành cảm ơn Quý Thầy/Cô đã dành thời gian quý báu, gác lại những bận rộn để đến tham dự sự kiện của chúng em. Sự hiện diện của Quý Thầy/Cô không chỉ là niềm vinh dự mà còn là nguồn động viên lớn lao, tiếp thêm cho cả đoàn sự tự tin và cảm hứng để mang đến một buổi diễn trọn vẹn nhất. Kính chúc Quý Thầy/Cô thật nhiều sức khỏe, hạnh phúc và luôn thành công trên con đường gieo mầm tri thức.\nTrân trọng cảm ơn! 🎋",
