@@ -24,6 +24,13 @@ export interface GalleryPhoto {
   caption?: string;
 }
 
+export interface SponsorItem {
+  id: string;
+  name: string;
+  logoUrl: string;
+  category: 'sponsor' | 'companion'; // 'sponsor': Đơn vị tài trợ, 'companion': Đơn vị đồng hành
+}
+
 export interface EventConfig {
   theme: ThemeName;
   eventName: string;
@@ -63,6 +70,7 @@ export interface EventConfig {
   showCountdown?: boolean;
   showGallery?: boolean;
   showSongRequest?: boolean;
+  sponsors?: SponsorItem[];
 }
 
 export const EVENT_CONFIG: EventConfig = {
@@ -167,4 +175,12 @@ export const EVENT_CONFIG: EventConfig = {
   showCountdown: true,
   showGallery: false,
   showSongRequest: false,
+  sponsors: [
+    {
+      id: 'sp-1',
+      name: 'The Light',
+      logoUrl: '/images/logo-the-light.png',
+      category: 'companion',
+    },
+  ],
 };

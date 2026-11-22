@@ -13,7 +13,10 @@ import {
   ExternalLink,
   Layers,
   Award,
+  Plus,
+  Handshake,
 } from 'lucide-react';
+import type { SponsorItem } from '@/config/event';
 
 interface EventLogoSettingProps {
   onLogoUpdated?: (newLogoUrl: string | null) => void;
@@ -40,6 +43,14 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
   const [isUploadingSeal, setIsUploadingSeal] = useState<boolean>(false);
   const [isSavingSeal, setIsSavingSeal] = useState<boolean>(false);
 
+  // Sponsors & Companions state
+  const [sponsorsList, setSponsorsList] = useState<SponsorItem[]>([]);
+  const [newPartnerName, setNewPartnerName] = useState<string>('');
+  const [newPartnerCategory, setNewPartnerCategory] = useState<'sponsor' | 'companion'>('sponsor');
+  const [newPartnerUrl, setNewPartnerUrl] = useState<string>('');
+  const [isUploadingPartner, setIsUploadingPartner] = useState<boolean>(false);
+  const [isSavingPartners, setIsSavingPartners] = useState<boolean>(false);
+
   // General loading & notification
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [statusMessage, setStatusMessage] = useState<{
@@ -50,6 +61,7 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
   const logoFileInputRef = useRef<HTMLInputElement | null>(null);
   const bgFileInputRef = useRef<HTMLInputElement | null>(null);
   const sealFileInputRef = useRef<HTMLInputElement | null>(null);
+  const partnerFileInputRef = useRef<HTMLInputElement | null>(null);
 
   const showNotification = (type: 'success' | 'error', text: string) => {
     setStatusMessage({ type, text });
@@ -63,7 +75,11 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
     let mounted = true;
     async function fetchSettings() {
       try {
-        const res = await fetch('/api/settings', { cache: 'no-store' });
+        const [res, adminRes] = await Promise.all([
+          fetch('/api/settings', { cache: 'no-store' }),
+          fetch('/api/admin/settings', { cache: 'no-store' }).catch(() => null),
+        ]);
+
         if (res.ok) {
           const data = await res.json();
           if (mounted) {
@@ -81,6 +97,13 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
             }
           }
         }
+
+        if (adminRes && adminRes.ok) {
+          const adminData = await adminRes.json();
+          if (mounted && adminData?.config?.sponsors) {
+            setSponsorsList(adminData.config.sponsors);
+          }
+        }
       } catch {
         // Bỏ qua lỗi kết nối
       } finally {
@@ -93,6 +116,83 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
       mounted = false;
     };
   }, []);
+
+  // Upload ảnh Đơn vị tài trợ / đồng hành
+  const handlePartnerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingPartner(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Lỗi khi tải ảnh lên');
+      }
+      setNewPartnerUrl(data.url);
+      showNotification('success', 'Đã tải ảnh logo lên thành công!');
+    } catch (err) {
+      showNotification('error', (err as Error).message);
+    } finally {
+      setIsUploadingPartner(false);
+      if (partnerFileInputRef.current) partnerFileInputRef.current.value = '';
+    }
+  };
+
+  // Lưu danh sách đối tác vào cấu hình
+  const savePartnersToConfig = async (list: SponsorItem[]) => {
+    setIsSavingPartners(true);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sponsors: list }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Không thể lưu cài đặt đối tác');
+      }
+      showNotification('success', 'Đã cập nhật danh sách đơn vị tài trợ & đồng hành!');
+    } catch (err) {
+      showNotification('error', (err as Error).message);
+    } finally {
+      setIsSavingPartners(false);
+    }
+  };
+
+  // Thêm mới đối tác
+  const handleAddPartner = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPartnerUrl.trim()) {
+      showNotification('error', 'Vui lòng tải lên ảnh logo hoặc dán đường dẫn ảnh');
+      return;
+    }
+
+    const newItem: SponsorItem = {
+      id: `sp-${Date.now()}`,
+      name: newPartnerName.trim(),
+      logoUrl: newPartnerUrl.trim(),
+      category: newPartnerCategory,
+    };
+
+    const updated = [...sponsorsList, newItem];
+    setSponsorsList(updated);
+    setNewPartnerName('');
+    setNewPartnerUrl('');
+    await savePartnersToConfig(updated);
+  };
+
+  // Xóa đối tác
+  const handleDeletePartner = async (id: string) => {
+    const updated = sponsorsList.filter((s) => s.id !== id);
+    setSponsorsList(updated);
+    await savePartnersToConfig(updated);
+  };
 
   // 2. Upload Logo từ máy
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -834,6 +934,152 @@ export function EventLogoSetting({ onLogoUpdated, onBgUpdated, onSealUpdated }: 
               </button>
             </form>
           </div>
+        </div>
+
+        {/* ========================================================
+            4. ĐƠN VỊ TÀI TRỢ & ĐƠN VỊ ĐỒNG HÀNH
+           ======================================================== */}
+        <div className="p-4 sm:p-5 rounded-2xl bg-bg-surface/80 border border-border/80 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+            <div className="flex items-center gap-2">
+              <Handshake className="w-4 h-4 text-accent" />
+              <h3 className="font-semibold text-sm text-text">
+                4. Đơn Vị Tài Trợ & Đơn Vị Đồng Hành
+              </h3>
+            </div>
+            <span className="text-[11px] text-text-muted">
+              (Hiển thị trang trọng gần chân thiệp mời, tự động ẩn nhóm không có ảnh)
+            </span>
+          </div>
+
+          {/* Danh sách các logo đối tác hiện có */}
+          {sponsorsList.length === 0 ? (
+            <div className="p-6 text-center rounded-xl border border-dashed border-border/80 bg-bg/40 text-xs text-text-muted">
+              Chưa có đơn vị tài trợ hoặc đồng hành nào. Bạn có thể thêm ngay bên dưới.
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {sponsorsList.map((item) => (
+                <div
+                  key={item.id}
+                  className="relative group p-3 rounded-xl border border-border/80 bg-bg flex flex-col items-center justify-between gap-2 shadow-2xs hover:border-accent transition-all"
+                >
+                  <div className="w-full h-20 flex items-center justify-center p-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.logoUrl}
+                      alt={item.name || 'Logo'}
+                      className="max-h-full max-w-full object-contain bg-transparent border-0 shadow-none drop-shadow-xs"
+                    />
+                  </div>
+                  <div className="w-full text-center space-y-1">
+                    <span
+                      className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full ${
+                        item.category === 'sponsor'
+                          ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                          : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                      }`}
+                    >
+                      {item.category === 'sponsor' ? 'Đơn vị tài trợ' : 'Đơn vị đồng hành'}
+                    </span>
+                    <p className="text-xs font-medium text-text truncate w-full" title={item.name}>
+                      {item.name || '(Chưa đặt tên)'}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePartner(item.id)}
+                    disabled={isSavingPartners}
+                    title="Xóa logo này"
+                    className="absolute top-1.5 right-1.5 p-1 rounded-lg bg-bg-surface/80 hover:bg-rose-50 text-text-muted hover:text-rose-600 transition-colors shadow-2xs"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Form thêm mới đối tác */}
+          <form
+            onSubmit={handleAddPartner}
+            className="pt-2 border-t border-border/60 space-y-3"
+          >
+            <p className="text-xs font-semibold text-text flex items-center gap-1.5">
+              <Plus className="w-3.5 h-3.5 text-accent" />
+              <span>Thêm đối tác mới</span>
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+              <input
+                type="text"
+                value={newPartnerName}
+                onChange={(e) => setNewPartnerName(e.target.value)}
+                placeholder="Tên đơn vị (ví dụ: The Light, ACB...)"
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60"
+              />
+
+              <select
+                value={newPartnerCategory}
+                onChange={(e) => setNewPartnerCategory(e.target.value as 'sponsor' | 'companion')}
+                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text"
+              >
+                <option value="sponsor">Đơn vị tài trợ</option>
+                <option value="companion">Đơn vị đồng hành</option>
+              </select>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={partnerFileInputRef}
+                  onChange={handlePartnerUpload}
+                  accept="image/png,image/jpeg,image/webp,image/svg+xml"
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => partnerFileInputRef.current?.click()}
+                  disabled={isUploadingPartner || isSavingPartners}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl border border-border bg-bg hover:bg-bg-surface text-xs font-medium text-text transition-all disabled:opacity-50 cursor-pointer shadow-2xs"
+                >
+                  {isUploadingPartner ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin text-accent" />
+                      <span>Đang tải...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-3.5 h-3.5 text-accent" />
+                      <span>Chọn file từ máy</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={newPartnerUrl}
+                onChange={(e) => setNewPartnerUrl(e.target.value)}
+                placeholder="Hoặc dán URL logo (Khuyến khích PNG trong suốt không nền)..."
+                className="flex-1 px-3.5 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60 font-mono"
+              />
+
+              <button
+                type="submit"
+                disabled={!newPartnerUrl.trim() || isSavingPartners}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-primary-fg text-xs font-semibold hover:opacity-95 active:scale-[0.98] transition-all disabled:opacity-40 shadow-sm shrink-0 cursor-pointer"
+              >
+                {isSavingPartners ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Plus className="w-3.5 h-3.5" />
+                )}
+                <span>+ Thêm đối tác</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </section>

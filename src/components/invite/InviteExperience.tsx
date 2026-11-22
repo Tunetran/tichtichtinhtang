@@ -128,6 +128,7 @@ export function InviteExperience({
 
     // 4. Nhịp 3: Chuyển sang reading sau 1.4s (tăng 0.3s cho nhịp 2)
     setTimeout(() => {
+      window.scrollTo({ top: 0, behavior: 'instant' });
       setStage('reading');
     }, 1400);
   };
@@ -225,40 +226,44 @@ export function InviteExperience({
       {/* Floating Vinyl Audio Controller */}
       <AudioPlayer isPlaying={isPlaying} onToggle={handleToggleAudio} />
 
-      {/* Chặng 1 & 2: Phong bì niêm phong vật lý */}
+      {/* Chặng 1, 2 & 3: Chuyển đổi mượt mà giữa Phong bì và Nội dung thiệp */}
       <AnimatePresence mode="wait">
-        {stage !== 'reading' && (
-          <EnvelopeStage
+        {stage !== 'reading' ? (
+          <motion.div
             key="envelope-stage"
-            guest={guest}
-            config={config}
-            stage={stage}
-            onOpen={handleOpenEnvelope}
-            logoUrl={logoUrl}
-            waxSealUrl={waxSealUrl}
-          />
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0, transition: { duration: 0.4, ease: 'easeInOut' } }}
+            className="w-full flex justify-center"
+          >
+            <EnvelopeStage
+              guest={guest}
+              config={config}
+              stage={stage}
+              onOpen={handleOpenEnvelope}
+              logoUrl={logoUrl}
+              waxSealUrl={waxSealUrl}
+            />
+          </motion.div>
+        ) : (
+          <motion.div
+            key="reading-stage"
+            className="w-full flex justify-center"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <LetterContent
+              guest={guest}
+              config={config}
+              onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
+              logoUrl={logoUrl}
+              isOpened={stage === 'reading'}
+              onCloseEnvelope={handleCloseEnvelope}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Chặng 3: Nhịp 3 phóng to lá thư êm ái giữa màn hình */}
-      {stage === 'reading' && (
-        <motion.div
-          key="reading-stage"
-          className="w-full flex justify-center"
-          initial={{ scale: 0.86, opacity: 0, y: 24 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 110, damping: 20 }}
-        >
-          <LetterContent
-            guest={guest}
-            config={config}
-            onRsvpUpdated={(updatedGuest) => setGuest(updatedGuest)}
-            logoUrl={logoUrl}
-            isOpened={stage === 'reading'}
-            onCloseEnvelope={handleCloseEnvelope}
-          />
-        </motion.div>
-      )}
     </div>
   );
 }

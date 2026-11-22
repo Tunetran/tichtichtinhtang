@@ -73,22 +73,52 @@ export async function POST(req: Request, context: RouteContext) {
     // - DECLINED: attendees_count = 0, song_request = null, wish_message, responded_at = NOW
     const now = new Date().toISOString();
     const isAccepted = data.status === 'ACCEPTED';
+    const phone = data.phone?.trim() || null;
+    const email = data.email?.trim() || null;
 
-    const updatePayload = {
+    // Đóng gói JSON an toàn vào wish_message để tương thích với mọi bản backup / DB
+    let wishToSave = data.wish_message?.trim() || null;
+    if (phone || email) {
+      const contactPayload = {
+        phone: phone || '',
+        email: email || '',
+        note: wishToSave || '',
+      };
+      wishToSave = JSON.stringify(contactPayload);
+    }
+
+    const updatePayload: Record<string, unknown> = {
       status: data.status,
       attendees_count: isAccepted ? (data.attendees_count ?? 1) : 0,
       song_request: isAccepted ? (data.song_request?.trim() || null) : null,
-      wish_message: data.wish_message?.trim() || null,
+      wish_message: wishToSave,
       responded_at: now,
       opened_at: guest.opened_at || now,
     };
 
-    const { data: updatedGuest, error: updateError } = await supabaseAdmin
+    if (phone) updatePayload.phone = phone;
+    if (email) updatePayload.email = email;
+
+    let { data: updatedGuest, error: updateError } = await supabaseAdmin
       .from('guests')
       .update(updatePayload)
       .eq('id', guest.id)
       .select('slug, full_name, custom_message, status, attendees_count, song_request, wish_message, responded_at')
       .single();
+
+    // Fallback nếu database Supabase cũ chưa có cột phone hoặc email
+    if (updateError && (updateError.message.includes('phone') || updateError.message.includes('email'))) {
+      delete updatePayload.phone;
+      delete updatePayload.email;
+      const retry = await supabaseAdmin
+        .from('guests')
+        .update(updatePayload)
+        .eq('id', guest.id)
+        .select('slug, full_name, custom_message, status, attendees_count, song_request, wish_message, responded_at')
+        .single();
+      updatedGuest = retry.data;
+      updateError = retry.error;
+    }
 
     if (updateError || !updatedGuest) {
       return NextResponse.json(

@@ -36,6 +36,26 @@
       "hex": "#A8D5BA"
     }
   ],
+  "dresscodeOptions": [
+    {
+      "title": "ĐỒ LỊCH SỰ",
+      "description": "Trang phục công sở, thanh lịch, trang nhã",
+      "image": "/images/dresscode-1-smart.png",
+      "bgHex": "#C9E6C9"
+    },
+    {
+      "title": "ÁO DÀI",
+      "description": "Áo dài truyền thống hoặc áo dài cách tân",
+      "image": "/images/dresscode-2-aodai.png",
+      "bgHex": "#F8B4C4"
+    },
+    {
+      "title": "TRANG PHỤC TRUYỀN THỐNG",
+      "description": "Cổ phục Việt Nam, trang phục dân gian",
+      "image": "/images/dresscode-3-traditional.png",
+      "bgHex": "#FAD8C0"
+    }
+  ],
   "hostName": "Đoàn Kịch The Light",
   "contactLabel": "Ban Tổ Chức (Hotline / Zalo)",
   "contactUrl": "https://zalo.me/0987654321",
@@ -60,7 +80,14 @@
     {
       "time": "19:30",
       "title": "Kết thúc sự kiện",
-      "description": "Trao gửi lời tri ấn & chụp ảnh kỷ niệm cùng toàn thể đoàn kịch"
+      "description": "Trao gửi lời tri ân & chụp ảnh kỷ niệm cùng toàn thể đoàn kịch"
+    }
+  ],
+  "gallery": [
+    {
+      "src": "https://hxrfcdgaydfpaydtouwo.supabase.co/storage/v1/object/public/event-images/uploads/images/1795371549495-code_generated_image--2-.png",
+      "alt": "Code Generated Image (2)",
+      "caption": "Code Generated Image (2)"
     }
   ],
   "audio": {
@@ -72,6 +99,14 @@
   "rsvpHeading": "Xác Nhận Tham Dự",
   "rsvpSubheading": "Quý Thầy/Cô vui lòng gửi xác nhận để BTC sắp xếp chỗ ngồi và đón tiếp chu đáo nhất",
   "showCountdown": true,
-  "showGallery": false,
-  "showSongRequest": false
+  "showGallery": true,
+  "showSongRequest": false,
+  "sponsors": [
+    {
+      "id": "sp-1",
+      "name": "The Light",
+      "logoUrl": "/images/logo-the-light.png",
+      "category": "companion"
+    }
+  ]
 }

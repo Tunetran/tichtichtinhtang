@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import type { GuestRecord, AdminStats, GuestStatus } from '@/types/guest';
 import { EVENT_CONFIG } from '@/config/event';
+import { parseGuestContact } from '@/lib/guest-contact';
 import { StatsCards } from './StatsCards';
 import { GuestTable } from './GuestTable';
 import { SongRequestsTab } from './SongRequestsTab';
@@ -250,26 +251,33 @@ export function AdminDashboard() {
       'Tên khách mời',
       'Trạng thái',
       'Số người tham dự',
+      'Số điện thoại',
+      'Gmail / Email',
       'Lời nhắn gửi đêm nhạc',
-      'Ghi chú riêng BTC',
+      'Ghi chú / Lời chúc',
       'Lời nhắn riêng từ Host',
       'Link thiệp mời',
       'Thời gian mở',
       'Thời gian phản hồi',
     ];
 
-    const rows = guests.map((g, idx) => [
-      escapeCsv(idx + 1),
-      escapeCsv(g.full_name),
-      escapeCsv(statusMap[g.status] || g.status),
-      escapeCsv(g.attendees_count),
-      escapeCsv(g.song_request || ''),
-      escapeCsv(g.wish_message || ''),
-      escapeCsv(g.custom_message || ''),
-      escapeCsv(`${origin}/invite/${g.slug}`),
-      escapeCsv(g.opened_at || ''),
-      escapeCsv(g.responded_at || ''),
-    ]);
+    const rows = guests.map((g, idx) => {
+      const contact = parseGuestContact(g);
+      return [
+        escapeCsv(idx + 1),
+        escapeCsv(g.full_name),
+        escapeCsv(statusMap[g.status] || g.status),
+        escapeCsv(g.attendees_count),
+        escapeCsv(contact.phone || ''),
+        escapeCsv(contact.email || ''),
+        escapeCsv(g.song_request || ''),
+        escapeCsv(contact.note || ''),
+        escapeCsv(g.custom_message || ''),
+        escapeCsv(`${origin}/invite/${g.slug}`),
+        escapeCsv(g.opened_at || ''),
+        escapeCsv(g.responded_at || ''),
+      ];
+    });
 
     const csvBody = [headers.map(escapeCsv).join(','), ...rows.map((r) => r.join(','))].join('\r\n');
 

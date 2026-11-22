@@ -14,10 +14,13 @@ import {
   Music,
   UserCheck,
   Clock,
+  Phone,
+  Mail,
 } from 'lucide-react';
 import type { GuestRecord, GuestStatus } from '@/types/guest';
 import { EVENT_CONFIG } from '@/config/event';
 import { removeVietnameseTones } from '@/lib/slug';
+import { parseGuestContact } from '@/lib/guest-contact';
 
 interface GuestTableProps {
   guests: GuestRecord[];
@@ -34,6 +37,8 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
   const [searchKeyword, setSearchKeyword] = useState('');
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const [copiedZaloSlug, setCopiedZaloSlug] = useState<string | null>(null);
+  const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
+  const [copiedEmailId, setCopiedEmailId] = useState<string | null>(null);
 
   // Sao chép an toàn vào Clipboard kèm fallback cho Safari / iframe
   const copyTextToClipboard = async (text: string): Promise<boolean> => {
@@ -84,6 +89,22 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
     }
   };
 
+  const handleCopyPhone = async (id: string, phone: string) => {
+    const ok = await copyTextToClipboard(phone);
+    if (ok) {
+      setCopiedPhoneId(id);
+      setTimeout(() => setCopiedPhoneId(null), 2000);
+    }
+  };
+
+  const handleCopyEmail = async (id: string, email: string) => {
+    const ok = await copyTextToClipboard(email);
+    if (ok) {
+      setCopiedEmailId(id);
+      setTimeout(() => setCopiedEmailId(null), 2000);
+    }
+  };
+
   // Tính số lượng khách theo trạng thái cho các Tab
   const counts = useMemo(() => {
     return {
@@ -104,8 +125,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
     }
 
     if (searchKeyword.trim()) {
-      const normalizedKeyword = removeVietnameseTones(searchKeyword.trim().toLowerCase());
+      const rawKeyword = searchKeyword.trim().toLowerCase();
+      const normalizedKeyword = removeVietnameseTones(rawKeyword);
       result = result.filter((g) => {
+        const contact = parseGuestContact(g);
         const normalizedName = removeVietnameseTones(g.full_name.toLowerCase());
         const normalizedMessage = g.custom_message
           ? removeVietnameseTones(g.custom_message.toLowerCase())
@@ -113,10 +136,17 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
         const normalizedSong = g.song_request
           ? removeVietnameseTones(g.song_request.toLowerCase())
           : '';
+        const normalizedNote = contact.note
+          ? removeVietnameseTones(contact.note.toLowerCase())
+          : '';
+
         return (
           normalizedName.includes(normalizedKeyword) ||
           normalizedMessage.includes(normalizedKeyword) ||
           normalizedSong.includes(normalizedKeyword) ||
+          normalizedNote.includes(normalizedKeyword) ||
+          contact.phone.toLowerCase().includes(rawKeyword) ||
+          contact.email.toLowerCase().includes(rawKeyword) ||
           g.slug.includes(normalizedKeyword)
         );
       });
@@ -256,9 +286,11 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                 <thead className="bg-bg/70 border-b border-border/80 text-text-muted uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3 px-4 font-semibold">Khách Mời</th>
-                    <th className="py-3 px-4 font-semibold">Trạng Thái</th>
-                    <th className="py-3 px-4 font-semibold">Lời Nhắn & Ghi Chú Riêng BTC</th>
-                    <th className="py-3 px-4 font-semibold">Cập Nhật</th>
+                    <th className="py-3 px-3 font-semibold">Trạng Thái</th>
+                    <th className="py-3 px-3 font-semibold">Số Điện Thoại</th>
+                    <th className="py-3 px-3 font-semibold">Gmail / Email</th>
+                    <th className="py-3 px-3 font-semibold">Lời Nhắn & Ghi Chú</th>
+                    <th className="py-3 px-3 font-semibold">Cập Nhật</th>
                     <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
                   </tr>
                 </thead>
@@ -267,6 +299,9 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                     const isCopied = copiedSlug === guest.slug;
                     const isZaloCopied = copiedZaloSlug === guest.slug;
                     const updateTime = formatTime(guest.responded_at || guest.opened_at);
+                    const contact = parseGuestContact(guest);
+                    const isPhoneCopied = copiedPhoneId === guest.id;
+                    const isEmailCopied = copiedEmailId === guest.id;
 
                     return (
                       <tr key={guest.id} className="hover:bg-bg/40 transition-colors">
@@ -293,12 +328,67 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                         </td>
 
                         {/* Cột 2: Trạng thái */}
-                        <td className="py-3.5 px-4 whitespace-nowrap">
+                        <td className="py-3.5 px-3 whitespace-nowrap">
                           {renderStatusBadge(guest)}
                         </td>
 
-                        {/* Cột 3: Lời nhắn & Ghi chú riêng BTC */}
-                        <td className="py-3.5 px-4 max-w-[240px]">
+                        {/* Cột 3: Số Điện Thoại */}
+                        <td className="py-3.5 px-3 whitespace-nowrap">
+                          {contact.phone ? (
+                            <div className="inline-flex items-center gap-1.5 bg-bg/80 px-2 py-1 rounded-lg border border-border/80">
+                              <Phone className="w-3 h-3 text-accent shrink-0" />
+                              <span className="font-mono text-[11px] font-medium text-text select-all">
+                                {contact.phone}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyPhone(guest.id, contact.phone)}
+                                title="Sao chép số điện thoại"
+                                className="p-1 text-text-muted hover:text-accent transition-colors cursor-pointer"
+                              >
+                                {isPhoneCopied ? (
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3 h-3" />
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-text-muted/40">—</span>
+                          )}
+                        </td>
+
+                        {/* Cột 4: Gmail / Email */}
+                        <td className="py-3.5 px-3 max-w-[180px]">
+                          {contact.email ? (
+                            <div className="inline-flex items-center gap-1.5 bg-bg/80 px-2 py-1 rounded-lg border border-border/80 max-w-full">
+                              <Mail className="w-3 h-3 text-accent shrink-0" />
+                              <span
+                                className="font-mono text-[11px] text-text truncate max-w-[120px] select-all"
+                                title={contact.email}
+                              >
+                                {contact.email}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyEmail(guest.id, contact.email)}
+                                title="Sao chép email"
+                                className="p-1 text-text-muted hover:text-accent transition-colors cursor-pointer shrink-0"
+                              >
+                                {isEmailCopied ? (
+                                  <Check className="w-3 h-3 text-emerald-600" />
+                                ) : (
+                                  <Copy className="w-3 h-3" />
+                                )}
+                              </button>
+                            </div>
+                          ) : (
+                            <span className="text-text-muted/40">—</span>
+                          )}
+                        </td>
+
+                        {/* Cột 5: Lời nhắn & Ghi chú riêng BTC */}
+                        <td className="py-3.5 px-3 max-w-[200px]">
                           <div className="space-y-1 text-xs">
                             {guest.song_request && (
                               <div className="flex items-center gap-1.5 text-accent font-medium truncate" title={`Lời nhắn gửi đêm nhạc: ${guest.song_request}`}>
@@ -306,10 +396,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                                 <span className="truncate">&ldquo;{guest.song_request}&rdquo;</span>
                               </div>
                             )}
-                            {guest.wish_message ? (
-                              <p className="text-text-muted truncate italic text-[11px]" title={`Ghi chú riêng BTC: ${guest.wish_message}`}>
-                                <span className="not-italic text-accent font-semibold mr-1">[BTC]:</span>
-                                &ldquo;{guest.wish_message}&rdquo;
+                            {contact.note ? (
+                              <p className="text-text-muted truncate italic text-[11px]" title={`Ghi chú riêng: ${contact.note}`}>
+                                <span className="not-italic text-accent font-semibold mr-1">[Lời nhắn]:</span>
+                                &ldquo;{contact.note}&rdquo;
                               </p>
                             ) : !guest.song_request ? (
                               <span className="text-text-muted/40">—</span>
@@ -317,8 +407,8 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           </div>
                         </td>
 
-                        {/* Cột 4: Thời gian */}
-                        <td className="py-3.5 px-4 text-text-muted whitespace-nowrap text-[11px]">
+                        {/* Cột 6: Thời gian */}
+                        <td className="py-3.5 px-3 text-text-muted whitespace-nowrap text-[11px]">
                           {updateTime ? (
                             <span className="flex items-center gap-1">
                               <Clock className="w-3 h-3" />
@@ -329,7 +419,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           )}
                         </td>
 
-                        {/* Cột 5: Cụm nút thao tác */}
+                        {/* Cột 7: Cụm nút thao tác */}
                         <td className="py-3.5 px-4 text-right">
                           <div className="inline-flex items-center gap-1">
                             {/* Copy Link */}
@@ -416,6 +506,9 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
               const isCopied = copiedSlug === guest.slug;
               const isZaloCopied = copiedZaloSlug === guest.slug;
               const updateTime = formatTime(guest.responded_at || guest.opened_at);
+              const contact = parseGuestContact(guest);
+              const isPhoneCopied = copiedPhoneId === guest.id;
+              const isEmailCopied = copiedEmailId === guest.id;
 
               return (
                 <div
@@ -442,6 +535,50 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                     <div>{renderStatusBadge(guest)}</div>
                   </div>
 
+                  {/* Hiển thị SĐT & Email khách mời */}
+                  {(contact.phone || contact.email) && (
+                    <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                      {contact.phone && (
+                        <div className="inline-flex items-center gap-1.5 bg-bg/90 px-2 py-1 rounded-lg border border-border/80 text-xs">
+                          <Phone className="w-3 h-3 text-accent" />
+                          <span className="font-mono text-[11px] font-medium text-text select-all">
+                            {contact.phone}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyPhone(guest.id, contact.phone)}
+                            className="p-0.5 hover:text-accent transition-colors"
+                          >
+                            {isPhoneCopied ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3 text-text-muted" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                      {contact.email && (
+                        <div className="inline-flex items-center gap-1.5 bg-bg/90 px-2 py-1 rounded-lg border border-border/80 text-xs">
+                          <Mail className="w-3 h-3 text-accent" />
+                          <span className="font-mono text-[11px] text-text max-w-[150px] truncate select-all">
+                            {contact.email}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyEmail(guest.id, contact.email)}
+                            className="p-0.5 hover:text-accent transition-colors"
+                          >
+                            {isEmailCopied ? (
+                              <Check className="w-3 h-3 text-emerald-600" />
+                            ) : (
+                              <Copy className="w-3 h-3 text-text-muted" />
+                            )}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
                   {guest.custom_message && (
                     <div className="text-xs bg-bg/80 p-2.5 rounded-lg border border-border/40 text-text italic">
                       <span className="not-italic text-[10px] uppercase font-bold text-accent block">
@@ -451,7 +588,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                     </div>
                   )}
 
-                  {(guest.song_request || guest.wish_message) && (
+                  {(guest.song_request || contact.note) && (
                     <div className="space-y-1 text-xs border-t border-border/40 pt-2 text-text">
                       {guest.song_request && (
                         <p className="flex items-center gap-1.5 text-accent font-medium">
@@ -459,10 +596,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           <span>Lời nhắn gửi đêm nhạc: &ldquo;{guest.song_request}&rdquo;</span>
                         </p>
                       )}
-                      {guest.wish_message && (
+                      {contact.note && (
                         <p className="text-text-muted italic text-[11px]">
-                          <span className="not-italic text-accent font-semibold mr-1">Ghi chú riêng BTC:</span>
-                          &ldquo;{guest.wish_message}&rdquo;
+                          <span className="not-italic text-accent font-semibold mr-1">Lời nhắn:</span>
+                          &ldquo;{contact.note}&rdquo;
                         </p>
                       )}
                     </div>

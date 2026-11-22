@@ -44,22 +44,12 @@ export function RsvpSection({
       const isAttending = attendanceChoice === 'yes' || attendanceChoice === 'try';
       const status = isAttending ? 'ACCEPTED' : 'DECLINED';
 
-      // Ghép thông tin liên hệ và đôi lời gửi BTC
-      const contactNote = [
-        phone.trim() ? `SĐT: ${phone.trim()}` : null,
-        email.trim() ? `Email: ${email.trim()}` : null,
-        attendanceChoice === 'try' ? '(Sẽ cố gắng tham gia)' : null,
-        attendanceChoice === 'unsure' ? '(Chưa rõ lịch trình)' : null,
-      ]
-        .filter(Boolean)
-        .join(' • ');
-
-      const combinedWish = [contactNote, message.trim()].filter(Boolean).join('\n');
-
       const payload = {
         status,
         attendees_count: isAttending ? 1 : 0,
-        wish_message: combinedWish || null,
+        phone: phone.trim() || null,
+        email: email.trim() || null,
+        wish_message: message.trim() || null,
         song_request: message.trim() || null,
       };
 
@@ -99,17 +89,17 @@ export function RsvpSection({
   };
 
   return (
-    <section className="space-y-6 pt-4 font-sans-ui" id="rsvp-section">
+    <section className="space-y-6 pt-2 font-sans-ui" id="rsvp-section">
       {/* Huy hiệu Tiêu đề chuẩn Page 5 */}
       <div className="flex justify-center">
         <div className="px-6 py-2 rounded-full bg-[#FCEBE6] border border-[#F8C6D2] shadow-xs">
-          <h2 className="font-serif-title text-xl sm:text-2xl font-bold tracking-[0.15em] text-[#3E3836] uppercase text-center">
+          <h2 className="font-serif-title text-xl sm:text-2xl font-bold tracking-normal text-[#3E3836] uppercase text-center">
             {config.rsvpHeading || 'XÁC NHẬN THAM DỰ'}
           </h2>
         </div>
       </div>
 
-      <p className="text-center text-xs sm:text-sm text-[#61733F] max-w-sm mx-auto leading-relaxed px-4">
+      <p className="text-center text-xs sm:text-sm text-[#61733F] max-w-sm mx-auto leading-relaxed px-4 tracking-normal font-sans-ui">
         {config.rsvpSubheading ||
           'Quý Thầy/Cô vui lòng gửi xác nhận để BTC sắp xếp chỗ ngồi và đón tiếp chu đáo nhất'}
       </p>
@@ -127,18 +117,18 @@ export function RsvpSection({
           <div className="relative bg-[#FFFDF9]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-7 shadow-[0_15px_35px_-8px_rgba(0,108,58,0.12)] border border-[#C8E6C9] space-y-4 font-sans-ui text-center">
             <div className="flex items-center justify-center gap-2 text-[#61733F]">
               <CheckCircle2 className="w-5 h-5 text-[#006C3A]" />
-              <p className="font-semibold text-sm sm:text-base text-[#3E3836]">
+              <p className="font-semibold text-sm sm:text-base text-[#3E3836] tracking-normal font-sans-ui">
                 Bạn đã báo chưa chắc chắn hoặc không thể tham dự
               </p>
             </div>
-            <p className="text-xs text-[#61733F]">
+            <p className="text-xs text-[#61733F] tracking-normal font-sans-ui leading-relaxed">
               The Light xin chân thành cảm ơn phản hồi của bạn. Chúc bạn luôn dồi dào sức khỏe!
             </p>
             <div className="pt-1">
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="text-xs font-semibold text-[#006C3A] hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
+                className="text-xs font-semibold text-[#006C3A] hover:underline cursor-pointer min-h-[44px] inline-flex items-center font-sans-ui"
               >
                 Thay đổi xác nhận của bạn
               </button>
@@ -146,16 +136,16 @@ export function RsvpSection({
           </div>
         )
       ) : (
-        /* Form RSVP thiết kế theo chuẩn Page 5 */
+        /* Form RSVP thiết kế theo chuẩn Page 5 với font UI Be_Vietnam_Pro */
         <form
           onSubmit={handleSubmit}
           className="relative bg-[#FFFDF9]/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,108,58,0.15)] border-2 border-[#F8C6D2]/80 space-y-5 text-left font-sans-ui overflow-hidden"
         >
           {/* 1. Họ và tên */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="rsvp_name"
-              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
             >
               Họ và tên
             </label>
@@ -166,15 +156,15 @@ export function RsvpSection({
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Nhập họ và tên..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
             />
           </div>
 
           {/* 2. Số điện thoại liên hệ */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="rsvp_phone"
-              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
             >
               Số điện thoại liên hệ
             </label>
@@ -184,15 +174,15 @@ export function RsvpSection({
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Nhập số điện thoại..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
             />
           </div>
 
           {/* 3. Gmail */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="rsvp_email"
-              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
             >
               Gmail
             </label>
@@ -202,15 +192,15 @@ export function RsvpSection({
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Nhập địa chỉ email..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
             />
           </div>
 
           {/* 4. Đôi lời gửi đến BTC */}
-          <div className="space-y-1">
+          <div className="space-y-1.5">
             <label
               htmlFor="rsvp_message"
-              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
             >
               Đôi lời gửi đến BTC
             </label>
@@ -220,13 +210,13 @@ export function RsvpSection({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Gửi lời chúc, nhắn nhủ hoặc lưu ý đến The Light..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors resize-none font-sans-ui leading-relaxed"
             />
           </div>
 
           {/* 5. Xác nhận đến tham dự sự kiện (3 tùy chọn) */}
           <div className="space-y-2 pt-1">
-            <label className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic">
+            <label className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal">
               Xác nhận đến tham dự sự kiện
             </label>
             <div className="space-y-2.5">
@@ -239,13 +229,13 @@ export function RsvpSection({
                   key={opt.id}
                   type="button"
                   onClick={() => setAttendanceChoice(opt.id as 'yes' | 'try' | 'unsure')}
-                  className={`w-full py-3 px-4 rounded-xl text-left font-handwriting text-base sm:text-lg transition-all flex items-center justify-between border cursor-pointer ${
+                  className={`w-full py-3 px-4 rounded-xl text-left font-sans-ui text-sm sm:text-base transition-all flex items-center justify-between border cursor-pointer ${
                     attendanceChoice === opt.id
-                      ? 'bg-[#E1EEDD] border-[#006C3A] text-[#006C3A] font-bold shadow-xs'
+                      ? 'bg-[#E1EEDD] border-[#006C3A] text-[#006C3A] font-semibold shadow-xs'
                       : 'bg-[#ECEAE2]/60 hover:bg-[#ECEAE2] border-[#D5DDD0] text-[#3E3836]'
                   }`}
                 >
-                  <span>{opt.label}</span>
+                  <span className="tracking-normal">{opt.label}</span>
                   <div
                     className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
                       attendanceChoice === opt.id
@@ -264,7 +254,7 @@ export function RsvpSection({
 
           {/* Lỗi nếu có */}
           {errorMessage && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
+            <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 font-sans-ui">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -278,12 +268,12 @@ export function RsvpSection({
               className="w-full py-3.5 px-6 rounded-2xl bg-[#FAE8D8] hover:bg-[#F6DCBE] active:scale-[0.98] transition-all border border-[#F0D0B4] shadow-sm flex items-center justify-center cursor-pointer min-h-[48px]"
             >
               {isSubmitting ? (
-                <div className="flex items-center gap-2 font-handwriting text-lg text-[#3E3836]">
+                <div className="flex items-center gap-2 font-sans-ui text-base text-[#3E3836]">
                   <Loader2 className="w-4 h-4 animate-spin text-[#006C3A]" />
                   <span>Đang gửi xác nhận...</span>
                 </div>
               ) : (
-                <span className="font-handwriting text-xl sm:text-2xl text-[#3E3836] font-bold tracking-wide">
+                <span className="font-sans-ui text-base sm:text-lg text-[#3E3836] font-bold tracking-wider uppercase">
                   GỬI LỜI XÁC NHẬN
                 </span>
               )}

@@ -1,6 +1,30 @@
 import type { Metadata, Viewport } from 'next';
+import { Playfair_Display, Be_Vietnam_Pro, Dancing_Script } from 'next/font/google';
 import { getEventConfig } from '@/lib/event-settings';
 import './globals.css';
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['500', '600', '700', '800'],
+  style: ['normal', 'italic'],
+  variable: '--font-serif-title',
+  display: 'swap',
+});
+
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  variable: '--font-sans-ui',
+  display: 'swap',
+});
+
+const dancingScript = Dancing_Script({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['600', '700'],
+  variable: '--font-handwriting',
+  display: 'swap',
+});
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -48,7 +72,12 @@ export default async function RootLayout({
   const config = await getEventConfig();
 
   return (
-    <html lang="vi" data-theme={config.theme} suppressHydrationWarning>
+    <html
+      lang="vi"
+      data-theme={config.theme}
+      className={`${playfairDisplay.variable} ${beVietnamPro.variable} ${dancingScript.variable}`}
+      suppressHydrationWarning
+    >
       <body
         className="bg-bg text-text font-sans-ui antialiased min-h-[100dvh] flex flex-col justify-between selection:bg-accent/20 selection:text-text relative"
         suppressHydrationWarning

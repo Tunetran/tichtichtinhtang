@@ -67,6 +67,7 @@ export async function updateEventConfig(partial: Partial<EventConfig>): Promise<
     showCountdown: partial.showCountdown !== undefined ? partial.showCountdown : current.showCountdown,
     showGallery: partial.showGallery !== undefined ? partial.showGallery : current.showGallery,
     showSongRequest: partial.showSongRequest !== undefined ? partial.showSongRequest : current.showSongRequest,
+    sponsors: partial.sponsors !== undefined ? partial.sponsors : current.sponsors,
   };
 
   // 1. Lưu dự phòng vào file local

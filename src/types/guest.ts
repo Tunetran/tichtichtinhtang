@@ -4,6 +4,8 @@ export interface GuestRecord {
   id: string;
   slug: string;
   full_name: string;
+  phone?: string | null;
+  email?: string | null;
   custom_message: string | null;
   status: GuestStatus;
   attendees_count: number;
@@ -18,6 +20,8 @@ export interface GuestRecord {
 export interface PublicGuest {
   slug: string;
   full_name: string;
+  phone?: string | null;
+  email?: string | null;
   custom_message: string | null;
   status: GuestStatus;
   attendees_count: number;

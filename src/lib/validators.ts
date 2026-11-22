@@ -6,8 +6,10 @@ export const rsvpSchema = z
       required_error: 'Vui lòng chọn xác nhận tham dự hoặc từ chối',
     }),
     attendees_count: z.number().int().min(0).max(4).optional(),
+    phone: z.string().trim().max(50, 'Số điện thoại tối đa 50 ký tự').optional().nullable(),
+    email: z.string().trim().max(150, 'Email tối đa 150 ký tự').optional().nullable(),
     song_request: z.string().trim().max(200, 'Tên bài hát tối đa 200 ký tự').optional().nullable(),
-    wish_message: z.string().trim().max(500, 'Lời chúc tối đa 500 ký tự').optional().nullable(),
+    wish_message: z.string().trim().max(1000, 'Lời chúc tối đa 1000 ký tự').optional().nullable(),
   })
   .refine(
     (data) =>
@@ -74,7 +76,7 @@ export const updateGuestSchema = z.object({
 export type UpdateGuestInput = z.infer<typeof updateGuestSchema>;
 
 export const eventSettingsSchema = z.object({
-  theme: z.enum(['candlelight', 'vintage', 'starlight']).default('candlelight'),
+  theme: z.enum(['candlelight', 'vintage', 'starlight', 'tichtichtinhtang']).default('tichtichtinhtang'),
   eventName: z.string().trim().min(1, 'Tên sự kiện không được để trống').max(200),
   slogan: z.string().trim().min(1, 'Câu slogan không được để trống').max(300),
   invitationBadge: z.string().trim().optional().default('Thư Mời Tham Dự'),
@@ -96,7 +98,7 @@ export const eventSettingsSchema = z.object({
   hostName: z.string().trim().min(1, 'Tên người chủ trì không được để trống').max(150),
   contactLabel: z.string().trim().min(1).max(100),
   contactUrl: z.string().trim().min(1),
-  envelopeGreeting: z.string().trim().default('Trân trọng kính mời'),
+  envelopeGreeting: z.string().trim().default('Bạn nhận được một lá thư từ'),
   sealHintText: z.string().trim().default('Chạm vào dấu sáp để mở thiệp'),
   letterSalutation: z.string().trim().default('Thân gửi'),
   generalInvitationText: z.array(z.string().trim()).min(1, 'Cần ít nhất 1 đoạn văn lời ngỏ'),
@@ -127,6 +129,17 @@ export const eventSettingsSchema = z.object({
   showCountdown: z.boolean().optional().default(true),
   showGallery: z.boolean().optional().default(true),
   showSongRequest: z.boolean().optional().default(true),
+  sponsors: z
+    .array(
+      z.object({
+        id: z.string().trim(),
+        name: z.string().trim().default(''),
+        logoUrl: z.string().trim().min(1, 'Đường dẫn logo không được để trống'),
+        category: z.enum(['sponsor', 'companion']),
+      })
+    )
+    .optional()
+    .default([]),
 });
 
 export type EventSettingsInput = z.infer<typeof eventSettingsSchema>;

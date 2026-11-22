@@ -25,7 +25,6 @@ export function EnvelopeStage({
   waxSealUrl,
 }: EnvelopeStageProps) {
   const [isFlapBehind, setIsFlapBehind] = useState(false);
-
   const sealSrc = waxSealUrl || '/images/wax-seal-combined.png';
 
   // Sau nửa chu kỳ mở nắp (~0.28s của 0.55s), hạ z-index nắp ra sau lá thư đang trượt lên
@@ -41,69 +40,59 @@ export function EnvelopeStage({
   }, [stage]);
 
   return (
-    <div
-      className="fixed inset-0 z-40 flex flex-col items-center justify-between py-6 sm:py-8 px-4 min-h-[100dvh] h-[100dvh] overflow-hidden select-none"
-      style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.25rem)',
-        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)',
-      }}
-    >
-      {/* NỀN PHONG CẢNH HỒ SEN & RẶNG TRE NGUYÊN BẢN (KHÔNG BỊ MỜ HAY BẠC MÀU) */}
-      <div className="absolute inset-0 -z-10 pointer-events-none select-none overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/bg-bamboo-lotus.png"
-          alt="Nền Tịch Tịch Tình Tang"
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
-
-      {/* HEADER: Tiêu đề đón nhận thư "BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ" (Chuẩn thiết kế 100%) */}
+    <div className="min-h-[100dvh] w-full flex flex-col items-center justify-center py-6 px-4 select-none relative z-30">
+      {/* ========================================================
+          TIÊU ĐỀ CHÀO MỪNG TRANG TRỌNG (Chữ HTML thật với font chuẩn)
+         ======================================================== */}
       <motion.div
+        initial={{ opacity: 0, y: -20 }}
         animate={
           stage === 'opening'
-            ? { opacity: 0, y: -24 }
-            : { opacity: 1, y: 0 }
+            ? { opacity: 0, y: -20, transition: { duration: 0.35, ease: 'easeOut' } }
+            : { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } }
         }
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[340px] sm:max-w-[420px] pt-1 sm:pt-4 flex justify-center z-10"
+        className="w-full max-w-[420px] text-center mb-5 sm:mb-7 space-y-1.5 z-10"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/images/header-text.png"
-          alt="BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ"
-          className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-xs"
-        />
-        <h1 className="sr-only">BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ</h1>
+        {/* Dòng dẫn: Be_Vietnam_Pro (font-sans-ui) */}
+        <p className="font-sans-ui text-xs sm:text-sm font-semibold tracking-[0.2em] sm:tracking-[0.25em] text-[#006C3A] uppercase">
+          {config.envelopeGreeting || 'BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ'}
+        </p>
+
+        {/* Tên show: Playfair_Display (font-serif-title) */}
+        <h1 className="font-serif-title text-2xl sm:text-3xl md:text-4xl font-extrabold text-[#006C3A] tracking-tight">
+          {config.eventName || 'Tịch Tịch Tình Tang'}
+        </h1>
+
+        {/* Câu slogan nghệ thuật */}
+        {config.slogan && (
+          <p className="font-serif-title text-xs sm:text-sm text-[#61733F] italic leading-relaxed tracking-normal max-w-sm mx-auto px-2 line-clamp-2">
+            &ldquo;{config.slogan}&rdquo;
+          </p>
+        )}
       </motion.div>
 
-      {/* PHONG BÌ 3D HỒNG REN TRẮNG & CON DẤU NGỌC TRAI THE LIGHT */}
+      {/* ========================================================
+          PHONG BÌ LÁ THƯ 3D CHÍNH GIỮA MÀN HÌNH
+         ======================================================== */}
       <motion.div
-        className="relative w-[86%] sm:w-[78%] max-w-[340px] sm:max-w-[380px] aspect-[1492/1080] [perspective:1200px] my-auto flex items-center justify-center"
+        className="relative w-[90%] sm:w-[84%] max-w-[360px] sm:max-w-[420px] aspect-[1492/1080] [perspective:1200px] flex items-center justify-center z-10"
+        initial={{ opacity: 0, scale: 0.94, y: 20 }}
         animate={
           stage === 'opening'
             ? {
-              y: [0, 0, 90],
-              opacity: [1, 1, 0],
-            }
-            : { y: 0, opacity: 1 }
-        }
-        transition={
-          stage === 'opening'
-            ? {
-              duration: 1.4,
-              times: [0, 0.75, 1],
-              ease: 'easeInOut',
-            }
-            : { duration: 0.3 }
+                y: [0, 0, 70],
+                opacity: [1, 1, 0],
+                transition: { duration: 1.2, times: [0, 0.7, 1], ease: 'easeInOut' },
+              }
+            : { opacity: 1, scale: 1, y: 0, transition: { duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] } }
         }
       >
-        {/* Khung thân phong bì */}
+        {/* Khung thân phong bì vật lý 3D */}
         <div
           className="relative w-full h-full rounded-2xl [perspective:1200px]"
           style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Lòng phong bì (Back Panel bên trong phong bì) */}
+          {/* Lòng phong bì (Back Panel) */}
           <div
             className="absolute inset-1.5 rounded-2xl z-0"
             style={{ backgroundColor: '#FAD5DC' }}
@@ -121,7 +110,7 @@ export function EnvelopeStage({
             }
             transition={
               stage === 'opening'
-                ? { delay: 0.38, duration: 0.9, ease: [0.22, 1, 0.36, 1] }
+                ? { delay: 0.35, duration: 0.85, ease: [0.22, 1, 0.36, 1] }
                 : { duration: 0.25 }
             }
           >
@@ -134,18 +123,18 @@ export function EnvelopeStage({
                 className="w-full h-full object-contain drop-shadow-sm"
               />
             </div>
-            <p className="font-serif text-xs sm:text-sm font-semibold text-[#006C3A] tracking-widest uppercase">
+            <p className="font-serif-title text-xs sm:text-sm font-semibold text-[#006C3A] tracking-wider uppercase">
               THƯ MỜI
             </p>
-            <p className="font-serif-title text-base sm:text-lg font-bold text-[#2D4A22] truncate max-w-[240px] mt-0.5">
+            <p className="font-serif-title text-base sm:text-lg font-bold text-[#2D4A22] truncate max-w-[240px] mt-0.5 tracking-normal">
               {guest.full_name}
             </p>
-            <p className="text-xs text-[#61733F] italic mt-0.5 line-clamp-1">
+            <p className="font-sans-ui text-xs text-[#61733F] italic mt-0.5 line-clamp-1 tracking-normal">
               {config.eventName}
             </p>
           </motion.div>
 
-          {/* TÚI MẶT TRƯỚC PHONG BÌ (Front Pocket với đường gấp và viền chuẩn) */}
+          {/* TÚI MẶT TRƯỚC PHONG BÌ (Front Pocket với đường ren và bóng đổ chuẩn) */}
           <div className="absolute inset-0 w-full h-full z-20 pointer-events-none">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -188,7 +177,7 @@ export function EnvelopeStage({
               />
             </div>
 
-            {/* Mặt sau nắp khi lật ngược: Lớp giấy hồng mềm mại */}
+            {/* Mặt sau nắp khi lật ngược 180 độ: Lớp giấy hồng mềm mại */}
             <div
               className="absolute inset-0 w-full h-full"
               style={{
@@ -226,10 +215,10 @@ export function EnvelopeStage({
                 stage === 'opening'
                   ? { duration: 0.35, ease: 'easeOut' }
                   : {
-                    duration: 2.4,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }
+                      duration: 2.4,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                    }
               }
             >
               {/* Con dấu sáp ngọc trai với logo The Light */}
@@ -247,23 +236,18 @@ export function EnvelopeStage({
         </div>
       </motion.div>
 
-      {/* FOOTER: Typography Logo "Tịch Tịch Tình Tang" (Chuẩn thiết kế 100%) */}
-      <motion.div
+      {/* Gợi ý nhẹ chạm để mở thư */}
+      <motion.p
+        initial={{ opacity: 0, y: 10 }}
         animate={
           stage === 'opening'
-            ? { opacity: 0, y: 24 }
-            : { opacity: 1, y: 0 }
+            ? { opacity: 0, y: 10, transition: { duration: 0.3 } }
+            : { opacity: 1, y: 0, transition: { duration: 0.7, delay: 0.4 } }
         }
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className="w-full max-w-[240px] sm:max-w-[280px] pb-2 sm:pb-4 z-10 flex flex-col items-center select-none"
+        className="mt-6 text-xs sm:text-sm text-[#006C3A] font-sans-ui font-medium tracking-wide uppercase text-center"
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={logoUrl || '/images/logo-tichtichtinhtang.png'}
-          alt="Tịch Tịch Tình Tang"
-          className="w-full h-auto object-contain drop-shadow-md pointer-events-none"
-        />
-      </motion.div>
+        {config.sealHintText || 'Chạm vào con dấu để mở thiệp'}
+      </motion.p>
     </div>
   );
 }
