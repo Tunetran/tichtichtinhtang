@@ -44,10 +44,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onE
   const [copiedEmailId, setCopiedEmailId] = useState<string | null>(null);
   const [clearingWishId, setClearingWishId] = useState<string | null>(null);
 
-  // Xóa lời chúc công khai của khách (chỉ làm rỗng lời chúc, giữ nguyên SĐT/Email/RSVP)
+  // Xóa lời chúc công khai của khách (chỉ làm rỗng lời chúc note, giữ nguyên SĐT/Email/RSVP)
   const handleClearWish = async (guest: GuestRecord) => {
     const contact = parseGuestContact(guest);
-    const wishText = (contact.note || guest.song_request || '').trim();
+    const wishText = contact.note.trim();
     if (!wishText) return;
 
     const confirmed = window.confirm(
@@ -292,8 +292,8 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onE
         </div>
 
         {/* Ô tìm kiếm tức thời & nút xuất CSV */}
-        <div className="flex items-center gap-2">
-          <div className="relative min-w-[200px] sm:min-w-[240px]">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="relative flex-1 min-w-[180px] sm:min-w-[240px]">
             <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
@@ -342,10 +342,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onE
         </div>
       ) : (
         <>
-          {/* 1. Desktop View: HTML Table */}
-          <div className="hidden md:block bg-bg-surface border border-border rounded-2xl overflow-hidden shadow-sm">
+          {/* Bảng khách mời bọc trong overflow-x-auto để vuốt ngang mượt trên mọi kích thước */}
+          <div className="bg-bg-surface border border-border rounded-2xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
+              <table className="w-full min-w-[720px] text-left text-xs">
                 <thead className="bg-bg/70 border-b border-border/80 text-text-muted uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3 px-4 font-semibold">Tên Khách</th>
@@ -460,10 +460,10 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onE
                           )}
                         </td>
 
-                        {/* Cột 6: Lời Chúc */}
+                        {/* Cột 6: Lời Chúc (Chỉ hiện note thực tế, không hiện JSON/SĐT/Email) */}
                         <td className="py-3.5 px-3 max-w-[220px]">
                           {(() => {
-                            const wishText = (contact.note || guest.song_request || '').trim();
+                            const wishText = contact.note.trim();
                             if (!wishText) {
                               return <span className="text-text-muted/40 italic">—</span>;
                             }
@@ -548,8 +548,8 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onE
             </div>
           </div>
 
-          {/* 2. Mobile View: Responsive Cards List */}
-          <div className="md:hidden space-y-3">
+          {/* 2. Mobile View: Hidden in favor of responsive scrollable table */}
+          <div className="hidden">
             {filteredGuests.map((guest) => {
               const isCopied = copiedSlug === guest.slug;
               const isZaloCopied = copiedZaloSlug === guest.slug;

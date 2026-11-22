@@ -580,7 +580,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-text block mb-1">Giờ đón khách</label>
                 <input
@@ -615,7 +615,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
           </div>
 
           <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="text-xs font-semibold text-text block mb-1">Tên hội trường</label>
                 <input
@@ -695,12 +695,12 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-text block mb-1">Đoàn kịch / Host chủ trì</label>
+              <label className="text-xs font-semibold text-text block mb-1">Đơn vị tổ chức / Host chủ trì</label>
               <input
                 type="text"
                 value={config.hostName || ''}
                 onChange={(e) => setConfig({ ...config, hostName: e.target.value })}
-                placeholder="Đoàn Kịch The Light"
+                placeholder="The Light"
                 className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text"
               />
             </div>
@@ -793,7 +793,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
               Chưa có đối tác nào. Thêm mới ở khung dưới.
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-2.5 max-h-48 overflow-y-auto p-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-48 overflow-y-auto p-1">
               {(config.sponsors || []).map((sp) => (
                 <div
                   key={sp.id}
@@ -835,7 +835,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
               <span>Thêm đối tác mới</span>
             </p>
 
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <input
                 type="text"
                 value={newPartnerName}

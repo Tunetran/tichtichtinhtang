@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { Calendar, MapPin, Sparkles, Camera, Edit3 } from 'lucide-react';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
+import { parseGuestContact } from '@/lib/guest-contact';
 
 interface MiniTicketProps {
   guest: GuestRecord;
@@ -16,6 +17,7 @@ interface MiniTicketProps {
 export function MiniTicket({ guest, config, logoUrl, onEdit }: MiniTicketProps) {
   const logoSrc = logoUrl || '/images/logo-tichtichtinhtang.png';
   const displayTime = `${config.startTime || '18:30'} • ${config.eventDateLabel || '05/12/2026'}`;
+  const { note } = parseGuestContact(guest);
 
   return (
     <motion.div
@@ -103,14 +105,14 @@ export function MiniTicket({ guest, config, logoUrl, onEdit }: MiniTicketProps) 
             </div>
           </div>
 
-          {/* Lời nhắn của khách (nếu có) */}
-          {(guest.wish_message || guest.song_request) && (
+          {/* Lời nhắn của khách (CHỈ hiển thị khi có note thực tế, tuyệt đối KHÔNG hiện phone/email, ẩn hoàn toàn nếu rỗng) */}
+          {Boolean(note) && (
             <div className="bg-[#E1EEDD]/60 p-2.5 rounded-xl border border-[#C8E6C9] text-xs">
               <span className="text-[10px] uppercase font-bold text-[#006C3A] block">
                 Đôi lời gửi gắm đến BTC:
               </span>
               <p className="font-handwriting text-base text-[#006C3A] italic leading-relaxed">
-                &ldquo;{guest.wish_message || guest.song_request}&rdquo;
+                &ldquo;{note}&rdquo;
               </p>
             </div>
           )}

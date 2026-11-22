@@ -75,6 +75,7 @@ export async function POST(req: Request, context: RouteContext) {
     const isAccepted = data.status === 'ACCEPTED';
     const phone = data.phone?.trim() || null;
     const email = data.email?.trim() || null;
+    const count = isAccepted ? (data.guests_count ?? data.attendees_count ?? 1) : 0;
 
     // Đóng gói JSON an toàn vào wish_message để tương thích với mọi bản backup / DB
     let wishToSave = data.wish_message?.trim() || null;
@@ -89,7 +90,8 @@ export async function POST(req: Request, context: RouteContext) {
 
     const updatePayload: Record<string, unknown> = {
       status: data.status,
-      attendees_count: isAccepted ? (data.attendees_count ?? 1) : 0,
+      attendees_count: count,
+      guests_count: count,
       song_request: isAccepted ? (data.song_request?.trim() || null) : null,
       wish_message: wishToSave,
       responded_at: now,
@@ -105,6 +107,19 @@ export async function POST(req: Request, context: RouteContext) {
       .eq('id', guest.id)
       .select('slug, full_name, custom_message, status, attendees_count, song_request, wish_message, responded_at')
       .single();
+
+    // Tự động tương thích nếu DB Supabase chưa chạy thêm cột guests_count
+    if (updateError && updateError.message?.toLowerCase().includes('guests_count')) {
+      delete updatePayload.guests_count;
+      const retry = await supabaseAdmin
+        .from('guests')
+        .update(updatePayload)
+        .eq('id', guest.id)
+        .select('slug, full_name, custom_message, status, attendees_count, song_request, wish_message, responded_at')
+        .single();
+      updatedGuest = retry.data;
+      updateError = retry.error;
+    }
 
     // Fallback nếu database Supabase cũ chưa có cột phone hoặc email
     if (updateError && (updateError.message.includes('phone') || updateError.message.includes('email'))) {

@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS guests (
   email VARCHAR(150),
   custom_message TEXT,
   status guest_status NOT NULL DEFAULT 'NOT_OPENED',
-  attendees_count SMALLINT NOT NULL DEFAULT 0 CHECK (attendees_count BETWEEN 0 AND 4),
+  attendees_count SMALLINT NOT NULL DEFAULT 0,
+  guests_count INTEGER NOT NULL DEFAULT 1,
   song_request VARCHAR(200),
   wish_message TEXT,
   opened_at TIMESTAMPTZ,
@@ -38,6 +39,9 @@ CREATE TABLE IF NOT EXISTS guests (
 -- Bổ sung các cột nếu bảng đã được tạo từ trước
 ALTER TABLE guests ADD COLUMN IF NOT EXISTS phone VARCHAR(50);
 ALTER TABLE guests ADD COLUMN IF NOT EXISTS email VARCHAR(150);
+ALTER TABLE guests ADD COLUMN IF NOT EXISTS guests_count INTEGER DEFAULT 1;
+ALTER TABLE guests DROP CONSTRAINT IF EXISTS guests_attendees_count_check;
+ALTER TABLE guests ADD CONSTRAINT guests_attendees_count_check CHECK (attendees_count >= 0);
 
 -- 3. CHỈ MỤC TỐI ƯU TRA CỨU & TÌM KIẾM
 CREATE INDEX IF NOT EXISTS idx_guests_slug ON guests(slug);

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import {
   Calendar,
   Clock,
@@ -11,6 +12,7 @@ import {
   RotateCcw,
   Users,
   Flag,
+  Heart,
 } from 'lucide-react';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
@@ -21,6 +23,7 @@ import { GuestWishesSection } from './GuestWishesSection';
 import { EventCountdown } from './EventCountdown';
 import { AddToCalendarButton } from './AddToCalendarButton';
 import { OrganizerContactModal } from './OrganizerContactModal';
+import { EventCalendar } from './EventCalendar';
 import type { OrganizerContact } from '@/lib/site-settings';
 
 interface LetterContentProps {
@@ -76,7 +79,7 @@ export function LetterContent({
   const handleRsvpSuccess = (updated: GuestRecord) => {
     onRsvpUpdated(updated);
     const contact = parseGuestContact(updated);
-    const wishText = (contact.note || updated.song_request || '').trim();
+    const wishText = contact.note.trim();
     if (wishText) {
       setLatestWish({
         id: updated.id,
@@ -96,7 +99,7 @@ export function LetterContent({
       : EVENT_CONFIG.generalInvitationText;
 
   return (
-    <article className="w-full max-w-[540px] mx-auto px-5 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-10 text-[#3E3836] pb-safe pt-safe font-sans-ui relative">
+    <article className="w-full max-w-[680px] mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-10 text-[#3E3836] pb-safe pt-safe font-sans-ui relative">
       {/* ========================================================
           1. HEADER SỰ KIỆN: Logo nghệ thuật Tịch Tịch Tình Tang (Page 2)
          ======================================================== */}
@@ -124,7 +127,34 @@ export function LetterContent({
       {/* ========================================================
           2. KHỐI THƯ MỜI: Lời ngỏ trang trọng gửi Thầy/Cô & Khách quý (Page 2)
          ======================================================== */}
-      <section className="relative bg-[#EAF4E6]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-9 space-y-5 leading-relaxed overflow-hidden">
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="relative bg-[#EAF4E6]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-9 space-y-5 leading-relaxed overflow-hidden"
+      >
+        {/* Lớp vân giấy mỹ thuật phủ nền thư */}
+        <div className="absolute inset-0 bg-[url('/images/textured-paper.png')] bg-repeat opacity-30 mix-blend-multiply pointer-events-none rounded-3xl" />
+
+        <style>{`
+          @keyframes name-shimmer {
+            0% {
+              background-position: 200% 0;
+            }
+            15%, 100% {
+              background-position: -200% 0;
+            }
+          }
+          .shimmer-name {
+            background: linear-gradient(115deg, #006C3A 0%, #006C3A 38%, #C9A84E 50%, #006C3A 62%, #006C3A 100%);
+            background-size: 260% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: name-shimmer 15s ease-in-out infinite;
+          }
+        `}</style>
+
         {/* Khung viền mỏng phía trong */}
         <div className="absolute inset-2.5 border border-[#006C3A]/20 rounded-2xl pointer-events-none" />
 
@@ -132,9 +162,21 @@ export function LetterContent({
           <p className="text-xs uppercase tracking-normal text-[#61733F] font-semibold font-sans-ui">
             {config.dedicationBadge || EVENT_CONFIG.dedicationBadge || 'Trân trọng kính mời Quý Thầy/Cô'}
           </p>
-          <h2 className="font-serif-title text-2xl sm:text-3xl text-[#006C3A] font-bold mt-1 leading-snug tracking-normal">
-            {salutation} <span className="capitalize">{guest.full_name}</span>,
+          <h2 className="font-serif-title text-2xl sm:text-3xl text-[#006C3A] font-bold mt-1 leading-snug tracking-normal break-words">
+            {salutation}{' '}
+            <span className="capitalize shimmer-name inline-block font-extrabold break-words">
+              {guest.full_name}
+            </span>
+            ,
           </h2>
+          {/* Đường gạch mảnh tự vẽ màu vàng nhũ / xanh ngọc phía dưới */}
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
+            className="h-[1.5px] w-28 sm:w-40 bg-gradient-to-r from-[#006C3A]/70 via-[#D4AF37] to-transparent origin-left mt-1.5"
+          />
         </div>
 
         {/* Lời ngỏ trang trọng (Hiển thị tự nhiên theo đúng nhập liệu từ Admin) */}
@@ -167,7 +209,7 @@ export function LetterContent({
             className="w-14 sm:w-16 h-auto object-contain pointer-events-none select-none bg-transparent border-0 shadow-none"
           />
         </div>
-      </section>
+      </motion.section>
 
       {/* Đường phân cách */}
       <SectionDivider />
@@ -175,7 +217,15 @@ export function LetterContent({
       {/* ========================================================
           3. KHỐI LỊCH DIỄN, THỜI GIAN & ĐỊA ĐIỂM (Page 3)
          ======================================================== */}
-      <section className="relative bg-[#FFFDF9]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-8 space-y-6 overflow-visible">
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="relative bg-[#FFFDF9]/95 backdrop-blur-xs rounded-3xl shadow-[0_20px_50px_-15px_rgba(0,108,58,0.18)] border border-[#C8E6C9] p-6 sm:p-8 space-y-6 overflow-visible"
+      >
+        {/* Lớp vân giấy mỹ thuật phủ nền */}
+        <div className="absolute inset-0 bg-[url('/images/textured-paper.png')] bg-repeat opacity-30 mix-blend-multiply pointer-events-none rounded-3xl" />
         {/* Câu thơ đề dân gian */}
         <div className="text-center space-y-1 border-b border-[#C8E6C9]/60 pb-3">
           <p className="font-serif-title text-sm sm:text-base text-[#006C3A] font-semibold tracking-normal leading-relaxed">
@@ -198,15 +248,8 @@ export function LetterContent({
             />
           </div>
 
-          {/* Khung Bảng Lịch: 100% các ô ngày hiển thị rõ ràng, hoàn toàn thông thoáng */}
-          <div className="relative mx-auto rounded-xl overflow-hidden border border-[#F8B4C4] shadow-sm bg-white">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/images/calendar-dec-2026.jpg"
-              alt="Lịch diễn Tháng 12/2026"
-              className="w-full h-auto object-contain block pointer-events-none select-none"
-            />
-          </div>
+          {/* Bảng Lịch HTML/Tailwind CSS Grid khóa chuẩn 100% trái tim ngày 5/12 */}
+          <EventCalendar />
         </div>
 
         {/* Live Countdown Timer đếm ngược đến 05/12/2026 */}
@@ -265,13 +308,13 @@ export function LetterContent({
           </div>
         </div>
 
-        {/* Nút thêm vào lịch & sao chép địa chỉ */}
-        <div className="pt-3 flex flex-wrap items-center justify-center gap-3 border-t border-[#C8E6C9]/40">
+        {/* Nút thêm vào lịch & sao chép địa chỉ: tự xếp 1 cột trên mobile, 2 cột trên sm+ */}
+        <div className="pt-3 grid grid-cols-1 sm:grid-cols-2 gap-3 border-t border-[#C8E6C9]/40 w-full">
           <AddToCalendarButton config={config} />
           <button
             type="button"
             onClick={handleCopyAddress}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap text-[#61733F] hover:text-[#006C3A] bg-white border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 min-h-[42px] cursor-pointer font-sans-ui tracking-normal"
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap text-[#61733F] hover:text-[#006C3A] bg-white border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 min-h-[44px] cursor-pointer font-sans-ui tracking-normal"
           >
             {copiedAddress ? (
               <>
@@ -286,7 +329,7 @@ export function LetterContent({
             )}
           </button>
         </div>
-      </section>
+      </motion.section>
 
       {/* Đường phân cách */}
       <SectionDivider />
@@ -294,7 +337,13 @@ export function LetterContent({
       {/* ========================================================
           4. KHỐI DRESSCODE (Page 4)
          ======================================================== */}
-      <section className="space-y-6 text-center">
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-6 text-center"
+      >
         {/* Huy hiệu DRESSCODE */}
         <div className="flex justify-center">
           <div className="px-6 py-2 rounded-full bg-[#FCEBE6] border border-[#F8C6D2] shadow-xs">
@@ -355,7 +404,7 @@ export function LetterContent({
             </p>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Đường phân cách */}
       <SectionDivider />
@@ -363,7 +412,13 @@ export function LetterContent({
       {/* ========================================================
           5. KHỐI TIMELINE SỰ KIỆN (Page 4)
          ======================================================== */}
-      <section className="space-y-6 text-center">
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-6 text-center"
+      >
         {/* Huy hiệu TIMELINE SỰ KIỆN */}
         <div className="flex justify-center">
           <div className="px-6 py-2 rounded-full bg-[#FCEBE6] border border-[#F8C6D2] shadow-xs">
@@ -420,7 +475,7 @@ export function LetterContent({
             </div>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Đường phân cách */}
       <SectionDivider />
@@ -428,18 +483,32 @@ export function LetterContent({
       {/* ========================================================
           6. KHỐI XÁC NHẬN THAM DỰ - RSVP (Page 5)
          ======================================================== */}
-      <RsvpSection
-        guest={guest}
-        config={config}
-        onRsvpSuccess={handleRsvpSuccess}
-        logoUrl={logoUrl}
-      />
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <RsvpSection
+          guest={guest}
+          config={config}
+          onRsvpSuccess={handleRsvpSuccess}
+          logoUrl={logoUrl}
+        />
+      </motion.div>
 
       {/* ========================================================
           KHỐI LỜI CHÚC TỪ KHÁCH MỜI
          ======================================================== */}
       <SectionDivider />
-      <GuestWishesSection latestWish={latestWish} />
+      <motion.div
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <GuestWishesSection latestWish={latestWish} />
+      </motion.div>
 
       {/* ========================================================
           KHỐI ĐƠN VỊ TÀI TRỢ & ĐƠN VỊ ĐỒNG HÀNH (Trang trọng gần cuối thiệp)
@@ -454,7 +523,13 @@ export function LetterContent({
         return (
           <>
             <SectionDivider />
-            <section className="space-y-8 text-center pt-2">
+            <motion.section
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              className="space-y-8 text-center pt-2"
+            >
               {/* Nhóm 1: Đơn vị tài trợ (tự ẩn nếu chưa có) */}
               {sponsors.length > 0 && (
                 <div className="space-y-4">
@@ -514,7 +589,7 @@ export function LetterContent({
                   </div>
                 </div>
               )}
-            </section>
+            </motion.section>
           </>
         );
       })()}
@@ -525,7 +600,13 @@ export function LetterContent({
       {/* ========================================================
           7. KHỐI LỜI CẢM ƠN & CHÂN TRANG TRI ÂN (Page 6)
          ======================================================== */}
-      <section className="space-y-6 text-center">
+      <motion.section
+        initial={{ opacity: 0, y: 14 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.2 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="space-y-6 text-center"
+      >
         {/* Logo The Light cành tre */}
         <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto flex items-center justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -567,10 +648,10 @@ export function LetterContent({
 
         {/* Bản quyền sự kiện */}
         <footer className="pt-4 text-xs text-[#61733F]/80 space-y-1 font-sans-ui tracking-normal">
-          <p>© {new Date().getFullYear()} Tịch Tịch Tình Tang — {config.hostName}</p>
+          <p>© {new Date().getFullYear()} Tịch Tịch Tình Tang — {config.hostName?.replace(/Đoàn Kịch\s*/gi, '') || 'The Light'}</p>
           <p className="text-[11px]">Trường Đại học Gia Định • TP. Hồ Chí Minh</p>
         </footer>
-      </section>
+      </motion.section>
     </article>
   );
 }

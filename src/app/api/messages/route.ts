@@ -17,11 +17,11 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Trích xuất lời chúc từ khách mời (đọc cả song_request và ghi chú trong wish_message)
+    // Trích xuất lời chúc từ khách mời: CHỈ lấy note thực tế, tuyệt đối không lộ phone/email/JSON
     const messages = (guests || [])
       .map((g) => {
         const contact = parseGuestContact(g as GuestRecord);
-        const text = (contact.note || g.song_request || '').trim();
+        const text = contact.note.trim();
         return {
           id: g.id,
           name: g.full_name,

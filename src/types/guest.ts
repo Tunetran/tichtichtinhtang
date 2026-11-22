@@ -9,6 +9,7 @@ export interface GuestRecord {
   custom_message: string | null;
   status: GuestStatus;
   attendees_count: number;
+  guests_count?: number;
   song_request: string | null;
   wish_message: string | null;
   opened_at: string | null;
@@ -25,6 +26,7 @@ export interface PublicGuest {
   custom_message: string | null;
   status: GuestStatus;
   attendees_count: number;
+  guests_count?: number;
   song_request: string | null;
   wish_message: string | null;
   responded_at: string | null;

@@ -134,6 +134,16 @@ export function AdminDashboard() {
     setEditError(null);
 
     try {
+      const contact = parseGuestContact(editingGuest);
+      let newWishMessage: string | null = editNote.trim() || null;
+      if (contact.phone || contact.email) {
+        newWishMessage = JSON.stringify({
+          phone: contact.phone || '',
+          email: contact.email || '',
+          note: editNote.trim() || '',
+        });
+      }
+
       const res = await fetch(`/api/admin/guests/${editingGuest.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -142,7 +152,8 @@ export function AdminDashboard() {
           custom_message: editMessage.trim() || null,
           status: editStatus,
           attendees_count: editStatus === 'ACCEPTED' ? editAttendees : 0,
-          wish_message: editNote.trim() || null,
+          song_request: null,
+          wish_message: newWishMessage,
         }),
       });
 

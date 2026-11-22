@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquareHeart, Sparkles } from 'lucide-react';
+import { parseGuestNote } from '@/lib/guest-contact';
 
 export interface WishItem {
   id: string;
@@ -50,8 +51,12 @@ export function GuestWishesSection({ latestWish }: GuestWishesSectionProps) {
   useEffect(() => {
     if (!latestWish || !latestWish.message?.trim()) return;
 
+    // Giải mã an toàn chuỗi lời chúc, tuyệt đối không đưa JSON hay phone/email vào bức tường
+    const { note } = parseGuestNote(latestWish.message);
+    if (!note) return;
+
     setWishes((prev) => {
-      const wishText = latestWish.message.trim();
+      const wishText = note;
       // Tránh thêm trùng lặp
       const alreadyExists = prev.some(
         (w) =>

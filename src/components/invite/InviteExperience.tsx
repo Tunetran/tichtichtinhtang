@@ -202,7 +202,7 @@ export function InviteExperience({
   const currentBgUrl = bgUrl || '/images/bg-bamboo-lotus.png';
 
   return (
-    <div className="font-sans-ui relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
+    <div className="font-sans-ui relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-clip">
       {/* Lớp nền phong cảnh Hồ sen & Rặng tre (-z-20) */}
       <div
         className="fixed inset-0 -z-20 pointer-events-none select-none overflow-hidden"

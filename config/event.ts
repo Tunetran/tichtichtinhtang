@@ -119,7 +119,7 @@ export const EVENT_CONFIG: EventConfig = {
       bgHex: '#FAD8C0',
     },
   ],
-  hostName: 'Đoàn Kịch The Light',
+  hostName: 'The Light',
   contactLabel: 'Ban Tổ Chức (Hotline / Zalo)',
   contactUrl: 'https://zalo.me/0987654321',
   envelopeGreeting: 'Bạn nhận được một lá thư từ',

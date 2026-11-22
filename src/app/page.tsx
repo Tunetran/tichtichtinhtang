@@ -175,7 +175,7 @@ export default async function HomePage() {
           </p>
 
           <div className="pt-3 border-t border-[#C8E6C9]/60 flex items-center justify-between text-[11px] text-[#61733F]/70">
-            <span>© {new Date().getFullYear()} Tịch Tịch Tình Tang — {config.hostName}</span>
+            <span>© {new Date().getFullYear()} Tịch Tịch Tình Tang — {config.hostName?.replace(/Đoàn Kịch\s*/gi, '') || 'The Light'}</span>
             <Link
               href="/admin"
               className="inline-flex items-center gap-1 hover:text-[#006C3A] transition-colors p-2 -mr-2"

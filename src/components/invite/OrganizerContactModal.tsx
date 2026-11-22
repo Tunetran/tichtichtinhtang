@@ -59,7 +59,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
         type="button"
         onClick={() => setIsOpen(true)}
         aria-label="Xem thông tin liên hệ Ban Tổ Chức"
-        className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-[#C8E6C9] bg-white/95 hover:bg-[#E8F5E9] hover:border-[#006C3A] text-[#006C3A] text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs active:scale-[0.98] transition-all duration-200 cursor-pointer font-sans-ui tracking-normal ${className}`}
+        className={`inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full border border-[#C8E6C9] bg-white/95 hover:bg-[#E8F5E9] hover:border-[#006C3A] text-[#006C3A] text-xs sm:text-sm font-semibold shadow-2xs hover:shadow-xs active:scale-[0.98] transition-all duration-200 cursor-pointer font-sans-ui tracking-normal min-h-[44px] ${className}`}
       >
         <MessageCircle className="w-4 h-4 text-[#006C3A] shrink-0" />
         <span>Liên hệ Ban Tổ Chức</span>
@@ -84,7 +84,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
               exit={{ opacity: 0, scale: 0.94, y: 15 }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-sm sm:max-w-md bg-[#FFFDF9] rounded-3xl p-6 sm:p-7 border border-[#C8E6C9] shadow-2xl space-y-4 font-sans-ui text-[#3E3836]"
+              className="relative w-[92vw] max-w-md max-h-[85dvh] overflow-y-auto bg-[#FFFDF9] rounded-3xl p-5 sm:p-7 border border-[#C8E6C9] shadow-2xl space-y-4 font-sans-ui text-[#3E3836]"
             >
               {/* Tiêu đề & nút đóng */}
               <div className="flex items-start justify-between gap-3 border-b border-[#C8E6C9]/60 pb-3.5">
@@ -105,7 +105,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
                   type="button"
                   onClick={() => setIsOpen(false)}
                   aria-label="Đóng hộp thoại"
-                  className="w-8 h-8 rounded-full hover:bg-[#E8F5E9] text-[#61733F] hover:text-[#006C3A] flex items-center justify-center transition-colors cursor-pointer shrink-0"
+                  className="w-10 h-10 rounded-full hover:bg-[#E8F5E9] text-[#61733F] hover:text-[#006C3A] flex items-center justify-center transition-colors cursor-pointer shrink-0 min-h-[44px] min-w-[44px]"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -153,7 +153,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
                           type="button"
                           onClick={() => handleCopyPhone(contact.phone!)}
                           aria-label="Sao chép số điện thoại"
-                          className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-white border border-[#C8E6C9] hover:bg-[#E8F5E9] text-[11px] font-semibold text-[#006C3A] transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1 px-3 py-2 rounded-lg bg-white border border-[#C8E6C9] hover:bg-[#E8F5E9] text-xs font-semibold text-[#006C3A] transition-colors cursor-pointer min-h-[44px]"
                         >
                           {copiedPhone ? (
                             <>
@@ -170,7 +170,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
 
                         <a
                           href={`tel:${cleanPhoneTel}`}
-                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#006C3A] hover:bg-[#016748] text-white text-[11px] font-bold shadow-xs transition-colors"
+                          className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-[#006C3A] hover:bg-[#016748] text-white text-xs font-bold shadow-xs transition-colors min-h-[44px]"
                         >
                           <span>Gọi ngay</span>
                         </a>
@@ -197,7 +197,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
                     </div>
                     <a
                       href={`mailto:${contact.email.trim()}`}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-white border border-[#C8E6C9] hover:bg-[#E8F5E9] text-[11px] font-bold text-[#006C3A] transition-colors shrink-0"
+                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-white border border-[#C8E6C9] hover:bg-[#E8F5E9] text-xs font-bold text-[#006C3A] transition-colors shrink-0 min-h-[44px]"
                     >
                       <span>Gửi thư</span>
                     </a>
@@ -224,7 +224,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
                       href={contact.social_url.trim()}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#006C3A] hover:bg-[#016748] text-white text-[11px] font-bold shadow-xs transition-colors shrink-0"
+                      className="inline-flex items-center gap-1 px-3.5 py-2 rounded-lg bg-[#006C3A] hover:bg-[#016748] text-white text-xs font-bold shadow-xs transition-colors shrink-0 min-h-[44px]"
                     >
                       <span>Mở link</span>
                     </a>
@@ -245,7 +245,7 @@ export function OrganizerContactModal({ contact, className = '' }: OrganizerCont
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="w-full py-2.5 rounded-xl border border-[#C8E6C9] hover:bg-[#E8F5E9] text-[#61733F] hover:text-[#006C3A] text-xs font-semibold transition-colors cursor-pointer"
+                  className="w-full py-2.5 min-h-[44px] rounded-xl border border-[#C8E6C9] hover:bg-[#E8F5E9] text-[#61733F] hover:text-[#006C3A] text-xs font-semibold transition-colors cursor-pointer"
                 >
                   Đóng
                 </button>

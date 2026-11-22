@@ -38,7 +38,7 @@ export async function GET(req: Request) {
       acceptedInvites: guestsList.filter((g) => g.status === 'ACCEPTED').length,
       totalAttendees: guestsList
         .filter((g) => g.status === 'ACCEPTED')
-        .reduce((sum, g) => sum + (g.attendees_count || 0), 0),
+        .reduce((sum, g) => sum + (g.guests_count || g.attendees_count || 1), 0),
       declinedInvites: guestsList.filter((g) => g.status === 'DECLINED').length,
     };
 

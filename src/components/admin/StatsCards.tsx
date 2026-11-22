@@ -24,9 +24,10 @@ export function StatsCards({ stats }: StatsCardsProps) {
       bg: 'bg-[#006C3A]/10 border-[#006C3A]/20',
     },
     {
-      title: 'Đồng ý',
-      value: `${stats.acceptedInvites} thiệp`,
-      subtext: `${stats.totalAttendees} người tham dự`,
+      title: 'Đồng ý tham gia',
+      value: `${stats.acceptedInvites} lượt`,
+      badge: `${stats.totalAttendees} người tham dự`,
+      subtext: `Tổng ${stats.totalAttendees} ghế cần chuẩn bị`,
       icon: CheckCircle2,
       color: 'text-emerald-700 font-bold',
       bg: 'bg-emerald-50 border-emerald-200',
@@ -78,10 +79,17 @@ export function StatsCards({ stats }: StatsCardsProps) {
               </div>
             </div>
 
-            <div className="mt-2.5">
+            <div className="mt-2.5 space-y-1">
               <p className={`text-xl sm:text-2xl font-bold tracking-tight text-text ${card.color}`}>
                 {card.value}
               </p>
+              {'badge' in card && card.badge && (
+                <div>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100/90 text-emerald-800 text-[11px] font-bold border border-emerald-300/60 shadow-2xs">
+                    👥 {card.badge}
+                  </span>
+                </div>
+              )}
               <p className="text-[11px] text-text-muted mt-0.5 truncate">
                 {card.subtext}
               </p>

@@ -6,18 +6,21 @@ export const rsvpSchema = z
     status: z.enum(['ACCEPTED', 'DECLINED'], {
       required_error: 'Vui lòng chọn xác nhận tham dự hoặc từ chối',
     }),
-    attendees_count: z.number().int().min(0).max(4).optional(),
+    attendees_count: z.number().int().min(0).max(20).optional(),
+    guests_count: z.number().int().min(0).max(20).optional(),
     phone: z.string().trim().max(50, 'Số điện thoại tối đa 50 ký tự').optional().nullable(),
     email: z.string().trim().max(150, 'Email tối đa 150 ký tự').optional().nullable(),
     song_request: z.string().trim().max(200, 'Tên bài hát tối đa 200 ký tự').optional().nullable(),
     wish_message: z.string().trim().max(1000, 'Lời chúc tối đa 1000 ký tự').optional().nullable(),
   })
   .refine(
-    (data) =>
-      data.status === 'DECLINED' ||
-      (data.attendees_count !== undefined && data.attendees_count >= 1 && data.attendees_count <= 4),
+    (data) => {
+      if (data.status === 'DECLINED') return true;
+      const count = data.guests_count ?? data.attendees_count;
+      return count !== undefined && count >= 1 && count <= 20;
+    },
     {
-      message: 'Vui lòng chọn số người tham dự từ 1 đến 4',
+      message: 'Vui lòng chọn số người tham dự hợp lệ (từ 1 đến 10)',
       path: ['attendees_count'],
     }
   );
@@ -69,7 +72,8 @@ export const updateGuestSchema = z.object({
     .optional()
     .nullable(),
   status: z.enum(['NOT_OPENED', 'OPENED', 'ACCEPTED', 'DECLINED']).optional(),
-  attendees_count: z.number().int().min(0).max(4).optional(),
+  attendees_count: z.number().int().min(0).max(20).optional(),
+  guests_count: z.number().int().min(0).max(20).optional(),
   song_request: z.string().trim().max(200).optional().nullable(),
   wish_message: z.string().trim().max(500).optional().nullable(),
 });

@@ -100,7 +100,7 @@ export default async function InvitePage({ params }: PageProps) {
   }
 
   return (
-    <div className="font-sans-ui">
+    <div className="font-sans-ui overflow-x-clip min-h-[100dvh]">
       <InviteExperience
         guest={guest}
         config={config}

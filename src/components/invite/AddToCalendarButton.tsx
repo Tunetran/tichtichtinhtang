@@ -65,12 +65,12 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
   };
 
   return (
-    <div className="relative inline-flex justify-center font-sans-ui">
+    <div className="relative w-full inline-flex justify-center font-sans-ui">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-label="Thêm sự kiện vào lịch của bạn"
-        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap font-sans-ui bg-white/95 hover:bg-[#E8F5E9] text-[#006C3A] border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 cursor-pointer min-h-[42px] select-none"
+        className="w-full inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap font-sans-ui bg-white/95 hover:bg-[#E8F5E9] text-[#006C3A] border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 cursor-pointer min-h-[44px] select-none"
       >
         <CalendarPlus className="w-4 h-4 text-[#006C3A] shrink-0" />
         <span className="whitespace-nowrap font-sans-ui">Thêm vào lịch của bạn</span>
@@ -88,13 +88,13 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute bottom-full left-0 mb-2 z-50 min-w-[200px] w-64 rounded-2xl bg-[#FFFDF9] border border-[#C8E6C9] shadow-[0_12px_30px_-5px_rgba(0,108,58,0.18)] py-2 font-sans-ui overflow-hidden animate-fadeIn">
+          <div className="absolute bottom-full left-0 mb-2 z-50 min-w-[200px] w-full sm:w-64 rounded-2xl bg-[#FFFDF9] border border-[#C8E6C9] shadow-[0_12px_30px_-5px_rgba(0,108,58,0.18)] py-2 font-sans-ui overflow-hidden animate-fadeIn">
             <a
               href={googleCalendarUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2.5 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[42px] font-sans-ui"
+              className="flex items-center gap-2.5 px-4 py-3 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[44px] font-sans-ui"
             >
               <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
               <span>Google Calendar</span>
@@ -103,7 +103,7 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             <button
               type="button"
               onClick={handleDownloadIcs}
-              className="w-full text-left flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[42px] font-sans-ui cursor-pointer"
+              className="w-full text-left flex items-center justify-between px-4 py-3 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[44px] font-sans-ui cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />

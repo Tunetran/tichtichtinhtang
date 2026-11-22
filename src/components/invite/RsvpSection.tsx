@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
+import { parseGuestContact } from '@/lib/guest-contact';
 import { MiniTicket } from './MiniTicket';
 
 interface RsvpSectionProps {
@@ -25,15 +26,29 @@ export function RsvpSection({
   const hasAlreadyResponded = guest.status === 'ACCEPTED' || guest.status === 'DECLINED';
   const [isEditing, setIsEditing] = useState(!hasAlreadyResponded);
 
+  // Giải mã an toàn thông tin liên hệ và lời nhắn đã lưu, điền đúng vào từng ô
+  const initialContact = parseGuestContact(guest);
   const [fullName, setFullName] = useState<string>(guest.full_name || '');
-  const [phone, setPhone] = useState<string>('');
-  const [email, setEmail] = useState<string>('');
-  const [message, setMessage] = useState<string>(guest.wish_message || guest.song_request || '');
+  const [phone, setPhone] = useState<string>(initialContact.phone);
+  const [email, setEmail] = useState<string>(initialContact.email);
+  const [message, setMessage] = useState<string>(initialContact.note);
   const [attendanceChoice, setAttendanceChoice] = useState<'yes' | 'try' | 'unsure'>(
     guest.status === 'DECLINED' ? 'unsure' : 'yes'
   );
+  const [attendeesCount, setAttendeesCount] = useState<number>(
+    guest.attendees_count > 0 ? guest.attendees_count : 1
+  );
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Đồng bộ lại khi guest thay đổi hoặc mở lại form sửa
+  useEffect(() => {
+    const contact = parseGuestContact(guest);
+    setFullName(guest.full_name || '');
+    setPhone(contact.phone);
+    setEmail(contact.email);
+    setMessage(contact.note);
+  }, [guest]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,10 +58,12 @@ export function RsvpSection({
     try {
       const isAttending = attendanceChoice === 'yes' || attendanceChoice === 'try';
       const status = isAttending ? 'ACCEPTED' : 'DECLINED';
+      const finalCount = isAttending ? attendeesCount : 0;
 
       const payload = {
         status,
-        attendees_count: isAttending ? 1 : 0,
+        attendees_count: finalCount,
+        guests_count: finalCount,
         phone: phone.trim() || null,
         email: email.trim() || null,
         wish_message: message.trim() || null,
@@ -156,44 +173,45 @@ export function RsvpSection({
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Nhập họ và tên..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui min-h-[44px]"
             />
           </div>
 
-          {/* 2. Số điện thoại liên hệ */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="rsvp_phone"
-              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
-            >
-              Số điện thoại liên hệ
-            </label>
-            <input
-              id="rsvp_phone"
-              type="tel"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              placeholder="Nhập số điện thoại..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
-            />
-          </div>
+          {/* 2 & 3: Số điện thoại và Gmail: tự xếp 1 cột trên điện thoại (grid-cols-1) và 2 cột từ sm: */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            <div className="space-y-1.5">
+              <label
+                htmlFor="rsvp_phone"
+                className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
+              >
+                Số điện thoại liên hệ
+              </label>
+              <input
+                id="rsvp_phone"
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="Nhập số điện thoại..."
+                className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui min-h-[44px]"
+              />
+            </div>
 
-          {/* 3. Gmail */}
-          <div className="space-y-1.5">
-            <label
-              htmlFor="rsvp_email"
-              className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
-            >
-              Gmail
-            </label>
-            <input
-              id="rsvp_email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Nhập địa chỉ email..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui"
-            />
+            <div className="space-y-1.5">
+              <label
+                htmlFor="rsvp_email"
+                className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal"
+              >
+                Gmail
+              </label>
+              <input
+                id="rsvp_email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Nhập địa chỉ email..."
+                className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors font-sans-ui min-h-[44px]"
+              />
+            </div>
           </div>
 
           {/* 4. Đôi lời gửi đến BTC */}
@@ -210,7 +228,7 @@ export function RsvpSection({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Gửi lời chúc, nhắn nhủ hoặc lưu ý đến The Light..."
-              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors resize-none font-sans-ui leading-relaxed"
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors resize-none font-sans-ui leading-relaxed min-h-[88px]"
             />
           </div>
 
@@ -219,7 +237,7 @@ export function RsvpSection({
             <label className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal">
               Xác nhận đến tham dự sự kiện
             </label>
-            <div className="space-y-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
               {[
                 { id: 'yes', label: 'Có tham gia' },
                 { id: 'try', label: 'Sẽ cố gắng tham gia' },
@@ -229,7 +247,7 @@ export function RsvpSection({
                   key={opt.id}
                   type="button"
                   onClick={() => setAttendanceChoice(opt.id as 'yes' | 'try' | 'unsure')}
-                  className={`w-full py-3 px-4 rounded-xl text-left font-sans-ui text-sm sm:text-base transition-all flex items-center justify-between border cursor-pointer ${
+                  className={`w-full py-3 px-3.5 rounded-xl text-left font-sans-ui text-xs sm:text-sm transition-all flex items-center justify-between border cursor-pointer min-h-[44px] ${
                     attendanceChoice === opt.id
                       ? 'bg-[#E1EEDD] border-[#006C3A] text-[#006C3A] font-semibold shadow-xs'
                       : 'bg-[#ECEAE2]/60 hover:bg-[#ECEAE2] border-[#D5DDD0] text-[#3E3836]'
@@ -237,7 +255,7 @@ export function RsvpSection({
                 >
                   <span className="tracking-normal">{opt.label}</span>
                   <div
-                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ml-1 ${
                       attendanceChoice === opt.id
                         ? 'border-[#006C3A] bg-[#006C3A]'
                         : 'border-[#7D8C63] bg-transparent'
@@ -251,6 +269,79 @@ export function RsvpSection({
               ))}
             </div>
           </div>
+
+          {/* Lựa chọn số người tham dự (Hiển thị khi khách chọn Có tham gia hoặc Sẽ cố gắng) */}
+          <AnimatePresence>
+            {(attendanceChoice === 'yes' || attendanceChoice === 'try') && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="space-y-2.5 pt-2 border-t border-[#D5DDD0]/70 overflow-hidden"
+              >
+                <div className="flex items-center justify-between">
+                  <label className="block font-sans-ui text-sm sm:text-base font-semibold text-[#3E3836] tracking-normal">
+                    Số người tham dự
+                  </label>
+                  <span className="text-xs font-bold text-[#006C3A] bg-[#E1EEDD] px-2.5 py-0.5 rounded-full border border-[#C8E6C9]">
+                    {attendeesCount} người
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {/* Các nút chọn nhanh 1, 2, 3, 4 */}
+                  <div className="grid grid-cols-4 gap-1.5 sm:gap-2 flex-1">
+                    {[1, 2, 3, 4].map((num) => (
+                      <button
+                        key={num}
+                        type="button"
+                        onClick={() => setAttendeesCount(num)}
+                        className={`py-2 px-1 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold transition-all border cursor-pointer flex items-center justify-center text-center ${
+                          attendeesCount === num
+                            ? 'bg-[#006C3A] text-white border-[#006C3A] shadow-xs'
+                            : 'bg-[#ECEAE2]/70 hover:bg-[#ECEAE2] border-[#D5DDD0] text-[#3E3836]'
+                        }`}
+                      >
+                        {num} người
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Bộ nút - / + chọn linh hoạt từ 1 đến 10 */}
+                  <div className="flex items-center border border-[#D5DDD0] rounded-xl bg-[#ECEAE2]/80 overflow-hidden shrink-0 shadow-2xs min-h-[44px]">
+                    <button
+                      type="button"
+                      onClick={() => setAttendeesCount((prev) => Math.max(1, prev - 1))}
+                      disabled={attendeesCount <= 1}
+                      aria-label="Giảm số người"
+                      className="w-9 h-11 flex items-center justify-center text-sm font-bold text-[#3E3836] hover:bg-[#ECEAE2] disabled:opacity-30 cursor-pointer transition-colors min-h-[44px]"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center text-xs font-bold text-[#006C3A] tabular-nums">
+                      {attendeesCount}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setAttendeesCount((prev) => Math.min(10, prev + 1))}
+                      disabled={attendeesCount >= 10}
+                      aria-label="Tăng số người"
+                      className="w-9 h-11 flex items-center justify-center text-sm font-bold text-[#3E3836] hover:bg-[#ECEAE2] disabled:opacity-30 cursor-pointer transition-colors min-h-[44px]"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-[11px] sm:text-xs text-[#61733F] italic leading-relaxed pt-0.5">
+                  {attendeesCount === 1
+                    ? '🌱 Rất hân hạnh được đón tiếp bạn đến thưởng thức đêm nhạc!'
+                    : `🎋 The Light sẽ chu đáo chuẩn bị ${attendeesCount} ghế ngồi liền kề cho đoàn của bạn!`}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Lỗi nếu có */}
           {errorMessage && (
