@@ -23,6 +23,14 @@ export async function POST(req: Request, context: RouteContext) {
       .single();
 
     if (findError || !guest) {
+      if (
+        slug === 'demo' ||
+        slug === 'thay-co' ||
+        !process.env.SUPABASE_URL ||
+        process.env.SUPABASE_URL.includes('placeholder')
+      ) {
+        return NextResponse.json({ ok: true, status: 'OPENED' });
+      }
       return NextResponse.json({ error: 'Không tìm thấy thiệp mời' }, { status: 404 });
     }
 

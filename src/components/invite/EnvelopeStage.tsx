@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Sparkles } from 'lucide-react';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
-import { LilyFlowerIcon } from '@/components/icons/LilyFlowerIcon';
 
 export type InviteStage = 'closed' | 'opening' | 'reading';
 
@@ -18,50 +16,6 @@ interface EnvelopeStageProps {
   waxSealUrl?: string | null;
 }
 
-/**
- * Biểu tượng Hoa Ly (Lily flower) trên con dấu sáp mặc định
- */
-function LilySealSymbol() {
-  const [hasImgError, setHasImgError] = useState(false);
-
-  if (!hasImgError) {
-    return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src="/images/lily-seal.png"
-        alt="Hoa Ly"
-        className="w-7 h-7 object-contain drop-shadow-sm relative z-10 select-none pointer-events-none"
-        onError={() => setHasImgError(true)}
-      />
-    );
-  }
-
-  return <LilyFlowerIcon className="w-7 h-7 text-white drop-shadow-sm relative z-10" />;
-}
-
-/**
- * Logo sự kiện động hiển thị trên lá thư bên trong phong bì:
- * Hiển thị trực tiếp ảnh PNG tách nền, không khung viền hay nền trắng, kèm drop-shadow-sm.
- */
-function EnvelopeLetterLogo({ logoUrl }: { logoUrl?: string | null }) {
-  const [hasError, setHasError] = useState(false);
-  const src = logoUrl || '/images/default-logo.png';
-
-  if (hasError) return null;
-
-  return (
-    <div className="w-12 h-12 flex items-center justify-center mb-1 shrink-0 bg-transparent border-0 shadow-none p-0">
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt="Logo sự kiện"
-        className="w-full h-full object-contain drop-shadow-sm bg-transparent"
-        onError={() => setHasError(true)}
-      />
-    </div>
-  );
-}
-
 export function EnvelopeStage({
   guest,
   config,
@@ -70,18 +24,16 @@ export function EnvelopeStage({
   logoUrl,
   waxSealUrl,
 }: EnvelopeStageProps) {
-  const [sealImgError, setSealImgError] = useState(false);
   const [isFlapBehind, setIsFlapBehind] = useState(false);
 
-  const greeting = config.envelopeGreeting || 'Trân trọng kính mời';
-  const hintText = config.sealHintText || 'Chạm vào con dấu hoa ly để mở thiệp';
+  const sealSrc = waxSealUrl || '/images/wax-seal-combined.png';
 
-  // Nhịp 1: Sau nửa chu kỳ mở nắp (~0.275s của 0.55s), hạ z-index nắp ra sau lá thư
+  // Sau nửa chu kỳ mở nắp (~0.28s của 0.55s), hạ z-index nắp ra sau lá thư đang trượt lên
   useEffect(() => {
     if (stage === 'opening') {
       const timer = setTimeout(() => {
         setIsFlapBehind(true);
-      }, 275);
+      }, 280);
       return () => clearTimeout(timer);
     } else {
       setIsFlapBehind(false);
@@ -90,27 +42,48 @@ export function EnvelopeStage({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex flex-col items-center justify-center p-4 min-h-[100dvh] h-[100dvh] overflow-hidden bg-[#FFF5F8]/95 select-none"
+      className="fixed inset-0 z-40 flex flex-col items-center justify-between py-6 sm:py-8 px-4 min-h-[100dvh] h-[100dvh] overflow-hidden select-none"
       style={{
-        paddingTop: 'env(safe-area-inset-top, 16px)',
-        paddingBottom: 'env(safe-area-inset-bottom, 16px)',
+        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 1.25rem)',
+        paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1.25rem)',
       }}
     >
-      {/* Họa tiết hoa ly mờ trang trí nền phong bì */}
-      <div className="absolute top-8 left-8 text-[#F6C1D3]/25 pointer-events-none select-none">
-        <LilyFlowerIcon className="w-24 h-24 -rotate-12" />
-      </div>
-      <div className="absolute bottom-10 right-8 text-[#F6C1D3]/25 pointer-events-none select-none">
-        <LilyFlowerIcon className="w-28 h-28 rotate-12" />
+      {/* NỀN PHONG CẢNH HỒ SEN & RẶNG TRE NGUYÊN BẢN (KHÔNG BỊ MỜ HAY BẠC MÀU) */}
+      <div className="absolute inset-0 -z-10 pointer-events-none select-none overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/bg-bamboo-lotus.png"
+          alt="Nền Tịch Tịch Tình Tang"
+          className="w-full h-full object-cover object-center"
+        />
       </div>
 
-      {/* Khung bao phong bì 3D với perspective 1200px */}
+      {/* HEADER: Tiêu đề đón nhận thư "BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ" (Chuẩn thiết kế 100%) */}
       <motion.div
-        className="relative w-full max-w-[340px] sm:max-w-[370px] flex flex-col items-center [perspective:1200px]"
+        animate={
+          stage === 'opening'
+            ? { opacity: 0, y: -24 }
+            : { opacity: 1, y: 0 }
+        }
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-[340px] sm:max-w-[420px] pt-1 sm:pt-4 flex justify-center z-10"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/images/header-text.png"
+          alt="BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ"
+          className="w-full h-auto object-contain select-none pointer-events-none drop-shadow-xs"
+        />
+        <h1 className="sr-only">BẠN NHẬN ĐƯỢC MỘT LÁ THƯ TỪ</h1>
+      </motion.div>
+
+      {/* PHONG BÌ 3D HỒNG REN TRẮNG & CON DẤU NGỌC TRAI THE LIGHT */}
+      <motion.div
+        className="relative w-[86%] sm:w-[78%] max-w-[340px] sm:max-w-[380px] aspect-[1492/1080] [perspective:1200px] my-auto flex items-center justify-center"
         animate={
           stage === 'opening'
             ? {
-              y: [0, 0, 80],
+              y: [0, 0, 90],
               opacity: [1, 1, 0],
             }
             : { y: 0, opacity: 1 }
@@ -119,95 +92,75 @@ export function EnvelopeStage({
           stage === 'opening'
             ? {
               duration: 1.4,
-              times: [0, 0.75, 1], // Giữ vị trí trong 1.05s đầu, sau đó trượt xuống và mờ dần trong 1.05s -> 1.4s
+              times: [0, 0.75, 1],
               ease: 'easeInOut',
             }
             : { duration: 0.3 }
         }
       >
-        {/* Lời đề tặng trên phong bì */}
-        <motion.div
-          animate={
-            stage === 'opening'
-              ? { opacity: 0, y: -12 }
-              : { opacity: 1, y: 0 }
-          }
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className="mb-5 text-center space-y-1.5 px-2 overflow-visible"
-        >
-          <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.2em] text-[#7D6670] font-bold font-sans-ui">
-            <Sparkles className="w-3.5 h-3.5 text-[#D85C8A]" />
-            <span>{greeting}</span>
-            <Sparkles className="w-3.5 h-3.5 text-[#D85C8A]" />
-          </div>
-
-          <h1 className="font-serif-title text-3xl sm:text-4xl text-[#5C1F38] font-bold px-2 py-2 pb-3 overflow-visible max-w-[340px] drop-shadow-xs leading-relaxed">
-            {guest.full_name}
-          </h1>
-
-          <p className="text-sm sm:text-base text-[#7D6670] italic max-w-xs mx-auto truncate font-serif-title leading-relaxed">
-            {config.eventName}
-          </p>
-        </motion.div>
-
-        {/* Thân phong bì vật lý 3D chiều sâu thật */}
+        {/* Khung thân phong bì */}
         <div
-          className="relative w-full aspect-[4/3] rounded-2xl border border-[#F6C1D3] shadow-2xl [perspective:1200px]"
-          style={{
-            backgroundColor: '#D85C8A',
-            transformStyle: 'preserve-3d',
-          }}
+          className="relative w-full h-full rounded-2xl [perspective:1200px]"
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          {/* Lớp nền sau phong bì (Back Panel) */}
-          <div className="absolute inset-0 bg-[#D85C8A] rounded-2xl z-0" />
-          <div className="absolute inset-1.5 rounded-xl border border-white/30 pointer-events-none z-0" />
+          {/* Lòng phong bì (Back Panel bên trong phong bì) */}
+          <div
+            className="absolute inset-1.5 rounded-2xl z-0"
+            style={{ backgroundColor: '#FAD5DC' }}
+          />
 
-          {/* NHỊP 2: Tờ thư kẹp giữa lớp mặt sau và túi mặt trước trượt lên cao (0.45s → 1.35s) */}
+          {/* TỜ THƯ KẸP BÊN TRONG (Trượt lên cao khi mở phong bì) */}
           <motion.div
-            className="absolute inset-x-4 top-4 h-[80%] bg-[#FFFDFD] rounded-xl shadow-xl p-4 flex flex-col items-center justify-center text-center border border-[#F3C6D6]/80 overflow-hidden"
+            className="absolute inset-x-5 top-3 h-[86%] bg-gradient-to-b from-[#FFFDF9] via-[#FAF6EE] to-[#F5EFE0] rounded-xl shadow-xl p-4 flex flex-col items-center justify-center text-center border border-[#D5E5C9] overflow-hidden"
             style={{ zIndex: 15 }}
-            initial={{ y: 15, scale: 0.9, opacity: 0 }}
+            initial={{ y: 15, scale: 0.92, opacity: 0 }}
             animate={
               stage === 'opening'
-                ? { y: -120, scale: 0.96, opacity: 1 }
-                : { y: 15, scale: 0.9, opacity: 0 }
+                ? { y: -130, scale: 0.98, opacity: 1 }
+                : { y: 15, scale: 0.92, opacity: 0 }
             }
             transition={
               stage === 'opening'
-                ? { delay: 0.45, duration: 0.9, ease: [0.22, 1, 0.36, 1] }
+                ? { delay: 0.38, duration: 0.9, ease: [0.22, 1, 0.36, 1] }
                 : { duration: 0.25 }
             }
           >
-            <div className="absolute inset-1.5 border border-[#F3C6D6]/60 rounded-lg pointer-events-none" />
-            <EnvelopeLetterLogo logoUrl={logoUrl} />
-            <p className="font-serif-title text-base sm:text-lg font-bold text-[#5C1F38] truncate max-w-[240px] leading-relaxed">
-              {config.eventName}
+            <div className="absolute inset-1.5 border border-[#61733F]/30 rounded-lg pointer-events-none" />
+            <div className="w-14 h-14 flex items-center justify-center mb-1 shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/logo-the-light.png"
+                alt="The Light"
+                className="w-full h-full object-contain drop-shadow-sm"
+              />
+            </div>
+            <p className="font-serif text-xs sm:text-sm font-semibold text-[#006C3A] tracking-widest uppercase">
+              THƯ MỜI
             </p>
-            <p className="text-base text-[#D85C8A] italic mt-0.5 font-handwriting leading-relaxed">
-              {config.slogan}
+            <p className="font-serif-title text-base sm:text-lg font-bold text-[#2D4A22] truncate max-w-[240px] mt-0.5">
+              {guest.full_name}
+            </p>
+            <p className="text-xs text-[#61733F] italic mt-0.5 line-clamp-1">
+              {config.eventName}
             </p>
           </motion.div>
 
-          {/* Túi mặt trước phong bì (Front Pocket) */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              backgroundColor: '#D85C8A',
-              clipPath: 'polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%)',
-              zIndex: 25,
-            }}
-          >
-            <div className="absolute inset-1.5 rounded-xl border border-white/20 pointer-events-none" />
+          {/* TÚI MẶT TRƯỚC PHONG BÌ (Front Pocket với đường gấp và viền chuẩn) */}
+          <div className="absolute inset-0 w-full h-full z-20 pointer-events-none">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/envelope-pocket.png"
+              alt="Thân phong bì"
+              className="w-full h-full object-contain pointer-events-none select-none drop-shadow-md"
+            />
           </div>
 
-          {/* NHỊP 1: Nắp phong bì (Flap) lật mở 3D (0s → 0.55s) */}
+          {/* NẮP PHONG BÌ VIỀN REN TRẮNG 3D (Lật mở 180 độ lên trên) */}
           <motion.div
-            className="absolute top-0 left-0 right-0 h-[53%] origin-top will-change-transform shadow-md pointer-events-none"
+            className="absolute inset-x-0 top-0 w-full aspect-[1492/1080] pointer-events-none will-change-transform"
             style={{
-              backgroundColor: '#C44D78',
-              clipPath: 'polygon(0 0, 100% 0, 50% 100%)',
-              transformOrigin: 'top',
-              backfaceVisibility: 'visible',
+              transformOrigin: 'top center',
+              transformStyle: 'preserve-3d',
               zIndex: isFlapBehind ? 5 : 35,
             }}
             initial={{ rotateX: 0 }}
@@ -221,101 +174,95 @@ export function EnvelopeStage({
                 ? { duration: 0.55, ease: [0.22, 1, 0.36, 1] }
                 : { duration: 0.3 }
             }
-          />
+          >
+            {/* Mặt trước nắp: Nắp ren trắng nguyên bản */}
+            <div
+              className="absolute inset-0 w-full h-full"
+              style={{ backfaceVisibility: 'hidden' }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/envelope-flap.png"
+                alt="Nắp phong bì"
+                className="w-full h-full object-contain pointer-events-none select-none"
+              />
+            </div>
 
-          {/* Con dấu sáp niêm phong (nhỏ dần & mờ đi khi mở) */}
+            {/* Mặt sau nắp khi lật ngược: Lớp giấy hồng mềm mại */}
+            <div
+              className="absolute inset-0 w-full h-full"
+              style={{
+                backfaceVisibility: 'hidden',
+                transform: 'rotateX(180deg)',
+              }}
+            >
+              <div
+                className="w-full h-full"
+                style={{
+                  backgroundColor: '#FDD5DC',
+                  clipPath: 'polygon(0 0, 100% 0, 50% 61.2%)',
+                }}
+              />
+            </div>
+          </motion.div>
+
+          {/* CON DẤU SÁP NGỌC TRAI THE LIGHT (Chạm vào để mở lá thư) */}
           <div
-            className="absolute inset-0 flex items-center justify-center pointer-events-auto"
+            className="absolute left-1/2 top-[62%] -translate-x-1/2 -translate-y-1/2 w-[36%] aspect-[1466/1430] pointer-events-auto"
             style={{ zIndex: 40 }}
           >
-            {waxSealUrl && !sealImgError ? (
-              /* Con dấu sáp upload động */
-              <motion.button
-                type="button"
-                onClick={onOpen}
-                disabled={stage !== 'closed'}
-                aria-label={hintText}
-                className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center cursor-pointer active:scale-[0.94] transition-transform duration-200 min-h-[44px] min-w-[44px] focus:outline-none"
-                animate={
-                  stage === 'opening'
-                    ? { scale: 0.8, opacity: 0 }
-                    : { scale: [1, 1.05, 1] }
-                }
-                transition={
-                  stage === 'opening'
-                    ? { duration: 0.35, ease: 'easeOut' }
-                    : {
-                      duration: 2.4,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }
-                }
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={waxSealUrl}
-                  alt="Con dấu sáp"
-                  className="w-full h-full object-contain drop-shadow-md select-none pointer-events-none"
-                  onError={() => setSealImgError(true)}
-                />
-              </motion.button>
-            ) : (
-              /* Con dấu sáp Hoa Ly mặc định */
-              <motion.button
-                type="button"
-                onClick={onOpen}
-                disabled={stage !== 'closed'}
-                aria-label={hintText}
-                className="wax-seal-btn relative w-16 h-16 sm:w-18 sm:h-18 rounded-full flex items-center justify-center cursor-pointer border-2 border-white/80 active:scale-[0.94] transition-transform duration-200 min-h-[44px] min-w-[44px]"
-                style={{
-                  background:
-                    'radial-gradient(circle at 35% 30%, #FFFFFF 0%, #FCE4EC 28%, #F8BBD0 65%, #D85C8A 100%)',
-                }}
-                animate={
-                  stage === 'opening'
-                    ? { scale: 0.8, opacity: 0 }
-                    : {
-                      scale: [1, 1.05, 1],
-                      boxShadow: [
-                        '0 8px 24px rgba(216, 92, 138, 0.35)',
-                        '0 12px 28px rgba(216, 92, 138, 0.55)',
-                        '0 8px 24px rgba(216, 92, 138, 0.35)',
-                      ],
-                    }
-                }
-                transition={
-                  stage === 'opening'
-                    ? { duration: 0.35, ease: 'easeOut' }
-                    : {
-                      duration: 2.4,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
-                    }
-                }
-              >
-                <div className="w-12 h-12 rounded-full border border-white/50 flex items-center justify-center shadow-inner relative overflow-hidden bg-white/20 backdrop-blur-[1px]">
-                  <div className="absolute inset-0 bg-gradient-to-tr from-rose-900/10 via-transparent to-white/40" />
-                  <LilySealSymbol />
-                </div>
-              </motion.button>
-            )}
+            <motion.button
+              type="button"
+              onClick={onOpen}
+              disabled={stage !== 'closed'}
+              aria-label="Chạm để mở thiệp mời"
+              className="relative w-full h-full flex items-center justify-center cursor-pointer active:scale-95 hover:scale-105 transition-transform duration-200 focus:outline-none"
+              animate={
+                stage === 'opening'
+                  ? { scale: [1, 1.15, 0], opacity: [1, 1, 0] }
+                  : { scale: [1, 1.04, 1] }
+              }
+              transition={
+                stage === 'opening'
+                  ? { duration: 0.35, ease: 'easeOut' }
+                  : {
+                    duration: 2.4,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }
+              }
+            >
+              {/* Con dấu sáp ngọc trai với logo The Light */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={sealSrc}
+                alt="Con dấu sáp The Light"
+                className="w-full h-full object-contain drop-shadow-[0_8px_20px_rgba(0,108,58,0.25)] select-none pointer-events-none"
+              />
+
+              {/* Vòng hào quang sáng nhẹ xung quanh con dấu */}
+              <div className="absolute -inset-2 rounded-full border border-white/50 animate-ping opacity-25 pointer-events-none" />
+            </motion.button>
           </div>
         </div>
+      </motion.div>
 
-        {/* Lời nhắc chạm vào con dấu */}
-        <motion.p
-          animate={
-            stage === 'opening'
-              ? { opacity: 0, y: 8 }
-              : { opacity: 1, y: 0 }
-          }
-          transition={{ duration: 0.3 }}
-          className="mt-5 text-xs sm:text-sm text-[#7D6670] font-medium flex items-center gap-1.5 animate-pulse select-none font-sans-ui"
-        >
-          <span>✨</span>
-          <span>{hintText}</span>
-          <span>✨</span>
-        </motion.p>
+      {/* FOOTER: Typography Logo "Tịch Tịch Tình Tang" (Chuẩn thiết kế 100%) */}
+      <motion.div
+        animate={
+          stage === 'opening'
+            ? { opacity: 0, y: 24 }
+            : { opacity: 1, y: 0 }
+        }
+        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+        className="w-full max-w-[240px] sm:max-w-[280px] pb-2 sm:pb-4 z-10 flex flex-col items-center select-none"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={logoUrl || '/images/logo-tichtichtinhtang.png'}
+          alt="Tịch Tịch Tình Tang"
+          className="w-full h-auto object-contain drop-shadow-md pointer-events-none"
+        />
       </motion.div>
     </div>
   );

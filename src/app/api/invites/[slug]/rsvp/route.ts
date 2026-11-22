@@ -45,6 +45,26 @@ export async function POST(req: Request, context: RouteContext) {
       .single();
 
     if (findError || !guest) {
+      if (
+        slug === 'demo' ||
+        slug === 'thay-co' ||
+        !process.env.SUPABASE_URL ||
+        process.env.SUPABASE_URL.includes('placeholder')
+      ) {
+        return NextResponse.json({
+          ok: true,
+          guest: {
+            slug,
+            full_name: slug === 'thay-co' ? 'Quý Thầy/Cô' : 'Quý Khách Mời',
+            custom_message: null,
+            status: data.status,
+            attendees_count: data.status === 'ACCEPTED' ? (data.attendees_count ?? 1) : 0,
+            song_request: data.song_request?.trim() || null,
+            wish_message: data.wish_message?.trim() || null,
+            responded_at: new Date().toISOString(),
+          } as PublicGuest,
+        });
+      }
       return NextResponse.json({ error: 'Không tìm thấy thiệp mời' }, { status: 404 });
     }
 

@@ -187,26 +187,28 @@ export function InviteExperience({
     }, 250);
   };
 
+  const currentBgUrl = bgUrl || '/images/bg-bamboo-lotus.png';
+
   return (
     <div className="font-sans-ui relative min-h-[100dvh] w-full flex flex-col items-center overflow-x-hidden">
-      {/* Lớp nền ảnh sự kiện động phủ toàn màn hình kèm mờ trắng-hồng dịu (-z-20) */}
-      {bgUrl && (
-        <div
-          className="fixed inset-0 -z-20 pointer-events-none select-none overflow-hidden"
-          aria-hidden="true"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={bgUrl}
-            alt="Nền thiệp mời"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
-            }}
-          />
-          <div className="absolute inset-0 bg-white/75 backdrop-blur-[2px]" />
-        </div>
-      )}
+      {/* Lớp nền phong cảnh Hồ sen & Rặng tre (-z-20) */}
+      <div
+        className="fixed inset-0 -z-20 pointer-events-none select-none overflow-hidden"
+        aria-hidden="true"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={currentBgUrl}
+          alt="Nền thiệp mời"
+          className="w-full h-full object-cover object-center"
+          onError={(e) => {
+            (e.target as HTMLElement).style.display = 'none';
+          }}
+        />
+        {stage === 'reading' && (
+          <div className="absolute inset-0 bg-white/25 backdrop-blur-[0.5px] transition-opacity duration-700" />
+        )}
+      </div>
 
       {/* Hiệu ứng logo sự kiện/trái tim pastel rơi phía sau nền (-z-10) */}
       <FallingHearts logoUrl={logoUrl} />

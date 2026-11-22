@@ -54,7 +54,7 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `dem-nhac-tinh-yeu.ics`;
+    a.download = `tich-tich-tinh-tang.ics`;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

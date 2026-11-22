@@ -1,88 +1,77 @@
 {
-  "theme": "starlight",
-  "eventName": "Đêm Nhạc Tình Yêu — Giai Điệu Chạm Trái Tim",
-  "slogan": "Một buổi tối chỉ có ánh nến, tiếng đàn và những bản tình ca ngọt ngào",
+  "theme": "tichtichtinhtang",
+  "eventName": "Tịch Tịch Tình Tang",
+  "slogan": "Vở ca nhạc kịch dân gian lấy cảm hứng từ truyện cổ tích “Cây Tre Trăm Đốt”",
   "invitationBadge": "Thư Mời Tham Dự",
-  "dedicationBadge": "Dành tặng người bạn quý",
-  "eventDateLabel": "Thứ Bảy, ngày 25 tháng 12 năm 2026",
-  "eventDateIso": "2026-12-25T19:30:00+07:00",
-  "checkinTime": "19:00",
-  "startTime": "19:30",
-  "venueName": "The Muse Acoustic Lounge",
-  "venueAddress": "Tầng 3, 128 Phan Kế Bính, Ba Đình, Hà Nội",
-  "googleMapsUrl": "https://maps.google.com/?q=The+Muse+Acoustic+Lounge",
-  "dresscodeDescription": "Trang phục lịch thiệp, thanh nhã (khuyến khích theo bảng màu bên dưới)",
+  "dedicationBadge": "Trân trọng kính mời Quý Thầy/Cô",
+  "poemQuote": [
+    "TÍCH XƯA KỂ LẠI CHUYỆN TÌNH",
+    "TÍCH NÀO KỂ LẠI CHUYỆN TÌNH ĐÂY TA?"
+  ],
+  "eventDateLabel": "Thứ Bảy, ngày 05 tháng 12 năm 2026",
+  "eventDateIso": "2026-12-05T18:30:00+07:00",
+  "checkinTime": "18:00 - 18:30",
+  "startTime": "18:30",
+  "endTime": "19:30",
+  "venueHall": "HỘI TRƯỜNG B",
+  "venueName": "Trường Đại học Gia Định",
+  "venueAddress": "371 Nguyễn Kiệm, Phường Hạnh Thông, TP. Hồ Chí Minh",
+  "googleMapsUrl": "https://maps.google.com/?q=371+Nguy%E1%BB%85n+Ki%E1%BB%87m+%C4%90%E1%BA%A1i+H%E1%BB%8Dc+Gia+%C4%90%E1%BB%8Bnh",
+  "dresscodeDescription": "Khuyến khích lựa chọn trang phục theo 3 phong cách thanh nhã",
   "dresscodeColors": [
     {
-      "name": "Đỏ rượu / Burgundy",
-      "hex": "#7A1835"
+      "name": "Xanh tre / Ngọc bích",
+      "hex": "#006C3A"
     },
     {
-      "name": "Vàng kem / Champagne",
-      "hex": "#E8D3A2"
+      "name": "Hồng sen pastel",
+      "hex": "#F4A7BB"
     },
     {
-      "name": "Trắng thanh lịch",
-      "hex": "#FFFFFF"
+      "name": "Vàng kem mây",
+      "hex": "#FFF4D6"
     },
     {
-      "name": "Đen quý phái",
-      "hex": "#1C1917"
+      "name": "Xanh cốm non",
+      "hex": "#A8D5BA"
     }
   ],
-  "hostName": "Ashley",
+  "hostName": "Đoàn Kịch The Light",
   "contactLabel": "Ban Tổ Chức (Hotline / Zalo)",
-  "contactUrl": "https://zalo.me/0778706084",
-  "envelopeGreeting": "Trân trọng kính mời",
-  "sealHintText": "Chạm vào dấu sáp để mở thiệp",
-  "letterSalutation": "Thân gửi",
+  "contactUrl": "https://zalo.me/0987654321",
+  "envelopeGreeting": "Bạn nhận được một lá thư từ",
+  "sealHintText": "Chạm vào con dấu The Light để mở thiệp",
+  "letterSalutation": "Kính gửi",
   "generalInvitationText": [
-    "Khi những ngọn nến lung linh được thắp sáng và từng phím đàn cất lên, chúng mình mong muốn được cùng bạn sẻ chia một đêm nhạc ấm áp, nơi những cảm xúc chân thành nhất được nâng niu.",
-    "Sự hiện diện của bạn là mảnh ghép hoàn hảo tạo nên những khoảnh khắc đáng nhớ của đêm nay. Hãy để âm nhạc dẫn lối cho những rung động trái tim."
+    "Trân trọng kính mời Thầy/Cô đến xem vở ca nhạc kịch dân gian được lấy cảm hứng từ truyện cổ tích “Cây Tre Trăm Đốt”.",
+    "Sự có mặt của Thầy/Cô là niềm vinh dự và là lời động viên lớn nhất với The Light."
   ],
   "timeline": [
     {
-      "time": "19:00",
-      "title": "Đón khách & Check-in",
-      "description": "Thưởng thức đồ uống nhẹ, nhận quà kỷ niệm và chụp ảnh check-in"
+      "time": "18:00 - 18:30",
+      "title": "Check-in",
+      "description": "Đón tiếp Quý Thầy/Cô, nhận quà kỷ niệm & chụp hình lưu niệm"
+    },
+    {
+      "time": "18:30 - 19:30",
+      "title": "Bắt đầu sự kiện",
+      "description": "Công diễn vở ca nhạc kịch dân gian “Tịch Tịch Tình Tang”"
     },
     {
       "time": "19:30",
-      "title": "Khai mạc đêm nhạc",
-      "description": "Giai điệu mở màn & lời tri ân gửi tới những người bạn thân thương"
-    },
-    {
-      "time": "20:00",
-      "title": "Giao lưu & Bản tình ca yêu cầu",
-      "description": "Lắng nghe những câu chuyện cảm xúc và ca khúc acoustic theo yêu cầu"
-    },
-    {
-      "time": "21:30",
-      "title": "Bế mạc & Lưu giữ kỷ niệm",
-      "description": "Trao gửi lời cảm ơn và chụp hình kỷ niệm cùng ban nhạc"
-    }
-  ],
-  "gallery": [
-    {
-      "src": "https://upnellhkbrbuihtafloa.supabase.co/storage/v1/object/public/event-images/uploads/images/1795185599019-731810116_18197703829369100_349244903542.jpg",
-      "alt": "Nụ cười và hoa tươi",
-      "caption": "Khoảnh khắc trọn vẹn"
-    },
-    {
-      "src": "https://upnellhkbrbuihtafloa.supabase.co/storage/v1/object/public/event-images/uploads/images/1795185717779-470226964_1489062828441711_7885305438257.jpg",
-      "alt": "Trầm nhẹ và sâu lắng",
-      "caption": "Giai điệu tình ca"
+      "title": "Kết thúc sự kiện",
+      "description": "Trao gửi lời tri ấn & chụp ảnh kỷ niệm cùng toàn thể đoàn kịch"
     }
   ],
   "audio": {
-    "src": "https://upnellhkbrbuihtafloa.supabase.co/storage/v1/object/public/event-audio/uploads/audio/1795185491716-kim-min-seok-snapyt-app.mp3",
-    "defaultVolume": 0.45
+    "src": "/music/bg-love.mp3",
+    "defaultVolume": 0.4
   },
-  "ogImage": "https://upnellhkbrbuihtafloa.supabase.co/storage/v1/object/public/event-images/uploads/images/1795186268573-sunrise-cat-anime-seaside-scenery-4k-wal.jpg",
-  "footerThankYou": "Rất mong được gặp bạn trong đêm nhạc ấm áp này",
+  "ogImage": "/images/page-1.png",
+  "footerThankYou": "The Light xin chân thành cảm ơn Quý Thầy/Cô đã dành thời gian quý báu, gác lại những bận rộn để đến tham dự sự kiện của chúng em. Sự hiện diện của Quý Thầy/Cô không chỉ là niềm vinh dự mà còn là nguồn động viên lớn lao, tiếp thêm cho cả đoàn sự tự tin và cảm hứng để mang đến một buổi diễn trọn vẹn nhất. Kính chúc Quý Thầy/Cô thật nhiều sức khỏe, hạnh phúc và luôn thành công trên con đường gieo mầm tri thức.\nTrân trọng cảm ơn! 🎋",
   "rsvpHeading": "Xác Nhận Tham Dự",
-  "rsvpSubheading": "Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình",
+  "rsvpSubheading": "Quý Thầy/Cô vui lòng gửi xác nhận để BTC sắp xếp chỗ ngồi và đón tiếp chu đáo nhất",
   "showCountdown": true,
-  "showGallery": true,
+  "showGallery": false,
   "showSongRequest": false
 }

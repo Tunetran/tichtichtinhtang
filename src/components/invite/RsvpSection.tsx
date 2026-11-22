@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Heart, XCircle, Loader2, MessageSquareHeart } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
@@ -16,18 +16,22 @@ interface RsvpSectionProps {
   logoUrl?: string | null;
 }
 
-export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess, logoUrl }: RsvpSectionProps) {
+export function RsvpSection({
+  guest,
+  config = EVENT_CONFIG,
+  onRsvpSuccess,
+  logoUrl,
+}: RsvpSectionProps) {
   const hasAlreadyResponded = guest.status === 'ACCEPTED' || guest.status === 'DECLINED';
   const [isEditing, setIsEditing] = useState(!hasAlreadyResponded);
 
-  const [selectedStatus, setSelectedStatus] = useState<'ACCEPTED' | 'DECLINED'>(
-    guest.status === 'DECLINED' ? 'DECLINED' : 'ACCEPTED'
+  const [fullName, setFullName] = useState<string>(guest.full_name || '');
+  const [phone, setPhone] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
+  const [message, setMessage] = useState<string>(guest.wish_message || guest.song_request || '');
+  const [attendanceChoice, setAttendanceChoice] = useState<'yes' | 'try' | 'unsure'>(
+    guest.status === 'DECLINED' ? 'unsure' : 'yes'
   );
-  const [attendeesCount, setAttendeesCount] = useState<number>(
-    guest.attendees_count > 0 ? guest.attendees_count : 1
-  );
-  const [songRequest, setSongRequest] = useState<string>(guest.song_request || '');
-  const [wishMessage, setWishMessage] = useState<string>(guest.wish_message || '');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -37,11 +41,26 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess, logoU
     setErrorMessage(null);
 
     try {
+      const isAttending = attendanceChoice === 'yes' || attendanceChoice === 'try';
+      const status = isAttending ? 'ACCEPTED' : 'DECLINED';
+
+      // Ghép thông tin liên hệ và đôi lời gửi BTC
+      const contactNote = [
+        phone.trim() ? `SĐT: ${phone.trim()}` : null,
+        email.trim() ? `Email: ${email.trim()}` : null,
+        attendanceChoice === 'try' ? '(Sẽ cố gắng tham gia)' : null,
+        attendanceChoice === 'unsure' ? '(Chưa rõ lịch trình)' : null,
+      ]
+        .filter(Boolean)
+        .join(' • ');
+
+      const combinedWish = [contactNote, message.trim()].filter(Boolean).join('\n');
+
       const payload = {
-        status: selectedStatus,
-        attendees_count: selectedStatus === 'ACCEPTED' ? attendeesCount : 0,
-        song_request: selectedStatus === 'ACCEPTED' ? songRequest.trim() || null : null,
-        wish_message: wishMessage.trim() || null,
+        status,
+        attendees_count: isAttending ? 1 : 0,
+        wish_message: combinedWish || null,
+        song_request: message.trim() || null,
       };
 
       const res = await fetch(`/api/invites/${guest.slug}/rsvp`, {
@@ -55,14 +74,14 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess, logoU
         throw new Error(data.error || 'Có lỗi xảy ra khi gửi xác nhận.');
       }
 
-      // Kích hoạt confetti hạt hồng cánh sen / hồng pastel / trắng nếu đồng ý tham gia
-      if (selectedStatus === 'ACCEPTED') {
+      // Kích hoạt pháo hoa cánh hoa sen & lá tre khi đồng ý tham gia
+      if (isAttending) {
         try {
           confetti({
-            particleCount: 65,
-            spread: 70,
-            origin: { y: 0.72 },
-            colors: ['#D85C8A', '#F6C1D3', '#FFFFFF', '#FDE2EC'],
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.75 },
+            colors: ['#006C3A', '#A8D5BA', '#F4A7BB', '#FFF4D6'],
             disableForReducedMotion: true,
           });
         } catch {
@@ -80,18 +99,23 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess, logoU
   };
 
   return (
-    <section className="space-y-6 pt-6 border-t border-[#F6C1D3]/70 font-sans-ui">
-      <div className="text-center space-y-1.5 px-2">
-        <h3 className="font-serif-title text-xl sm:text-2xl font-bold text-[#5C1F38] text-balance leading-relaxed py-1 overflow-visible">
-          {config.rsvpHeading || 'Xác Nhận Tham Dự'}
-        </h3>
-        <p className="text-xs sm:text-sm text-[#7D6670] text-balance max-w-sm mx-auto leading-relaxed">
-          {config.rsvpSubheading || 'Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình'}
-        </p>
+    <section className="space-y-6 pt-4 font-sans-ui" id="rsvp-section">
+      {/* Huy hiệu Tiêu đề chuẩn Page 5 */}
+      <div className="flex justify-center">
+        <div className="px-6 py-2 rounded-full bg-[#FCEBE6] border border-[#F8C6D2] shadow-xs">
+          <h2 className="font-serif-title text-xl sm:text-2xl font-bold tracking-[0.15em] text-[#3E3836] uppercase text-center">
+            {config.rsvpHeading || 'XÁC NHẬN THAM DỰ'}
+          </h2>
+        </div>
       </div>
 
-      {/* Khi đã phản hồi và không ở chế độ sửa: Hiển thị Thẻ Vé Kỷ Niệm (nếu Accepted) hoặc Thông báo Từ chối */}
-      {hasAlreadyResponded && !isEditing && (
+      <p className="text-center text-xs sm:text-sm text-[#61733F] max-w-sm mx-auto leading-relaxed px-4">
+        {config.rsvpSubheading ||
+          'Quý Thầy/Cô vui lòng gửi xác nhận để BTC sắp xếp chỗ ngồi và đón tiếp chu đáo nhất'}
+      </p>
+
+      {/* Hiển thị Vé kỷ niệm khi đã gửi phản hồi */}
+      {hasAlreadyResponded && !isEditing ? (
         guest.status === 'ACCEPTED' ? (
           <MiniTicket
             guest={guest}
@@ -100,246 +124,173 @@ export function RsvpSection({ guest, config = EVENT_CONFIG, onRsvpSuccess, logoU
             onEdit={() => setIsEditing(true)}
           />
         ) : (
-          <div className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-7 shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 space-y-4 overflow-hidden font-sans-ui">
-            <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
-            <div className="flex items-center gap-3 relative z-10">
-              <XCircle className="w-6 h-6 text-rose-500 shrink-0" />
-              <div>
-                <p className="font-semibold text-[#5C1F38] text-sm sm:text-base">
-                  Bạn đã báo không thể tham dự đêm nhạc
-                </p>
-                <p className="text-xs text-[#7D6670] mt-0.5">
-                  Cảm ơn bạn đã phản hồi cho Ban Tổ Chức. Chúc bạn luôn an yên!
-                </p>
-              </div>
+          <div className="relative bg-[#FFFDF9]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-7 shadow-[0_15px_35px_-8px_rgba(0,108,58,0.12)] border border-[#C8E6C9] space-y-4 font-sans-ui text-center">
+            <div className="flex items-center justify-center gap-2 text-[#61733F]">
+              <CheckCircle2 className="w-5 h-5 text-[#006C3A]" />
+              <p className="font-semibold text-sm sm:text-base text-[#3E3836]">
+                Bạn đã báo chưa chắc chắn hoặc không thể tham dự
+              </p>
             </div>
-
-            {guest.wish_message && (
-              <div className="text-xs bg-[#FFF5F8] p-3 rounded-xl border border-[#F6C1D3] text-[#4A3B42] space-y-1">
-                <span className="text-[#D85C8A] flex items-center gap-1.5 font-bold">
-                  <MessageSquareHeart className="w-3.5 h-3.5" /> Ghi chú riêng cho BTC của bạn:
-                </span>
-                <p className="italic pl-5 text-[#7D6670] font-handwriting text-base">&ldquo;{guest.wish_message}&rdquo;</p>
-              </div>
-            )}
-
-            <div className="pt-2 text-center">
+            <p className="text-xs text-[#61733F]">
+              The Light xin chân thành cảm ơn phản hồi của bạn. Chúc bạn luôn dồi dào sức khỏe!
+            </p>
+            <div className="pt-1">
               <button
                 type="button"
                 onClick={() => setIsEditing(true)}
-                className="text-xs font-semibold text-[#D85C8A] hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
+                className="text-xs font-semibold text-[#006C3A] hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
               >
-                Thay đổi phản hồi của bạn
+                Thay đổi xác nhận của bạn
               </button>
             </div>
           </div>
         )
-      )}
-
-      {/* Form tương tác RSVP */}
-      {isEditing && (
+      ) : (
+        /* Form RSVP thiết kế theo chuẩn Page 5 */
         <form
           onSubmit={handleSubmit}
-          className="relative bg-[#FFFDFD]/95 backdrop-blur-sm rounded-2xl p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(216,92,138,0.18)] border border-[#F3C6D6]/80 space-y-5 text-left overflow-hidden font-sans-ui"
+          className="relative bg-[#FFFDF9]/95 backdrop-blur-sm rounded-3xl p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,108,58,0.15)] border-2 border-[#F8C6D2]/80 space-y-5 text-left font-sans-ui overflow-hidden"
         >
-          <div className="absolute inset-3 border border-[#F3C6D6]/80 rounded-xl pointer-events-none" />
-          {/* Lựa chọn 2 phương án */}
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              type="button"
-              onClick={() => setSelectedStatus('ACCEPTED')}
-              className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm border transition-all duration-200 active:scale-[0.98] min-h-[44px] cursor-pointer font-sans-ui ${
-                selectedStatus === 'ACCEPTED'
-                  ? 'bg-[#D85C8A] text-white border-[#D85C8A] shadow-md ring-2 ring-[#D85C8A]/20'
-                  : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
-              }`}
+          {/* 1. Họ và tên */}
+          <div className="space-y-1">
+            <label
+              htmlFor="rsvp_name"
+              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
             >
-              <Heart
-                className={`w-4 h-4 ${
-                  selectedStatus === 'ACCEPTED' ? 'fill-current text-white' : 'text-[#D85C8A]'
-                }`}
-              />
-              <span>Tôi sẽ tham gia</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setSelectedStatus('DECLINED')}
-              className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl font-bold text-xs sm:text-sm border transition-all duration-200 active:scale-[0.98] min-h-[44px] cursor-pointer font-sans-ui ${
-                selectedStatus === 'DECLINED'
-                  ? 'bg-[#7D6670] text-white border-[#7D6670] shadow-md ring-2 ring-[#7D6670]/20'
-                  : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
-              }`}
-            >
-              <XCircle className="w-4 h-4 text-[#7D6670]" />
-              <span>Rất tiếc vắng mặt</span>
-            </button>
+              Họ và tên
+            </label>
+            <input
+              id="rsvp_name"
+              type="text"
+              required
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Nhập họ và tên..."
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+            />
           </div>
 
-          {/* Các trường mở rộng động */}
-          <AnimatePresence mode="wait">
-            {selectedStatus === 'ACCEPTED' ? (
-              <motion.div
-                key="accepted-fields"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-4 pt-1 font-sans-ui"
-              >
-                {/* Chọn số người tham dự */}
-                <div className="space-y-2">
-                  <label className="block text-xs font-semibold text-[#5C1F38]">
-                    Số người tham dự:
-                  </label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4].map((num) => (
-                      <button
-                        key={num}
-                        type="button"
-                        onClick={() => setAttendeesCount(num)}
-                        className={`flex-1 py-2 text-xs font-bold rounded-xl border transition-all active:scale-[0.98] min-h-[44px] cursor-pointer ${
-                          attendeesCount === num
-                            ? 'bg-[#D85C8A] text-white border-[#D85C8A] shadow-xs ring-2 ring-[#D85C8A]/20'
-                            : 'bg-[#FFF5F8] text-[#4A3B42] border-[#F6C1D3] hover:border-[#D85C8A]'
-                        }`}
-                      >
-                        {num} người
-                      </button>
-                    ))}
-                  </div>
-                  {/* Ghi chú linh hoạt theo số người tham dự */}
-                  <p className="text-sm text-[#7A1835] mt-2 italic font-medium leading-relaxed">
-                    {attendeesCount === 1 && "Still us rất hân hạnh được đón tiếp bạn trong đêm nhạc."}
-                    {attendeesCount === 2 && "Thật ấm áp! Hẹn gặp bạn cùng người đồng hành tại đêm nhạc."}
-                    {attendeesCount >= 3 && `Càng đông càng vui! Ban tổ chức sẽ chuẩn bị chỗ ngồi chu đáo cho nhóm ${attendeesCount} người của bạn.`}
-                  </p>
-                </div>
+          {/* 2. Số điện thoại liên hệ */}
+          <div className="space-y-1">
+            <label
+              htmlFor="rsvp_phone"
+              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+            >
+              Số điện thoại liên hệ
+            </label>
+            <input
+              id="rsvp_phone"
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Nhập số điện thoại..."
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+            />
+          </div>
 
-                {/* Ô 1: Lời nhắn gửi đến đêm nhạc (hiển thị trên Bức tường lời nhắn - lưu vào song_request) */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="song_request" className="block text-xs font-semibold text-[#5C1F38]">
-                      Lời nhắn gửi đến đêm nhạc
-                    </label>
-                    <span className="text-[11px] text-[#7D6670]/80 italic shrink-0">
-                      Hiển thị trên Bức tường lời nhắn
-                    </span>
-                  </div>
-                  <textarea
-                    id="song_request"
-                    rows={2}
-                    maxLength={200}
-                    value={songRequest}
-                    onChange={(e) => setSongRequest(e.target.value)}
-                    placeholder="Gửi một lời chúc hoặc tâm tình nhỏ đến Still us..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 resize-none min-h-[44px]"
-                  />
-                </div>
+          {/* 3. Gmail */}
+          <div className="space-y-1">
+            <label
+              htmlFor="rsvp_email"
+              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+            >
+              Gmail
+            </label>
+            <input
+              id="rsvp_email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Nhập địa chỉ email..."
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors"
+            />
+          </div>
 
-                {/* Ô 2: Ghi chú riêng cho Ban Tổ Chức (chỉ BTC nhìn thấy - lưu vào wish_message) */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="wish_message_acc" className="block text-xs font-semibold text-[#5C1F38]">
-                      Ghi chú riêng cho Ban Tổ Chức (tùy chọn)
-                    </label>
-                    <span className="text-[11px] text-[#7D6670]/80 italic shrink-0">
-                      Chỉ Ban Tổ Chức nhìn thấy
-                    </span>
-                  </div>
-                  <textarea
-                    id="wish_message_acc"
-                    rows={2}
-                    maxLength={500}
-                    value={wishMessage}
-                    onChange={(e) => setWishMessage(e.target.value)}
-                    placeholder="Ví dụ: SĐT liên hệ, muốn ngồi gần bạn A, hoặc dự kiến đến lúc 17:00..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 resize-none min-h-[44px]"
-                  />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="declined-fields"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                className="space-y-4 pt-1 font-sans-ui"
-              >
-                {/* Ghi chú riêng cho Ban Tổ Chức khi từ chối */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <label htmlFor="wish_message_dec" className="block text-xs font-semibold text-[#5C1F38]">
-                      Ghi chú riêng cho Ban Tổ Chức (tùy chọn)
-                    </label>
-                    <span className="text-[11px] text-[#7D6670]/80 italic shrink-0">
-                      Chỉ Ban Tổ Chức nhìn thấy
-                    </span>
-                  </div>
-                  <textarea
-                    id="wish_message_dec"
-                    rows={3}
-                    maxLength={500}
-                    value={wishMessage}
-                    onChange={(e) => setWishMessage(e.target.value)}
-                    placeholder="Ví dụ: SĐT liên hệ, muốn ngồi gần bạn A, hoặc dự kiến đến lúc 17:00..."
-                    className="w-full px-3.5 py-2.5 text-xs sm:text-sm rounded-xl bg-[#FFF5F8] border border-[#F6C1D3] focus:outline-none focus:ring-1 focus:ring-[#D85C8A] text-[#4A3B42] placeholder:text-[#7D6670]/60 resize-none"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* 4. Đôi lời gửi đến BTC */}
+          <div className="space-y-1">
+            <label
+              htmlFor="rsvp_message"
+              className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic"
+            >
+              Đôi lời gửi đến BTC
+            </label>
+            <textarea
+              id="rsvp_message"
+              rows={3}
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Gửi lời chúc, nhắn nhủ hoặc lưu ý đến The Light..."
+              className="w-full px-4 py-3 rounded-xl bg-[#F7F5EE]/80 border border-[#D5DDD0] text-sm text-[#3E3836] placeholder:text-[#3E3836]/40 focus:outline-none focus:border-[#006C3A] focus:ring-1 focus:ring-[#006C3A] transition-colors resize-none"
+            />
+          </div>
 
-          {/* Báo lỗi nếu có */}
+          {/* 5. Xác nhận đến tham dự sự kiện (3 tùy chọn) */}
+          <div className="space-y-2 pt-1">
+            <label className="block font-handwriting text-lg sm:text-xl text-[#3E3836] italic">
+              Xác nhận đến tham dự sự kiện
+            </label>
+            <div className="space-y-2.5">
+              {[
+                { id: 'yes', label: 'Có tham gia' },
+                { id: 'try', label: 'Sẽ cố gắng tham gia' },
+                { id: 'unsure', label: 'Chưa rõ' },
+              ].map((opt) => (
+                <button
+                  key={opt.id}
+                  type="button"
+                  onClick={() => setAttendanceChoice(opt.id as 'yes' | 'try' | 'unsure')}
+                  className={`w-full py-3 px-4 rounded-xl text-left font-handwriting text-base sm:text-lg transition-all flex items-center justify-between border cursor-pointer ${
+                    attendanceChoice === opt.id
+                      ? 'bg-[#E1EEDD] border-[#006C3A] text-[#006C3A] font-bold shadow-xs'
+                      : 'bg-[#ECEAE2]/60 hover:bg-[#ECEAE2] border-[#D5DDD0] text-[#3E3836]'
+                  }`}
+                >
+                  <span>{opt.label}</span>
+                  <div
+                    className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                      attendanceChoice === opt.id
+                        ? 'border-[#006C3A] bg-[#006C3A]'
+                        : 'border-[#7D8C63] bg-transparent'
+                    }`}
+                  >
+                    {attendanceChoice === opt.id && (
+                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                    )}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Lỗi nếu có */}
           {errorMessage && (
-            <p className="text-xs text-rose-500 bg-rose-50 border border-rose-200 p-2.5 rounded-lg">
-              {errorMessage}
-            </p>
+            <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
           )}
 
-          {/* Nút gửi & nút hủy */}
-          <div className="flex gap-2.5 pt-2">
-            {hasAlreadyResponded && (
-              <button
-                type="button"
-                onClick={() => setIsEditing(false)}
-                disabled={isSubmitting}
-                className="px-4 py-2.5 rounded-xl border border-[#F6C1D3] text-xs font-medium text-[#7D6670] hover:bg-[#FFF5F8] transition-colors min-h-[44px]"
-              >
-                Hủy bỏ
-              </button>
-            )}
+          {/* 6. Nút GỬI LỜI XÁC NHẬN */}
+          <div className="pt-2">
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 py-3 px-4 rounded-xl bg-[#D85C8A] text-white font-semibold text-xs sm:text-sm shadow-md hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 min-h-[44px]"
+              className="w-full py-3.5 px-6 rounded-2xl bg-[#FAE8D8] hover:bg-[#F6DCBE] active:scale-[0.98] transition-all border border-[#F0D0B4] shadow-sm flex items-center justify-center cursor-pointer min-h-[48px]"
             >
               {isSubmitting ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Đang ghi nhận...</span>
-                </>
+                <div className="flex items-center gap-2 font-handwriting text-lg text-[#3E3836]">
+                  <Loader2 className="w-4 h-4 animate-spin text-[#006C3A]" />
+                  <span>Đang gửi xác nhận...</span>
+                </div>
               ) : (
-                <span>Gửi phản hồi xác nhận</span>
+                <span className="font-handwriting text-xl sm:text-2xl text-[#3E3836] font-bold tracking-wide">
+                  GỬI LỜI XÁC NHẬN
+                </span>
               )}
             </button>
           </div>
         </form>
       )}
-
-      {/* Thông tin liên hệ BTC ở chân trang */}
-      <div className="text-center pt-2 text-xs text-[#7D6670] space-y-1 font-sans-ui">
-        <p>Cần hỗ trợ thêm thông tin sự kiện?</p>
-        <a
-          href={config.contactUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center justify-center font-semibold text-[#D85C8A] hover:underline min-h-[44px]"
-        >
-          {config.contactLabel}
-        </a>
-      </div>
     </section>
   );
 }

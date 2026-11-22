@@ -16,7 +16,7 @@ export function EventLogoImage({
   containerClassName = 'relative w-24 h-24 sm:w-28 sm:h-28 mx-auto flex items-center justify-center shrink-0 bg-transparent border-0 shadow-none p-0',
 }: EventLogoImageProps) {
   const [hasError, setHasError] = useState(false);
-  const imageSrc = src || '/images/default-logo.png';
+  const imageSrc = src || '/images/logo-tichtichtinhtang.png';
 
   if (hasError) return null;
 

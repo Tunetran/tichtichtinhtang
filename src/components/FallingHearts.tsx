@@ -1,24 +1,23 @@
 'use client';
 
-import { useState } from 'react';
 import { motion } from 'motion/react';
-import { Heart } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const ITEMS = [
-  { l: '4%', s: 14, imgS: 26, c: '#F4B8CC', d: 11, delay: 0 },
-  { l: '12%', s: 12, imgS: 22, c: '#FDE2EC', d: 14, delay: 3 },
-  { l: '19%', s: 16, imgS: 32, c: '#D85C8A', d: 12, delay: 1 },
-  { l: '27%', s: 10, imgS: 20, c: '#F4B8CC', d: 15, delay: 5 },
-  { l: '35%', s: 14, imgS: 28, c: '#FDE2EC', d: 13, delay: 2 },
-  { l: '43%', s: 17, imgS: 36, c: '#D85C8A', d: 16, delay: 4 },
-  { l: '51%', s: 12, imgS: 24, c: '#F4B8CC', d: 12, delay: 0.5 },
-  { l: '59%', s: 15, imgS: 30, c: '#FDE2EC', d: 14, delay: 3.5 },
-  { l: '67%', s: 11, imgS: 22, c: '#D85C8A', d: 13, delay: 1.5 },
-  { l: '75%', s: 16, imgS: 34, c: '#F4B8CC', d: 15, delay: 4.5 },
-  { l: '83%', s: 13, imgS: 26, c: '#FDE2EC', d: 11, delay: 2.5 },
-  { l: '90%', s: 17, imgS: 34, c: '#D85C8A', d: 14, delay: 0.8 },
-  { l: '95%', s: 10, imgS: 20, c: '#F4B8CC', d: 16, delay: 5.2 },
-  { l: '62%', s: 14, imgS: 28, c: '#FDE2EC', d: 12, delay: 6 },
+  { l: '4%', s: 18, d: 11, delay: 0, rot: [-30, 45, -30], type: 'petal' },
+  { l: '12%', s: 14, d: 14, delay: 3, rot: [15, -40, 15], type: 'leaf' },
+  { l: '19%', s: 22, d: 12, delay: 1, rot: [-25, 30, -25], type: 'petal' },
+  { l: '27%', s: 12, d: 15, delay: 5, rot: [40, -20, 40], type: 'sparkle' },
+  { l: '35%', s: 20, d: 13, delay: 2, rot: [-15, 50, -15], type: 'petal' },
+  { l: '43%', s: 16, d: 16, delay: 4, rot: [25, -35, 25], type: 'leaf' },
+  { l: '51%', s: 18, d: 12, delay: 0.5, rot: [-40, 30, -40], type: 'petal' },
+  { l: '59%', s: 14, d: 14, delay: 3.5, rot: [10, -50, 10], type: 'sparkle' },
+  { l: '67%', s: 20, d: 13, delay: 1.5, rot: [-30, 40, -30], type: 'petal' },
+  { l: '75%', s: 15, d: 15, delay: 4.5, rot: [35, -25, 35], type: 'leaf' },
+  { l: '83%', s: 19, d: 11, delay: 2.5, rot: [-20, 45, -20], type: 'petal' },
+  { l: '90%', s: 22, d: 14, delay: 0.8, rot: [30, -30, 30], type: 'petal' },
+  { l: '95%', s: 12, d: 16, delay: 5.2, rot: [-10, 35, -10], type: 'sparkle' },
+  { l: '62%', s: 16, d: 12, delay: 6, rot: [20, -45, 20], type: 'leaf' },
 ];
 
 interface FallingHeartsProps {
@@ -26,30 +25,50 @@ interface FallingHeartsProps {
 }
 
 export function FallingHearts({ logoUrl }: FallingHeartsProps) {
-  const [hasError, setHasError] = useState(false);
-  const useLogo = Boolean(logoUrl && !hasError);
-
   return (
     <div className="fixed inset-0 pointer-events-none -z-10 overflow-hidden" aria-hidden="true">
       {ITEMS.map((h, i) => (
         <motion.div
           key={i}
-          className="absolute -top-10"
-          style={{ left: h.l, color: h.c, opacity: useLogo ? 0.35 : 0.5 }}
-          animate={{ y: ['-30px', '108vh'], x: [-12, 12, -12], rotate: [-20, 20, -20] }}
+          className="absolute -top-10 flex items-center justify-center"
+          style={{ left: h.l, opacity: 0.45 }}
+          animate={{
+            y: ['-40px', '108vh'],
+            x: [-16, 16, -16],
+            rotate: h.rot,
+          }}
           transition={{ duration: h.d, repeat: Infinity, delay: h.delay, ease: 'linear' }}
         >
-          {useLogo ? (
+          {h.type === 'petal' ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={logoUrl!}
+              src="/images/lotus-petal.png"
               alt=""
-              className="object-contain pointer-events-none select-none drop-shadow-2xs"
-              style={{ width: `${h.imgS}px`, height: `${h.imgS}px` }}
-              onError={() => setHasError(true)}
+              className="object-contain pointer-events-none select-none drop-shadow-xs"
+              style={{ width: `${h.s}px`, height: `${h.s}px` }}
+              onError={(e) => {
+                // Fallback nếu ảnh không tải được
+                (e.target as HTMLElement).style.display = 'none';
+              }}
             />
+          ) : h.type === 'leaf' ? (
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#006C3A"
+              strokeWidth="1.5"
+              className="opacity-60"
+              style={{ width: `${h.s}px`, height: `${h.s}px` }}
+            >
+              <path
+                d="M12 2C6 8 4 14 6 20C12 22 18 20 20 14C22 8 18 4 12 2Z"
+                fill="#C8E6C9"
+                fillOpacity="0.4"
+              />
+              <path d="M12 2V22" stroke="#006C3A" strokeWidth="1" />
+            </svg>
           ) : (
-            <Heart size={h.s} fill="currentColor" />
+            <Sparkles size={h.s} className="text-[#006C3A]/40" />
           )}
         </motion.div>
       ))}

@@ -27,7 +27,7 @@ export function EventCountdown({ targetDateIso }: EventCountdownProps) {
 
   useEffect(() => {
     setMounted(true);
-    const target = targetDateIso ? new Date(targetDateIso).getTime() : new Date('2026-02-14T19:30:00+07:00').getTime();
+    const target = targetDateIso ? new Date(targetDateIso).getTime() : new Date('2026-12-05T18:30:00+07:00').getTime();
 
     const calculate = () => {
       const now = Date.now();

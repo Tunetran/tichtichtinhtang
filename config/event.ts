@@ -1,4 +1,4 @@
-export type ThemeName = 'candlelight' | 'vintage' | 'starlight';
+export type ThemeName = 'candlelight' | 'vintage' | 'starlight' | 'tichtichtinhtang';
 
 export interface TimelineItem {
   time: string;
@@ -11,6 +11,13 @@ export interface DresscodeColor {
   hex: string;
 }
 
+export interface DresscodeOption {
+  title: string;
+  description: string;
+  image: string;
+  bgHex?: string;
+}
+
 export interface GalleryPhoto {
   src: string;
   alt: string;
@@ -21,24 +28,28 @@ export interface EventConfig {
   theme: ThemeName;
   eventName: string;
   slogan: string;
-  invitationBadge?: string; // Ví dụ: "Thư Mời Tham Dự", "Thiệp Mời", "Save The Date"
-  dedicationBadge?: string; // Ví dụ: "Dành tặng người bạn quý", "Kính gửi Quý khách"
+  invitationBadge?: string;
+  dedicationBadge?: string;
+  poemQuote?: string[];
   eventDateLabel: string;
-  eventDateIso?: string; // ISO 8601 string for countdown & calendar export
+  eventDateIso?: string;
   checkinTime: string;
   startTime: string;
+  endTime?: string;
   venueName: string;
+  venueHall?: string;
   venueAddress: string;
   googleMapsUrl: string;
   dresscodeDescription: string;
   dresscodeColors: DresscodeColor[];
+  dresscodeOptions?: DresscodeOption[];
   hostName: string;
   contactLabel: string;
   contactUrl: string;
-  envelopeGreeting: string; // "Trân trọng kính mời"
-  sealHintText: string; // "Chạm vào dấu sáp để mở thư"
-  letterSalutation: string; // "Thân gửi"
-  generalInvitationText: string[]; // Các đoạn văn lời ngỏ
+  envelopeGreeting: string;
+  sealHintText: string;
+  letterSalutation: string;
+  generalInvitationText: string[];
   timeline: TimelineItem[];
   gallery: GalleryPhoto[];
   audio: {
@@ -55,88 +66,105 @@ export interface EventConfig {
 }
 
 export const EVENT_CONFIG: EventConfig = {
-  theme: 'candlelight',
-  eventName: 'Đêm Nhạc Tình Yêu — Giai Điệu Chạm Trái Tim',
-  slogan: 'Một buổi tối chỉ có ánh nến, tiếng đàn và những bản tình ca ngọt ngào',
+  theme: 'tichtichtinhtang',
+  eventName: 'Tịch Tịch Tình Tang',
+  slogan: 'Vở ca nhạc kịch dân gian lấy cảm hứng từ truyện cổ tích “Cây Tre Trăm Đốt”',
   invitationBadge: 'Thư Mời Tham Dự',
-  dedicationBadge: 'Dành tặng người bạn quý',
-  eventDateLabel: 'Thứ Bảy, ngày 14 tháng 02 năm 2026',
-  eventDateIso: '2026-02-14T19:30:00+07:00',
-  checkinTime: '19:00',
-  startTime: '19:30',
-  venueName: 'The Muse Acoustic Lounge',
-  venueAddress: 'Tầng 3, 128 Phan Kế Bính, Ba Đình, Hà Nội',
-  googleMapsUrl: 'https://maps.google.com/?q=The+Muse+Acoustic+Lounge',
-  dresscodeDescription: 'Trang phục lịch thiệp, thanh nhã (khuyến khích theo bảng màu bên dưới)',
-  dresscodeColors: [
-    { name: 'Đỏ rượu / Burgundy', hex: '#7A1835' },
-    { name: 'Vàng kem / Champagne', hex: '#E8D3A2' },
-    { name: 'Trắng thanh lịch', hex: '#FFFFFF' },
-    { name: 'Đen quý phái', hex: '#1C1917' },
+  dedicationBadge: 'Trân trọng kính mời Quý Thầy/Cô',
+  poemQuote: [
+    'TÍCH XƯA KỂ LẠI CHUYỆN TÌNH',
+    'TÍCH NÀO KỂ LẠI CHUYỆN TÌNH ĐÂY TA?',
   ],
-  hostName: 'Minh Trí & Phương Anh',
+  eventDateLabel: 'Thứ Bảy, ngày 05 tháng 12 năm 2026',
+  eventDateIso: '2026-12-05T18:30:00+07:00',
+  checkinTime: '18:00 - 18:30',
+  startTime: '18:30',
+  endTime: '19:30',
+  venueHall: 'HỘI TRƯỜNG B',
+  venueName: 'Trường Đại học Gia Định',
+  venueAddress: '371 Nguyễn Kiệm, Phường Hạnh Thông, TP. Hồ Chí Minh',
+  googleMapsUrl: 'https://maps.google.com/?q=371+Nguy%E1%BB%85n+Ki%E1%BB%87m+%C4%90%E1%BA%A1i+H%E1%BB%8Dc+Gia+%C4%90%E1%BB%8Bnh',
+  dresscodeDescription: 'Khuyến khích lựa chọn trang phục theo 3 phong cách thanh nhã',
+  dresscodeColors: [
+    { name: 'Xanh tre / Ngọc bích', hex: '#006C3A' },
+    { name: 'Hồng sen pastel', hex: '#F4A7BB' },
+    { name: 'Vàng kem mây', hex: '#FFF4D6' },
+    { name: 'Xanh cốm non', hex: '#A8D5BA' },
+  ],
+  dresscodeOptions: [
+    {
+      title: 'ĐỒ LỊCH SỰ',
+      description: 'Trang phục công sở, thanh lịch, trang nhã',
+      image: '/images/dresscode-1-smart.png',
+      bgHex: '#C9E6C9',
+    },
+    {
+      title: 'ÁO DÀI',
+      description: 'Áo dài truyền thống hoặc áo dài cách tân',
+      image: '/images/dresscode-2-aodai.png',
+      bgHex: '#F8B4C4',
+    },
+    {
+      title: 'TRANG PHỤC TRUYỀN THỐNG',
+      description: 'Cổ phục Việt Nam, trang phục dân gian',
+      image: '/images/dresscode-3-traditional.png',
+      bgHex: '#FAD8C0',
+    },
+  ],
+  hostName: 'Đoàn Kịch The Light',
   contactLabel: 'Ban Tổ Chức (Hotline / Zalo)',
   contactUrl: 'https://zalo.me/0987654321',
-  envelopeGreeting: 'Trân trọng kính mời',
-  sealHintText: 'Chạm vào dấu sáp để mở thiệp',
-  letterSalutation: 'Thân gửi',
+  envelopeGreeting: 'Bạn nhận được một lá thư từ',
+  sealHintText: 'Chạm vào con dấu The Light để mở thiệp',
+  letterSalutation: 'Kính gửi',
   generalInvitationText: [
-    'Khi những ngọn nến lung linh được thắp sáng và từng phím đàn cất lên, chúng mình mong muốn được cùng bạn sẻ chia một đêm nhạc ấm áp, nơi những cảm xúc chân thành nhất được nâng niu.',
-    'Sự hiện diện của bạn là mảnh ghép hoàn hảo tạo nên những khoảnh khắc đáng nhớ của đêm nay. Hãy để âm nhạc dẫn lối cho những rung động trái tim.',
+    'Trân trọng kính mời Thầy/Cô đến xem vở ca nhạc kịch dân gian được lấy cảm hứng từ truyện cổ tích “Cây Tre Trăm Đốt”.',
+    'Sự có mặt của Thầy/Cô là niềm vinh dự và là lời động viên lớn nhất với The Light.',
   ],
   timeline: [
     {
-      time: '19:00',
-      title: 'Đón khách & Check-in',
-      description: 'Thưởng thức đồ uống nhẹ, nhận quà kỷ niệm và chụp ảnh check-in',
+      time: '18:00 - 18:30',
+      title: 'Check-in',
+      description: 'Đón tiếp Quý Thầy/Cô, nhận quà kỷ niệm & chụp hình lưu niệm',
+    },
+    {
+      time: '18:30 - 19:30',
+      title: 'Bắt đầu sự kiện',
+      description: 'Công diễn vở ca nhạc kịch dân gian “Tịch Tịch Tình Tang”',
     },
     {
       time: '19:30',
-      title: 'Khai mạc đêm nhạc',
-      description: 'Giai điệu mở màn & lời tri ân gửi tới những người bạn thân thương',
-    },
-    {
-      time: '20:00',
-      title: 'Giao lưu & Bản tình ca yêu cầu',
-      description: 'Lắng nghe những câu chuyện cảm xúc và ca khúc acoustic theo yêu cầu',
-    },
-    {
-      time: '21:30',
-      title: 'Bế mạc & Lưu giữ kỷ niệm',
-      description: 'Trao gửi lời cảm ơn và chụp hình kỷ niệm cùng ban nhạc',
+      title: 'Kết thúc sự kiện',
+      description: 'Trao gửi lời tri ân & chụp ảnh kỷ niệm cùng toàn thể đoàn kịch',
     },
   ],
   gallery: [
     {
-      src: '/images/photo-1.jpg',
-      alt: 'Khoảnh khắc acoustic ấm cúng',
-      caption: 'Khúc dạo đầu ngọt ngào',
+      src: '/images/page-1.png',
+      alt: 'Bìa thư Tịch Tịch Tình Tang',
+      caption: 'Thư mời mở màn',
     },
     {
-      src: '/images/photo-2.jpg',
-      alt: 'Ánh nến và phím đàn piano',
-      caption: 'Giai điệu tình ca',
+      src: '/images/page-3.png',
+      alt: 'Lịch công diễn và địa điểm',
+      caption: 'Lịch diễn 05/12/2026',
     },
     {
-      src: '/images/photo-3.jpg',
-      alt: 'Không gian lãng mạn đêm nhạc',
-      caption: 'Lắng đọng từng cung bậc',
-    },
-    {
-      src: '/images/photo-4.jpg',
-      alt: 'Nụ cười và hoa tươi',
-      caption: 'Khoảnh khắc trọn vẹn',
+      src: '/images/page-4.png',
+      alt: 'Dresscode và Lịch trình sự kiện',
+      caption: 'Trang phục & Timeline',
     },
   ],
   audio: {
     src: '/music/bg-love.mp3',
     defaultVolume: 0.4,
   },
-  ogImage: '/images/cover.jpg',
-  footerThankYou: 'Rất mong được gặp bạn trong đêm nhạc ấm áp này',
+  ogImage: '/images/page-1.png',
+  footerThankYou:
+    'The Light xin chân thành cảm ơn Quý Thầy/Cô đã dành thời gian quý báu, gác lại những bận rộn để đến tham dự sự kiện của chúng em. Sự hiện diện của Quý Thầy/Cô không chỉ là niềm vinh dự mà còn là nguồn động viên lớn lao, tiếp thêm cho cả đoàn sự tự tin và cảm hứng để mang đến một buổi diễn trọn vẹn nhất. Kính chúc Quý Thầy/Cô thật nhiều sức khỏe, hạnh phúc và luôn thành công trên con đường gieo mầm tri thức.\nTrân trọng cảm ơn! 🎋',
   rsvpHeading: 'Xác Nhận Tham Dự',
-  rsvpSubheading: 'Sự hiện diện của bạn là niềm vinh hạnh lớn của chúng mình',
+  rsvpSubheading: 'Quý Thầy/Cô vui lòng gửi xác nhận để BTC sắp xếp chỗ ngồi và đón tiếp chu đáo nhất',
   showCountdown: true,
-  showGallery: true,
-  showSongRequest: true,
+  showGallery: false,
+  showSongRequest: false,
 };

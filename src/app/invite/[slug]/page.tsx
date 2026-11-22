@@ -79,14 +79,30 @@ export default async function InvitePage({ params }: PageProps) {
     getSiteSettings(),
   ]);
 
-  if (guestResult.error || !guestResult.data) {
+  let guest = guestResult.data as GuestRecord | null;
+  if (!guest && (slug === 'demo' || slug === 'thay-co' || !process.env.SUPABASE_URL || process.env.SUPABASE_URL.includes('placeholder'))) {
+    guest = {
+      id: 'demo-guest',
+      slug,
+      full_name: slug === 'thay-co' ? 'Quý Thầy/Cô' : 'Quý Khách Mời',
+      custom_message: 'Sự hiện diện của Quý vị là niềm vinh hạnh to lớn đối với đoàn kịch The Light chúng em.',
+      status: 'NOT_OPENED',
+      attendees_count: 1,
+      song_request: null,
+      wish_message: null,
+      opened_at: null,
+      responded_at: null,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+  } else if (!guest) {
     notFound();
   }
 
   return (
     <div className="font-sans-ui">
       <InviteExperience
-        guest={guestResult.data as GuestRecord}
+        guest={guest}
         config={config}
         initialLogoUrl={siteSettings.event_logo_url}
         initialBgUrl={siteSettings.event_bg_url}
