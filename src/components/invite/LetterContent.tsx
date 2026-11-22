@@ -129,14 +129,14 @@ export function LetterContent({
             {config.dedicationBadge || EVENT_CONFIG.dedicationBadge || 'Trân trọng kính mời Quý Thầy/Cô'}
           </p>
           <h2 className="font-serif-title text-2xl sm:text-3xl text-[#006C3A] font-bold mt-1 leading-snug tracking-normal">
-            {salutation} {guest.full_name},
+            {salutation} <span className="capitalize">{guest.full_name}</span>,
           </h2>
         </div>
 
-        {/* Lời ngỏ trang trọng (Chữ hoa Serif theo đúng thiết kế Page 2, giữ xuống dòng tự nhiên) */}
+        {/* Lời ngỏ trang trọng (Hiển thị tự nhiên theo đúng nhập liệu từ Admin) */}
         <div className="space-y-3.5 text-base sm:text-lg text-[#006C3A] font-serif tracking-normal leading-relaxed relative z-10 font-medium">
           {paragraphs.map((p, idx) => (
-            <p key={idx} className="uppercase text-justify text-balance leading-relaxed whitespace-pre-line">
+            <p key={idx} className="text-left normal-case tracking-normal leading-relaxed whitespace-pre-line">
               {p}
             </p>
           ))}
