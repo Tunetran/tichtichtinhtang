@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { EVENT_CONFIG } from '@/config/event';
 
 export const rsvpSchema = z
   .object({
@@ -80,7 +81,7 @@ export const eventSettingsSchema = z.object({
   eventName: z.string().trim().min(1, 'Tên sự kiện không được để trống').max(200),
   slogan: z.string().trim().min(1, 'Câu slogan không được để trống').max(300),
   invitationBadge: z.string().trim().optional().default('Thư Mời Tham Dự'),
-  dedicationBadge: z.string().trim().optional().default('Dành tặng người bạn quý'),
+  dedicationBadge: z.string().trim().optional().default('Trân trọng kính mời Quý Thầy/Cô'),
   eventDateLabel: z.string().trim().min(1, 'Ngày tổ chức không được để trống').max(150),
   eventDateIso: z.string().trim().optional(),
   checkinTime: z.string().trim().min(1, 'Giờ đón khách không được để trống').max(50),
@@ -100,8 +101,14 @@ export const eventSettingsSchema = z.object({
   contactUrl: z.string().trim().min(1),
   envelopeGreeting: z.string().trim().default('Bạn nhận được một lá thư từ'),
   sealHintText: z.string().trim().default('Chạm vào dấu sáp để mở thiệp'),
-  letterSalutation: z.string().trim().default('Thân gửi'),
-  generalInvitationText: z.array(z.string().trim()).min(1, 'Cần ít nhất 1 đoạn văn lời ngỏ'),
+  letterSalutation: z.string().trim().default('Kính gửi'),
+  generalInvitationText: z
+    .union([
+      z.array(z.string().trim()),
+      z.string().trim().transform((val) => val.split('\n').map((s) => s.trim()).filter(Boolean)),
+    ])
+    .optional()
+    .default(() => EVENT_CONFIG.generalInvitationText),
   timeline: z.array(
     z.object({
       time: z.string().trim().min(1),

@@ -16,6 +16,8 @@ import {
   Clock,
   Phone,
   Mail,
+  Download,
+  Loader2,
 } from 'lucide-react';
 import type { GuestRecord, GuestStatus } from '@/types/guest';
 import { EVENT_CONFIG } from '@/config/event';
@@ -28,17 +30,63 @@ interface GuestTableProps {
   onRefresh: () => void;
   onEdit: (guest: GuestRecord) => void;
   onDelete: (id: string, name: string) => void;
+  onExportCSV?: () => void;
 }
 
 type FilterTab = 'ALL' | GuestStatus;
 
-export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: GuestTableProps) {
+export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete, onExportCSV }: GuestTableProps) {
   const [activeTab, setActiveTab] = useState<FilterTab>('ALL');
   const [searchKeyword, setSearchKeyword] = useState('');
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
   const [copiedZaloSlug, setCopiedZaloSlug] = useState<string | null>(null);
   const [copiedPhoneId, setCopiedPhoneId] = useState<string | null>(null);
   const [copiedEmailId, setCopiedEmailId] = useState<string | null>(null);
+  const [clearingWishId, setClearingWishId] = useState<string | null>(null);
+
+  // Xóa lời chúc công khai của khách (chỉ làm rỗng lời chúc, giữ nguyên SĐT/Email/RSVP)
+  const handleClearWish = async (guest: GuestRecord) => {
+    const contact = parseGuestContact(guest);
+    const wishText = (contact.note || guest.song_request || '').trim();
+    if (!wishText) return;
+
+    const confirmed = window.confirm(
+      `Bạn có chắc chắn muốn xóa lời chúc của khách "${guest.full_name}" khỏi trang thiệp công khai?\n(Thông tin SĐT, Email và trạng thái tham dự RSVP của khách vẫn được giữ nguyên).`
+    );
+    if (!confirmed) return;
+
+    setClearingWishId(guest.id);
+    try {
+      let newWishMessage: string | null = null;
+      if (contact.phone || contact.email) {
+        newWishMessage = JSON.stringify({
+          phone: contact.phone || '',
+          email: contact.email || '',
+          note: '',
+        });
+      }
+
+      const res = await fetch(`/api/admin/guests/${guest.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          song_request: null,
+          wish_message: newWishMessage,
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => null);
+        throw new Error(errData?.error || 'Không thể xóa lời chúc');
+      }
+
+      onRefresh();
+    } catch (err) {
+      alert((err as Error).message || 'Lỗi khi xóa lời chúc');
+    } finally {
+      setClearingWishId(null);
+    }
+  };
 
   // Sao chép an toàn vào Clipboard kèm fallback cho Safari / iframe
   const copyTextToClipboard = async (text: string): Promise<boolean> => {
@@ -243,16 +291,31 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
           ))}
         </div>
 
-        {/* Ô tìm kiếm tức thời */}
-        <div className="relative min-w-[220px]">
-          <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            value={searchKeyword}
-            onChange={(e) => setSearchKeyword(e.target.value)}
-            placeholder="Tìm theo tên, lời nhắn..."
-            className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-bg-surface border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60"
-          />
+        {/* Ô tìm kiếm tức thời & nút xuất CSV */}
+        <div className="flex items-center gap-2">
+          <div className="relative min-w-[200px] sm:min-w-[240px]">
+            <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              placeholder="Tìm theo tên, SĐT, Email..."
+              className="w-full pl-9 pr-3 py-1.5 text-xs rounded-xl bg-bg-surface border border-border focus:outline-none focus:ring-1 focus:ring-accent text-text placeholder:text-text-muted/60"
+            />
+          </div>
+
+          {onExportCSV && (
+            <button
+              type="button"
+              onClick={onExportCSV}
+              disabled={guests.length === 0}
+              className="py-1.5 px-3 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs font-medium text-text transition-all flex items-center justify-center gap-1.5 shadow-2xs disabled:opacity-50 cursor-pointer shrink-0"
+              title="Tải danh sách khách mời (CSV Excel)"
+            >
+              <Download className="w-3.5 h-3.5 text-accent" />
+              <span className="hidden sm:inline">Xuất CSV</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -285,20 +348,18 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
               <table className="w-full text-left text-xs">
                 <thead className="bg-bg/70 border-b border-border/80 text-text-muted uppercase tracking-wider text-[11px]">
                   <tr>
-                    <th className="py-3 px-4 font-semibold">Khách Mời</th>
+                    <th className="py-3 px-4 font-semibold">Tên Khách</th>
                     <th className="py-3 px-3 font-semibold">Trạng Thái</th>
-                    <th className="py-3 px-3 font-semibold">Số Điện Thoại</th>
-                    <th className="py-3 px-3 font-semibold">Gmail / Email</th>
-                    <th className="py-3 px-3 font-semibold">Lời Nhắn & Ghi Chú</th>
-                    <th className="py-3 px-3 font-semibold">Cập Nhật</th>
+                    <th className="py-3 px-3 font-semibold">Số Người</th>
+                    <th className="py-3 px-3 font-semibold">Số ĐT</th>
+                    <th className="py-3 px-3 font-semibold">Email</th>
+                    <th className="py-3 px-3 font-semibold">Lời Chúc</th>
                     <th className="py-3 px-4 font-semibold text-right">Thao Tác</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {filteredGuests.map((guest) => {
                     const isCopied = copiedSlug === guest.slug;
-                    const isZaloCopied = copiedZaloSlug === guest.slug;
-                    const updateTime = formatTime(guest.responded_at || guest.opened_at);
                     const contact = parseGuestContact(guest);
                     const isPhoneCopied = copiedPhoneId === guest.id;
                     const isEmailCopied = copiedEmailId === guest.id;
@@ -314,7 +375,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                               </span>
                               {guest.custom_message && (
                                 <span
-                                  title={`Lời nhắn riêng: ${guest.custom_message}`}
+                                  title={`Lời nhắn riêng từ Host: ${guest.custom_message}`}
                                   className="inline-flex p-0.5 rounded text-accent bg-accent/10 cursor-help"
                                 >
                                   <MessageSquare className="w-3.5 h-3.5" />
@@ -332,7 +393,19 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           {renderStatusBadge(guest)}
                         </td>
 
-                        {/* Cột 3: Số Điện Thoại */}
+                        {/* Cột 3: Số người */}
+                        <td className="py-3.5 px-3 whitespace-nowrap font-medium text-text">
+                          {guest.status === 'ACCEPTED' ? (
+                            <span className="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold border border-emerald-200">
+                              <UserCheck className="w-3 h-3" />
+                              {guest.attendees_count} người
+                            </span>
+                          ) : (
+                            <span className="text-text-muted/40">—</span>
+                          )}
+                        </td>
+
+                        {/* Cột 4: Số Điện Thoại */}
                         <td className="py-3.5 px-3 whitespace-nowrap">
                           {contact.phone ? (
                             <div className="inline-flex items-center gap-1.5 bg-bg/80 px-2 py-1 rounded-lg border border-border/80">
@@ -358,7 +431,7 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           )}
                         </td>
 
-                        {/* Cột 4: Gmail / Email */}
+                        {/* Cột 5: Gmail / Email */}
                         <td className="py-3.5 px-3 max-w-[180px]">
                           {contact.email ? (
                             <div className="inline-flex items-center gap-1.5 bg-bg/80 px-2 py-1 rounded-lg border border-border/80 max-w-full">
@@ -387,77 +460,62 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                           )}
                         </td>
 
-                        {/* Cột 5: Lời nhắn & Ghi chú riêng BTC */}
-                        <td className="py-3.5 px-3 max-w-[200px]">
-                          <div className="space-y-1 text-xs">
-                            {guest.song_request && (
-                              <div className="flex items-center gap-1.5 text-accent font-medium truncate" title={`Lời nhắn gửi đêm nhạc: ${guest.song_request}`}>
-                                <MessageSquare className="w-3 h-3 shrink-0" />
-                                <span className="truncate">&ldquo;{guest.song_request}&rdquo;</span>
-                              </div>
-                            )}
-                            {contact.note ? (
-                              <p className="text-text-muted truncate italic text-[11px]" title={`Ghi chú riêng: ${contact.note}`}>
-                                <span className="not-italic text-accent font-semibold mr-1">[Lời nhắn]:</span>
-                                &ldquo;{contact.note}&rdquo;
-                              </p>
-                            ) : !guest.song_request ? (
-                              <span className="text-text-muted/40">—</span>
-                            ) : null}
-                          </div>
-                        </td>
+                        {/* Cột 6: Lời Chúc */}
+                        <td className="py-3.5 px-3 max-w-[220px]">
+                          {(() => {
+                            const wishText = (contact.note || guest.song_request || '').trim();
+                            if (!wishText) {
+                              return <span className="text-text-muted/40 italic">—</span>;
+                            }
 
-                        {/* Cột 6: Thời gian */}
-                        <td className="py-3.5 px-3 text-text-muted whitespace-nowrap text-[11px]">
-                          {updateTime ? (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3 h-3" />
-                              {updateTime}
-                            </span>
-                          ) : (
-                            <span className="text-text-muted/40">—</span>
-                          )}
+                            return (
+                              <div className="space-y-1.5">
+                                <p className="text-xs text-text italic leading-relaxed line-clamp-2" title={wishText}>
+                                  &ldquo;{wishText}&rdquo;
+                                </p>
+                                <button
+                                  type="button"
+                                  disabled={clearingWishId === guest.id}
+                                  onClick={() => handleClearWish(guest)}
+                                  className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600 hover:text-rose-700 hover:underline cursor-pointer transition-colors"
+                                  title="Xóa lời chúc này khỏi trang thiệp công khai"
+                                >
+                                  {clearingWishId === guest.id ? (
+                                    <Loader2 className="w-3 h-3 animate-spin text-rose-600" />
+                                  ) : (
+                                    <Trash2 className="w-3 h-3" />
+                                  )}
+                                  <span>Xóa lời chúc</span>
+                                </button>
+                              </div>
+                            );
+                          })()}
                         </td>
 
                         {/* Cột 7: Cụm nút thao tác */}
                         <td className="py-3.5 px-4 text-right">
-                          <div className="inline-flex items-center gap-1">
-                            {/* Copy Link */}
+                          <div className="inline-flex items-center justify-end gap-1.5">
+                            {/* Copy Link 1 chạm nổi bật có thông báo "Đã copy" */}
                             <button
                               type="button"
                               onClick={() => handleCopyLink(guest.slug)}
                               title="Sao chép đường dẫn thiệp mời"
-                              className={`p-1.5 rounded-lg border transition-all text-xs flex items-center gap-1 ${
+                              className={`px-2.5 py-1.5 rounded-lg border text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
                                 isCopied
-                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
-                                  : 'bg-bg hover:bg-bg-surface text-text-muted hover:text-text border-border'
+                                  ? 'bg-emerald-50 text-emerald-700 border-emerald-300 ring-1 ring-emerald-400'
+                                  : 'bg-white hover:bg-emerald-50/50 text-[#006C3A] border-[#C8E6C9]'
                               }`}
                             >
                               {isCopied ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-600" />
-                                  <span className="text-[10px] font-semibold text-emerald-600">Đã copy</span>
+                                  <span className="text-[11px] font-bold text-emerald-600">Đã copy</span>
                                 </>
                               ) : (
-                                <Copy className="w-3.5 h-3.5" />
-                              )}
-                            </button>
-
-                            {/* Copy Zalo */}
-                            <button
-                              type="button"
-                              onClick={() => handleCopyZalo(guest)}
-                              title="Sao chép tin nhắn gửi Zalo"
-                              className={`p-1.5 rounded-lg border transition-all ${
-                                isZaloCopied
-                                  ? 'bg-blue-50 text-blue-700 border-blue-300'
-                                  : 'bg-bg hover:bg-bg-surface text-text-muted hover:text-text border-border'
-                              }`}
-                            >
-                              {isZaloCopied ? (
-                                <Check className="w-3.5 h-3.5 text-blue-600" />
-                              ) : (
-                                <Share2 className="w-3.5 h-3.5" />
+                                <>
+                                  <Copy className="w-3.5 h-3.5" />
+                                  <span className="text-[11px]">Copy Link</span>
+                                </>
                               )}
                             </button>
 
@@ -466,27 +524,17 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                               href={`/invite/${guest.slug}`}
                               target="_blank"
                               title="Mở thiệp mời trong tab mới"
-                              className="p-1.5 rounded-lg border border-border bg-bg hover:bg-bg-surface text-text-muted hover:text-text"
+                              className="p-1.5 rounded-lg border border-border bg-bg hover:bg-bg-surface text-text-muted hover:text-text cursor-pointer"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                             </Link>
-
-                            {/* Sửa */}
-                            <button
-                              type="button"
-                              onClick={() => onEdit(guest)}
-                              title="Chỉnh sửa thông tin khách"
-                              className="p-1.5 rounded-lg border border-border bg-bg hover:bg-bg-surface text-text-muted hover:text-text"
-                            >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
 
                             {/* Xóa */}
                             <button
                               type="button"
                               onClick={() => onDelete(guest.id, guest.full_name)}
                               title="Xóa khách mời"
-                              className="p-1.5 rounded-lg border border-border bg-bg hover:bg-rose-50 text-text-muted hover:text-rose-600"
+                              className="p-1.5 rounded-lg border border-border bg-bg hover:bg-rose-50 text-text-muted hover:text-rose-600 cursor-pointer"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
@@ -534,6 +582,13 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
 
                     <div>{renderStatusBadge(guest)}</div>
                   </div>
+
+                  {guest.status === 'ACCEPTED' && (
+                    <div className="inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 font-semibold">
+                      <UserCheck className="w-3.5 h-3.5" />
+                      <span>{guest.attendees_count} người tham dự</span>
+                    </div>
+                  )}
 
                   {/* Hiển thị SĐT & Email khách mời */}
                   {(contact.phone || contact.email) && (
@@ -588,22 +643,35 @@ export function GuestTable({ guests, eventName, onRefresh, onEdit, onDelete }: G
                     </div>
                   )}
 
-                  {(guest.song_request || contact.note) && (
-                    <div className="space-y-1 text-xs border-t border-border/40 pt-2 text-text">
-                      {guest.song_request && (
-                        <p className="flex items-center gap-1.5 text-accent font-medium">
-                          <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-                          <span>Lời nhắn gửi đêm nhạc: &ldquo;{guest.song_request}&rdquo;</span>
-                        </p>
-                      )}
-                      {contact.note && (
-                        <p className="text-text-muted italic text-[11px]">
-                          <span className="not-italic text-accent font-semibold mr-1">Lời nhắn:</span>
-                          &ldquo;{contact.note}&rdquo;
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  {(() => {
+                    const wishText = (contact.note || guest.song_request || '').trim();
+                    if (!wishText) return null;
+
+                    return (
+                      <div className="space-y-1 text-xs border-t border-border/40 pt-2 text-text">
+                        <div className="flex items-start justify-between gap-2">
+                          <p className="text-text italic text-[11px] leading-relaxed flex-1">
+                            <span className="not-italic text-accent font-semibold mr-1">Lời chúc:</span>
+                            &ldquo;{wishText}&rdquo;
+                          </p>
+                          <button
+                            type="button"
+                            disabled={clearingWishId === guest.id}
+                            onClick={() => handleClearWish(guest)}
+                            className="inline-flex items-center gap-1 text-[11px] font-medium text-rose-600 hover:text-rose-700 hover:underline cursor-pointer shrink-0"
+                            title="Xóa lời chúc này"
+                          >
+                            {clearingWishId === guest.id ? (
+                              <Loader2 className="w-3 h-3 animate-spin text-rose-600" />
+                            ) : (
+                              <Trash2 className="w-3 h-3" />
+                            )}
+                            <span>Xóa lời chúc</span>
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {updateTime && (
                     <div className="text-[11px] text-text-muted flex items-center gap-1">

@@ -171,3 +171,7 @@ VALUES
     'NOT_OPENED'
   )
 ON CONFLICT (slug) DO NOTHING;
+
+-- 10. THÔNG BÁO POSTGREST TẢI LẠI SCHEMA NGAY LẬP TỨC
+NOTIFY pgrst, 'reload schema';
+

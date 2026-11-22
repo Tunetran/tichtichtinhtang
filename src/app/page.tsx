@@ -152,7 +152,7 @@ export default async function HomePage() {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[#C8E6C9]/60">
+          <div className="pt-3 flex justify-center border-t border-[#C8E6C9]/60">
             <AddToCalendarButton config={config} />
           </div>
         </div>

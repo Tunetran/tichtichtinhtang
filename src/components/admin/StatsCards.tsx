@@ -1,6 +1,6 @@
 'use client';
 
-import { Users, MailQuestion, Eye, CheckCircle2, XCircle } from 'lucide-react';
+import { Users, CheckCircle2, XCircle, Clock, Eye } from 'lucide-react';
 import type { AdminStats } from '@/types/guest';
 
 interface StatsCardsProps {
@@ -8,71 +8,77 @@ interface StatsCardsProps {
 }
 
 export function StatsCards({ stats }: StatsCardsProps) {
+  const pendingCount = Math.max(
+    0,
+    stats.totalInvites - stats.acceptedInvites - stats.declinedInvites
+  );
+  const openedTotal = stats.openedOnly + stats.acceptedInvites + stats.declinedInvites;
+
   const cards = [
     {
-      title: 'Tổng thiệp đã tạo',
+      title: 'Tổng khách',
       value: stats.totalInvites,
-      subtext: 'Tổng số đường dẫn mời',
+      subtext: 'Đã tạo trong hệ thống',
       icon: Users,
-      color: 'text-primary',
-      bg: 'bg-primary/10 border-primary/20',
+      color: 'text-[#006C3A]',
+      bg: 'bg-[#006C3A]/10 border-[#006C3A]/20',
     },
     {
-      title: 'Chưa mở thiệp',
-      value: stats.notOpened,
-      subtext: 'Chưa từng mở link',
-      icon: MailQuestion,
-      color: 'text-neutral-500',
-      bg: 'bg-neutral-100 border-neutral-200',
-    },
-    {
-      title: 'Đã mở — Chưa trả lời',
-      value: stats.openedOnly,
-      subtext: 'Đã xem nhưng chưa RSVP',
-      icon: Eye,
-      color: 'text-amber-600',
-      bg: 'bg-amber-50 border-amber-200',
-    },
-    {
-      title: 'Đồng ý tham gia',
-      value: `${stats.totalAttendees} khách`,
-      subtext: `từ ${stats.acceptedInvites} thiệp xác nhận`,
+      title: 'Đồng ý',
+      value: `${stats.acceptedInvites} thiệp`,
+      subtext: `${stats.totalAttendees} người tham dự`,
       icon: CheckCircle2,
-      color: 'text-emerald-600 font-bold',
+      color: 'text-emerald-700 font-bold',
       bg: 'bg-emerald-50 border-emerald-200',
       highlight: true,
     },
     {
-      title: 'Từ chối tham dự',
+      title: 'Từ chối',
       value: stats.declinedInvites,
-      subtext: 'Báo bận không thể đến',
+      subtext: 'Báo bận không đến',
       icon: XCircle,
-      color: 'text-rose-500',
+      color: 'text-rose-600',
       bg: 'bg-rose-50 border-rose-200',
+    },
+    {
+      title: 'Chưa phản hồi',
+      value: pendingCount,
+      subtext: 'Chưa gửi xác nhận RSVP',
+      icon: Clock,
+      color: 'text-amber-700',
+      bg: 'bg-amber-50 border-amber-200',
+    },
+    {
+      title: 'Đã mở thiệp',
+      value: openedTotal,
+      subtext: `${stats.openedOnly} chưa phản hồi`,
+      icon: Eye,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50 border-blue-200',
     },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 font-sans-ui">
       {cards.map((card, idx) => {
         const Icon = card.icon;
         return (
           <div
             key={idx}
-            className={`rounded-xl border p-4 sm:p-5 flex flex-col justify-between transition-all duration-200 bg-bg-surface ${
-              card.highlight ? 'ring-1 ring-emerald-400/40 shadow-sm' : ''
+            className={`rounded-2xl border p-4 flex flex-col justify-between transition-all bg-bg-surface shadow-2xs ${
+              card.highlight ? 'ring-1 ring-emerald-400/50' : ''
             }`}
           >
             <div className="flex items-center justify-between gap-2">
-              <span className="text-xs font-medium text-text-muted line-clamp-1">
+              <span className="text-xs font-semibold text-text-muted truncate">
                 {card.title}
               </span>
               <div className={`p-1.5 rounded-lg border shrink-0 ${card.bg}`}>
-                <Icon className={`w-4 h-4 ${card.color}`} />
+                <Icon className={`w-3.5 h-3.5 ${card.color}`} />
               </div>
             </div>
 
-            <div className="mt-3">
+            <div className="mt-2.5">
               <p className={`text-xl sm:text-2xl font-bold tracking-tight text-text ${card.color}`}>
                 {card.value}
               </p>

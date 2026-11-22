@@ -15,7 +15,9 @@ import {
 import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
+import { parseGuestContact } from '@/lib/guest-contact';
 import { RsvpSection } from './RsvpSection';
+import { GuestWishesSection } from './GuestWishesSection';
 import { EventCountdown } from './EventCountdown';
 import { AddToCalendarButton } from './AddToCalendarButton';
 
@@ -57,6 +59,7 @@ export function LetterContent({
   onCloseEnvelope,
 }: LetterContentProps) {
   const [copiedAddress, setCopiedAddress] = useState(false);
+  const [latestWish, setLatestWish] = useState<{ id?: string; name: string; message: string } | null>(null);
 
   const handleCopyAddress = async () => {
     try {
@@ -66,8 +69,27 @@ export function LetterContent({
     } catch {}
   };
 
+  const handleRsvpSuccess = (updated: GuestRecord) => {
+    onRsvpUpdated(updated);
+    const contact = parseGuestContact(updated);
+    const wishText = (contact.note || updated.song_request || '').trim();
+    if (wishText) {
+      setLatestWish({
+        id: updated.id,
+        name: updated.full_name,
+        message: wishText,
+      });
+    }
+  };
+
   const salutation = config.letterSalutation || 'Kính gửi';
-  const paragraphs = config.generalInvitationText || EVENT_CONFIG.generalInvitationText;
+  const rawParagraphs: unknown = config.generalInvitationText;
+  const paragraphs: string[] =
+    Array.isArray(rawParagraphs) && rawParagraphs.length > 0 && rawParagraphs.some((p) => typeof p === 'string' && p.trim())
+      ? (rawParagraphs as string[])
+      : typeof rawParagraphs === 'string' && (rawParagraphs as string).trim()
+      ? (rawParagraphs as string).split('\n').filter(Boolean)
+      : EVENT_CONFIG.generalInvitationText;
 
   return (
     <article className="w-full max-w-[540px] mx-auto px-5 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-10 text-[#3E3836] pb-safe pt-safe font-sans-ui relative">
@@ -104,17 +126,17 @@ export function LetterContent({
 
         <div className="border-b border-[#006C3A]/15 pb-3 relative z-10">
           <p className="text-xs uppercase tracking-normal text-[#61733F] font-semibold font-sans-ui">
-            {config.dedicationBadge || 'Trân trọng kính mời'}
+            {config.dedicationBadge || EVENT_CONFIG.dedicationBadge || 'Trân trọng kính mời Quý Thầy/Cô'}
           </p>
           <h2 className="font-serif-title text-2xl sm:text-3xl text-[#006C3A] font-bold mt-1 leading-snug tracking-normal">
             {salutation} {guest.full_name},
           </h2>
         </div>
 
-        {/* Lời ngỏ trang trọng (Chữ hoa Serif theo đúng thiết kế Page 2) */}
+        {/* Lời ngỏ trang trọng (Chữ hoa Serif theo đúng thiết kế Page 2, giữ xuống dòng tự nhiên) */}
         <div className="space-y-3.5 text-base sm:text-lg text-[#006C3A] font-serif tracking-normal leading-relaxed relative z-10 font-medium">
           {paragraphs.map((p, idx) => (
-            <p key={idx} className="uppercase text-justify text-balance leading-relaxed">
+            <p key={idx} className="uppercase text-justify text-balance leading-relaxed whitespace-pre-line">
               {p}
             </p>
           ))}
@@ -240,21 +262,21 @@ export function LetterContent({
         </div>
 
         {/* Nút thêm vào lịch & sao chép địa chỉ */}
-        <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-[#C8E6C9]/40">
+        <div className="pt-3 flex flex-wrap items-center justify-center gap-3 border-t border-[#C8E6C9]/40">
           <AddToCalendarButton config={config} />
           <button
             type="button"
             onClick={handleCopyAddress}
-            className="inline-flex items-center gap-1.5 text-xs text-[#61733F] hover:text-[#006C3A] bg-white border border-[#C8E6C9] px-3.5 py-2 rounded-xl transition-all min-h-[40px] cursor-pointer font-sans-ui tracking-normal"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap text-[#61733F] hover:text-[#006C3A] bg-white border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 min-h-[42px] cursor-pointer font-sans-ui tracking-normal"
           >
             {copiedAddress ? (
               <>
-                <Check className="w-3.5 h-3.5 text-emerald-600" />
+                <Check className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span className="text-emerald-600 font-semibold">Đã chép địa chỉ</span>
               </>
             ) : (
               <>
-                <Copy className="w-3.5 h-3.5" />
+                <Copy className="w-4 h-4 text-[#61733F] shrink-0" />
                 <span>Sao chép địa chỉ</span>
               </>
             )}
@@ -405,9 +427,15 @@ export function LetterContent({
       <RsvpSection
         guest={guest}
         config={config}
-        onRsvpSuccess={onRsvpUpdated}
+        onRsvpSuccess={handleRsvpSuccess}
         logoUrl={logoUrl}
       />
+
+      {/* ========================================================
+          KHỐI LỜI CHÚC TỪ KHÁCH MỜI
+         ======================================================== */}
+      <SectionDivider />
+      <GuestWishesSection latestWish={latestWish} />
 
       {/* ========================================================
           KHỐI ĐƠN VỊ TÀI TRỢ & ĐƠN VỊ ĐỒNG HÀNH (Trang trọng gần cuối thiệp)

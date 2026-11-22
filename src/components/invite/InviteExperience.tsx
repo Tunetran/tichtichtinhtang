@@ -104,6 +104,8 @@ export function InviteExperience({
 
   // Xử lý mở thư & kích hoạt âm thanh đồng bộ
   const handleOpenEnvelope = () => {
+    if (stage !== 'closed') return;
+
     // 1. Kích hoạt phát nhạc ĐỒNG BỘ trong click handler (vượt Autoplay iOS Safari / Zalo)
     if (audioRef.current) {
       audioRef.current
@@ -126,11 +128,11 @@ export function InviteExperience({
       method: 'POST',
     }).catch(() => { });
 
-    // 4. Nhịp 3: Chuyển sang reading sau 1.4s (tăng 0.3s cho nhịp 2)
+    // 4. Kết thúc (1.20s -> 1.65s): Chuyển sang reading với hiệu ứng phóng nhẹ từ tâm
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'instant' });
       setStage('reading');
-    }, 1400);
+    }, 1350);
   };
 
   // Nút bật/tắt nhạc chủ động
@@ -223,8 +225,10 @@ export function InviteExperience({
         playsInline
       />
 
-      {/* Floating Vinyl Audio Controller */}
-      <AudioPlayer isPlaying={isPlaying} onToggle={handleToggleAudio} />
+      {/* Floating Vinyl Audio Controller (hiển thị khi vào thiệp hoặc đang phát nhạc) */}
+      {(stage === 'reading' || isPlaying) && (
+        <AudioPlayer isPlaying={isPlaying} onToggle={handleToggleAudio} />
+      )}
 
       {/* Chặng 1, 2 & 3: Chuyển đổi mượt mà giữa Phong bì và Nội dung thiệp */}
       <AnimatePresence mode="wait">
@@ -248,10 +252,10 @@ export function InviteExperience({
           <motion.div
             key="reading-stage"
             className="w-full flex justify-center"
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0, scale: 0.94 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           >
             <LetterContent
               guest={guest}

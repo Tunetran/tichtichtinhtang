@@ -13,7 +13,7 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
   const [isCopied, setIsCopied] = useState(false);
 
   // Parse start and end time
-  const startDate = config.eventDateIso ? new Date(config.eventDateIso) : new Date(2026, 1, 14, 19, 30);
+  const startDate = config.eventDateIso ? new Date(config.eventDateIso) : new Date(2026, 11, 5, 18, 30);
   const endDate = new Date(startDate.getTime() + 3 * 60 * 60 * 1000); // 3 hours duration
 
   const formatGoogleDate = (d: Date) => {
@@ -65,15 +65,20 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
   };
 
   return (
-    <div className="relative inline-block text-left w-full sm:w-auto font-sans-ui">
+    <div className="relative inline-flex justify-center font-sans-ui">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border border-border bg-bg-surface hover:border-accent text-xs sm:text-sm font-semibold text-text shadow-sm transition-all duration-200 active:scale-[0.98] min-h-[44px] font-sans-ui cursor-pointer"
+        aria-label="Thêm sự kiện vào lịch của bạn"
+        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap font-sans-ui bg-white/95 hover:bg-[#E8F5E9] text-[#006C3A] border border-[#C8E6C9] hover:border-[#006C3A] shadow-xs hover:shadow-sm active:scale-[0.98] transition-all duration-200 cursor-pointer min-h-[42px] select-none"
       >
-        <CalendarPlus className="w-4 h-4 text-accent" />
-        <span>Thêm vào lịch cá nhân</span>
-        <ChevronDown className={`w-3.5 h-3.5 text-text-muted transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <CalendarPlus className="w-4 h-4 text-[#006C3A] shrink-0" />
+        <span className="whitespace-nowrap font-sans-ui">Thêm vào lịch của bạn</span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 text-[#61733F] transition-transform duration-200 shrink-0 ${
+            isOpen ? 'rotate-180' : ''
+          }`}
+        />
       </button>
 
       {isOpen && (
@@ -83,28 +88,28 @@ export function AddToCalendarButton({ config }: AddToCalendarButtonProps) {
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 sm:left-0 mt-2 w-56 rounded-xl bg-bg-surface border border-border shadow-xl z-50 py-1.5 animate-fadeIn font-sans-ui">
+          <div className="absolute left-1/2 -translate-x-1/2 sm:left-0 sm:translate-x-0 mt-2 w-64 rounded-2xl bg-[#FFFDF9] border border-[#C8E6C9] shadow-[0_12px_30px_-5px_rgba(0,108,58,0.18)] z-50 py-2 font-sans-ui overflow-hidden animate-fadeIn">
             <a
               href={googleCalendarUrl}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2.5 px-3.5 py-2.5 text-xs sm:text-sm font-medium text-text hover:bg-bg transition-colors min-h-[44px] font-sans-ui"
+              className="flex items-center gap-2.5 px-4 py-2.5 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[42px] font-sans-ui"
             >
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-blue-500 shrink-0" />
               <span>Google Calendar</span>
             </a>
 
             <button
               type="button"
               onClick={handleDownloadIcs}
-              className="w-full text-left flex items-center justify-between px-3.5 py-2.5 text-xs sm:text-sm font-medium text-text hover:bg-bg transition-colors min-h-[44px] font-sans-ui cursor-pointer"
+              className="w-full text-left flex items-center justify-between px-4 py-2.5 text-xs sm:text-sm font-medium text-[#3E3836] hover:bg-[#E8F5E9] hover:text-[#006C3A] transition-colors min-h-[42px] font-sans-ui cursor-pointer"
             >
               <div className="flex items-center gap-2.5">
-                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shrink-0" />
                 <span>Apple Calendar / Outlook (.ics)</span>
               </div>
-              {isCopied && <Check className="w-3.5 h-3.5 text-emerald-600" />}
+              {isCopied && <Check className="w-4 h-4 text-emerald-600 shrink-0" />}
             </button>
           </div>
         </>
