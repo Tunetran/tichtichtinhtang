@@ -1,22 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { supabaseAdmin } from './supabase-admin';
+import type { SiteSettings } from './site-settings-shared';
 
-export interface OrganizerContact {
-  name?: string;
-  phone?: string;
-  email?: string;
-  social_url?: string;
-  note?: string;
-}
-
-export interface SiteSettings {
-  event_logo_url: string | null;
-  event_bg_url: string | null;
-  wax_seal_url: string | null;
-  organizer_contact?: OrganizerContact | null;
-  updated_at?: string;
-}
+export * from './site-settings-shared';
 
 const LOCAL_SITE_SETTINGS_PATH = path.join(process.cwd(), 'config', 'site-settings.json');
 
@@ -28,7 +15,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
   try {
     const { data, error } = await supabaseAdmin
       .from('site_settings')
-      .select('event_logo_url, event_bg_url, wax_seal_url, organizer_contact, updated_at')
+      .select('event_logo_url, event_bg_url, wax_seal_url, organizer_contact, thank_you_body, updated_at')
       .eq('id', 'main')
       .maybeSingle();
 
@@ -38,6 +25,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
         event_bg_url: data.event_bg_url || null,
         wax_seal_url: data.wax_seal_url || null,
         organizer_contact: data.organizer_contact || null,
+        thank_you_body: data.thank_you_body || null,
         updated_at: data.updated_at,
       };
     }
@@ -56,6 +44,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
           event_bg_url: parsed.event_bg_url || null,
           wax_seal_url: parsed.wax_seal_url || null,
           organizer_contact: parsed.organizer_contact || null,
+          thank_you_body: parsed.thank_you_body || null,
           updated_at: parsed.updated_at,
         };
       }
@@ -64,7 +53,7 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     // Bỏ qua lỗi đọc file
   }
 
-  return { event_logo_url: null, event_bg_url: null, wax_seal_url: null, organizer_contact: null };
+  return { event_logo_url: null, event_bg_url: null, wax_seal_url: null, organizer_contact: null, thank_you_body: null };
 }
 
 /**
@@ -99,6 +88,7 @@ export async function updateSiteSettings(settings: Partial<SiteSettings>): Promi
         event_bg_url: updated.event_bg_url,
         wax_seal_url: updated.wax_seal_url,
         organizer_contact: updated.organizer_contact ?? null,
+        thank_you_body: updated.thank_you_body ?? null,
         updated_at: updated.updated_at,
       });
 

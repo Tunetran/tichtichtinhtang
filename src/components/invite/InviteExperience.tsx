@@ -9,7 +9,7 @@ import { EnvelopeStage, type InviteStage } from './EnvelopeStage';
 import { AudioPlayer } from './AudioPlayer';
 import { LetterContent } from './LetterContent';
 import { FallingHearts } from '@/components/FallingHearts';
-import type { OrganizerContact } from '@/lib/site-settings';
+import type { OrganizerContact } from '@/lib/site-settings-shared';
 
 interface InviteExperienceProps {
   guest: GuestRecord;
@@ -18,6 +18,7 @@ interface InviteExperienceProps {
   initialBgUrl?: string | null;
   initialWaxSealUrl?: string | null;
   initialOrganizerContact?: OrganizerContact | null;
+  initialThankYouBody?: string | null;
 }
 
 export function InviteExperience({
@@ -27,6 +28,7 @@ export function InviteExperience({
   initialBgUrl = null,
   initialWaxSealUrl = null,
   initialOrganizerContact = null,
+  initialThankYouBody = null,
 }: InviteExperienceProps) {
   const [guest, setGuest] = useState<GuestRecord>(initialGuest);
   const [stage, setStage] = useState<InviteStage>('closed');
@@ -34,6 +36,7 @@ export function InviteExperience({
   const [logoUrl, setLogoUrl] = useState<string | null>(initialLogoUrl);
   const [bgUrl, setBgUrl] = useState<string | null>(initialBgUrl);
   const [waxSealUrl, setWaxSealUrl] = useState<string | null>(initialWaxSealUrl);
+  const [thankYouBody, setThankYouBody] = useState<string | null>(initialThankYouBody);
   const [organizerContact, setOrganizerContact] = useState<OrganizerContact | null>(
     initialOrganizerContact
   );
@@ -62,6 +65,9 @@ export function InviteExperience({
           }
           if ('organizer_contact' in data) {
             setOrganizerContact(data.organizer_contact || null);
+          }
+          if ('thank_you_body' in data) {
+            setThankYouBody(data.thank_you_body || null);
           }
         }
       })
@@ -274,6 +280,7 @@ export function InviteExperience({
               isOpened={stage === 'reading'}
               onCloseEnvelope={handleCloseEnvelope}
               organizerContact={organizerContact}
+              thankYouBody={thankYouBody}
             />
           </motion.div>
         )}

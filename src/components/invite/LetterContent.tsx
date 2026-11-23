@@ -18,13 +18,14 @@ import type { GuestRecord } from '@/types/guest';
 import type { EventConfig } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
 import { parseGuestContact } from '@/lib/guest-contact';
+import { TypeAnimation } from 'react-type-animation';
+import { DEFAULT_THANK_YOU_BODY, type OrganizerContact } from '@/lib/site-settings-shared';
 import { RsvpSection } from './RsvpSection';
 import { GuestWishesSection } from './GuestWishesSection';
 import { EventCountdown } from './EventCountdown';
 import { AddToCalendarButton } from './AddToCalendarButton';
 import { OrganizerContactModal } from './OrganizerContactModal';
 import { EventCalendar } from './EventCalendar';
-import type { OrganizerContact } from '@/lib/site-settings';
 
 interface LetterContentProps {
   guest: GuestRecord;
@@ -34,6 +35,7 @@ interface LetterContentProps {
   isOpened?: boolean;
   onCloseEnvelope?: () => void;
   organizerContact?: OrganizerContact | null;
+  thankYouBody?: string | null;
 }
 
 /**
@@ -64,6 +66,7 @@ export function LetterContent({
   isOpened = false,
   onCloseEnvelope,
   organizerContact,
+  thankYouBody,
 }: LetterContentProps) {
   const [copiedAddress, setCopiedAddress] = useState(false);
   const [latestWish, setLatestWish] = useState<{ id?: string; name: string; message: string } | null>(null);
@@ -97,6 +100,12 @@ export function LetterContent({
       : typeof rawParagraphs === 'string' && (rawParagraphs as string).trim()
       ? (rawParagraphs as string).split('\n').filter(Boolean)
       : EVENT_CONFIG.generalInvitationText;
+
+  const letterBodyText = paragraphs.join('\n\n');
+  const thankYouText =
+    thankYouBody && thankYouBody.trim().length > 0
+      ? thankYouBody.trim()
+      : DEFAULT_THANK_YOU_BODY;
 
   return (
     <article className="w-full max-w-[680px] mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8 sm:space-y-10 text-[#3E3836] pb-safe pt-safe font-sans-ui relative">
@@ -179,13 +188,18 @@ export function LetterContent({
           />
         </div>
 
-        {/* Lời ngỏ trang trọng (Hiển thị tự nhiên theo đúng nhập liệu từ Admin) */}
-        <div className="space-y-3.5 text-base sm:text-lg text-[#006C3A] font-serif tracking-normal leading-relaxed relative z-10 font-medium">
-          {paragraphs.map((p, idx) => (
-            <p key={idx} className="text-left normal-case tracking-normal leading-relaxed whitespace-pre-line">
-              {p}
-            </p>
-          ))}
+        {/* Lời ngỏ trang trọng (Hiệu ứng gõ chữ với phông chữ viết tay Việt hóa) */}
+        <div className="relative z-10 text-left">
+          <TypeAnimation
+            key={letterBodyText}
+            sequence={[letterBodyText]}
+            speed={58}
+            repeat={0}
+            cursor={false}
+            wrapper="div"
+            style={{ whiteSpace: 'pre-line', display: 'block' }}
+            className="font-handwriting text-xl sm:text-[22px] leading-relaxed text-[#006C3A] whitespace-pre-line tracking-normal block text-left font-semibold"
+          />
         </div>
 
         {/* Lời nhắn riêng gửi cá nhân (nếu có) */}
@@ -618,16 +632,12 @@ export function LetterContent({
         </div>
 
         {/* Thẻ Thư Tri Ân Gửi Quý Thầy/Cô (Page 6) */}
-        <div className="relative bg-[#FFF4E5]/95 backdrop-blur-xs rounded-3xl p-6 sm:p-9 shadow-[0_15px_35px_-8px_rgba(0,108,58,0.12)] border border-[#FAD8C0] space-y-4 text-justify font-serif leading-relaxed text-[#3E3836]">
-          <p className="text-sm sm:text-base leading-relaxed uppercase tracking-normal">
-            THE LIGHT XIN CHÂN THÀNH CẢM ƠN QUÝ THẦY CÔ ĐÃ DÀNH THỜI GIAN QUÝ BÁU, GÁC LẠI
-            NHỮNG BẬN RỘN ĐỂ ĐẾN THAM DỰ SỰ KIỆN CỦA CHÚNG EM. SỰ HIỆN DIỆN CỦA QUÝ THẦY CÔ KHÔNG
-            CHỈ LÀ NIỀM VINH DỰ MÀ CÒN LÀ NGUỒN ĐỘNG VIÊN LỚN LAO, TIẾP THÊM CHO CẢ ĐOÀN SỰ TỰ
-            TIN VÀ CẢM HỨNG ĐỂ MANG ĐẾN MỘT BUỔI DIỄN TRỌN VẸN NHẤT. KÍNH CHÚC QUÝ THẦY CÔ THẬT
-            NHIỀU SỨC KHỎE, HẠNH PHÚC VÀ LUÔN THÀNH CÔNG TRÊN CON ĐƯỜNG GIEO MẦM TRI THỨC.
+        <div className="relative bg-[#FFF4E5]/95 backdrop-blur-xs rounded-3xl p-6 sm:p-9 shadow-[0_15px_35px_-8px_rgba(0,108,58,0.12)] border border-[#FAD8C0] space-y-4 font-serif leading-relaxed text-[#3E3836]">
+          <p className="text-sm sm:text-base leading-relaxed text-left normal-case tracking-normal whitespace-pre-line font-medium">
+            {thankYouText}
           </p>
           <p className="text-right font-serif-title text-base sm:text-lg font-bold text-[#006C3A] tracking-normal">
-            TRÂN TRỌNG CẢM ƠN! 🎋
+            {config.footerThankYou?.trim() || 'TRÂN TRỌNG CẢM ƠN! 🎋'}
           </p>
         </div>
 

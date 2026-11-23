@@ -81,7 +81,7 @@ async function checkAdminAuth(
 }
 
 /**
- * GET: Trả về { event_logo_url, event_bg_url, wax_seal_url, organizer_contact } hiện tại
+ * GET: Trả về { event_logo_url, event_bg_url, wax_seal_url, organizer_contact, thank_you_body } hiện tại
  */
 export async function GET() {
   const settings = await getSiteSettings();
@@ -91,6 +91,7 @@ export async function GET() {
       event_bg_url: settings.event_bg_url,
       wax_seal_url: settings.wax_seal_url,
       organizer_contact: settings.organizer_contact || null,
+      thank_you_body: settings.thank_you_body || null,
     },
     {
       headers: {
@@ -184,6 +185,7 @@ export async function POST(req: Request) {
       if (
         body &&
         ('organizer_contact' in body ||
+          'thank_you_body' in body ||
           ('event_logo_url' in body && 'event_bg_url' in body) ||
           ('wax_seal_url' in body && 'event_bg_url' in body))
       ) {
@@ -207,6 +209,9 @@ export async function POST(req: Request) {
         if ('organizer_contact' in body) {
           updates.organizer_contact = organizerContactToSave;
         }
+        if ('thank_you_body' in body) {
+          updates.thank_you_body = typeof body.thank_you_body === 'string' ? body.thank_you_body.trim() : null;
+        }
         if (typeof body.event_logo_url === 'string') {
           updates.event_logo_url = body.event_logo_url.trim() || null;
         }
@@ -225,6 +230,7 @@ export async function POST(req: Request) {
             event_bg_url: updated.event_bg_url,
             wax_seal_url: updated.wax_seal_url,
             organizer_contact: updated.organizer_contact || null,
+            thank_you_body: updated.thank_you_body || null,
             message: 'Đã lưu cấu hình cài đặt thành công!',
           },
           {

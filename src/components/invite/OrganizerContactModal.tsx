@@ -14,7 +14,7 @@ import {
   User,
   Info,
 } from 'lucide-react';
-import type { OrganizerContact } from '@/lib/site-settings';
+import type { OrganizerContact } from '@/lib/site-settings-shared';
 
 interface OrganizerContactModalProps {
   contact?: OrganizerContact | null;

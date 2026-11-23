@@ -23,7 +23,7 @@ import {
 } from 'lucide-react';
 import type { EventConfig, SponsorItem } from '@/config/event';
 import { EVENT_CONFIG } from '@/config/event';
-import type { OrganizerContact } from '@/lib/site-settings';
+import { DEFAULT_THANK_YOU_BODY, type OrganizerContact } from '@/lib/site-settings-shared';
 
 interface EventVisualSettingsTabProps {
   onSaved?: () => void;
@@ -35,10 +35,11 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Site settings: logo, bg, seal
+  // Site settings: logo, bg, seal, organizer contact, thank you body
   const [logoUrl, setLogoUrl] = useState<string>('/images/logo-tichtichtinhtang.png');
   const [bgUrl, setBgUrl] = useState<string>('/images/bg-bamboo-lotus.png');
   const [waxSealUrl, setWaxSealUrl] = useState<string>('/images/wax-seal-combined.png');
+  const [thankYouBody, setThankYouBody] = useState<string>(DEFAULT_THANK_YOU_BODY);
   const [organizerContact, setOrganizerContact] = useState<OrganizerContact>({
     name: '',
     phone: '',
@@ -100,6 +101,11 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
             if (sData.event_logo_url) setLogoUrl(sData.event_logo_url);
             if (sData.event_bg_url) setBgUrl(sData.event_bg_url);
             if (sData.wax_seal_url) setWaxSealUrl(sData.wax_seal_url);
+            if (typeof sData.thank_you_body === 'string' && sData.thank_you_body.trim()) {
+              setThankYouBody(sData.thank_you_body);
+            } else {
+              setThankYouBody(DEFAULT_THANK_YOU_BODY);
+            }
             if (sData.organizer_contact) {
               setOrganizerContact({
                 name: sData.organizer_contact.name || '',
@@ -228,6 +234,7 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
             event_bg_url: bgUrl,
             wax_seal_url: waxSealUrl,
             organizer_contact: organizerContact,
+            thank_you_body: thankYouBody,
           }),
         }),
       ]);
@@ -766,14 +773,35 @@ export function EventVisualSettingsTab({ onSaved, showToast }: EventVisualSettin
               </div>
             </div>
 
-            <div className="pt-2 border-t border-border/60">
-              <label className="text-xs font-semibold text-text block mb-1">Thư tri ân gửi Quý Thầy/Cô (Chân trang thiệp)</label>
-              <textarea
-                rows={3}
-                value={config.footerThankYou || ''}
-                onChange={(e) => setConfig({ ...config, footerThankYou: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text leading-relaxed"
-              />
+            <div className="pt-2 border-t border-border/60 space-y-4">
+              <div>
+                <label className="text-xs font-semibold text-text block mb-1">
+                  Nội dung đoạn văn cảm ơn cuối thiệp
+                </label>
+                <textarea
+                  rows={5}
+                  value={thankYouBody}
+                  onChange={(e) => setThankYouBody(e.target.value)}
+                  placeholder="The Light xin chân thành cảm ơn Quý Thầy Cô đã dành thời gian quý báu..."
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text leading-relaxed whitespace-pre-line"
+                />
+                <p className="text-[11px] text-text-muted mt-1">
+                  Đoạn văn tri ân gửi Quý Thầy/Cô và Khách quý ở chân trang thiệp mời (phía trên dòng chữ kết thúc). Hỗ trợ xuống dòng tự nhiên.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-text block mb-1">
+                  Dòng chữ kết thúc cảm ơn (mặc định: TRÂN TRỌNG CẢM ƠN!)
+                </label>
+                <input
+                  type="text"
+                  value={config.footerThankYou || ''}
+                  onChange={(e) => setConfig({ ...config, footerThankYou: e.target.value })}
+                  placeholder="TRÂN TRỌNG CẢM ƠN! 🎋"
+                  className="w-full px-3 py-2 text-xs rounded-xl bg-bg border border-border focus:ring-1 focus:ring-accent text-text"
+                />
+              </div>
             </div>
           </div>
         </div>

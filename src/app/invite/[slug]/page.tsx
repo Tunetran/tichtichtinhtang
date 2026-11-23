@@ -108,6 +108,7 @@ export default async function InvitePage({ params }: PageProps) {
         initialBgUrl={siteSettings.event_bg_url}
         initialWaxSealUrl={siteSettings.wax_seal_url}
         initialOrganizerContact={siteSettings.organizer_contact}
+        initialThankYouBody={siteSettings.thank_you_body}
       />
     </div>
   );
