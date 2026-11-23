@@ -197,7 +197,11 @@ export function LetterContent({
             repeat={0}
             cursor={false}
             wrapper="div"
-            style={{ whiteSpace: 'pre-line', display: 'block' }}
+            style={{
+              whiteSpace: 'pre-line',
+              display: 'block',
+              fontFamily: 'var(--font-handwriting), "Dancing Script", cursive',
+            }}
             className="font-handwriting text-xl sm:text-[22px] leading-relaxed text-[#006C3A] whitespace-pre-line tracking-normal block text-left font-semibold"
           />
         </div>
@@ -208,7 +212,10 @@ export function LetterContent({
             <p className="text-xs font-bold uppercase tracking-normal text-[#006C3A] flex items-center gap-1.5 font-sans-ui">
               <span>Lời nhắn riêng gửi đến bạn:</span>
             </p>
-            <p className="leading-relaxed text-[#3E3836] italic text-base sm:text-lg font-handwriting">
+            <p
+              style={{ fontFamily: 'var(--font-handwriting), "Dancing Script", cursive' }}
+              className="leading-relaxed text-[#3E3836] italic text-base sm:text-lg font-handwriting"
+            >
               &ldquo;{guest.custom_message}&rdquo;
             </p>
           </div>

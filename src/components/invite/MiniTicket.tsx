@@ -111,7 +111,10 @@ export function MiniTicket({ guest, config, logoUrl, onEdit }: MiniTicketProps) 
               <span className="text-[10px] uppercase font-bold text-[#006C3A] block">
                 Đôi lời gửi gắm đến BTC:
               </span>
-              <p className="font-handwriting text-base text-[#006C3A] italic leading-relaxed">
+              <p
+                style={{ fontFamily: 'var(--font-handwriting), "Dancing Script", cursive' }}
+                className="font-handwriting text-base text-[#006C3A] italic leading-relaxed"
+              >
                 &ldquo;{note}&rdquo;
               </p>
             </div>
